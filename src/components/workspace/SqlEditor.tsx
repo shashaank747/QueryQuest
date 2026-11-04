@@ -238,8 +238,24 @@ export const SqlEditor: React.FC = () => {
             renderLineHighlight: 'all',
             cursorBlinking: 'smooth',
             smoothScrolling: true,
-            suggestOnTriggerCharacters: true,
             multiCursorModifier: 'alt',
+            // Disable ghost text and phantom letters showing ahead of cursor
+            inlineSuggest: { enabled: false },
+            suggest: {
+              preview: false,
+              showWords: false,
+            },
+            quickSuggestions: false,
+            suggestOnTriggerCharacters: false,
+            wordBasedSuggestions: 'off',
+            acceptSuggestionOnEnter: 'off',
+            acceptSuggestionOnCommitCharacter: false,
+            tabCompletion: 'off',
+            snippetSuggestions: 'none',
+            autoClosingBrackets: 'never',
+            autoClosingQuotes: 'never',
+            autoClosingDelete: 'never',
+            autoSurround: 'never',
           }}
         />
       </div>
