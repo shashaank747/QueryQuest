@@ -10,6 +10,7 @@ export const supermarketWorld: WorldDefinition = {
   tagline: 'Streamline shelf stock, troubleshoot checkout errors, and generate retail revenue reports.',
   description:
     'Step into FreshMart Hypermarkets as a Junior Database Executive. Transform chaotic paper receipts and unlinked spreadsheets into an operational SQLite relational engine.',
+  thumbnailUrl: '/images/supermarket-world.jpg',
   storyIntro: {
     roleTitle: 'Junior Database Executive',
     organization: 'FreshMart Hypermarkets Ltd.',
