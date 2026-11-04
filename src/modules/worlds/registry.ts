@@ -10,6 +10,7 @@ export const WORLDS_REGISTRY: WorldDefinition[] = [
     tagline: 'Track flight radar schedules, passenger gates, and aircraft tarmac transitions.',
     description:
       'Manage airlines, terminal concourses, baggage handling systems, and live flight movements across runway states.',
+    thumbnailUrl: '/images/airport-world.jpg',
     storyIntro: {
       roleTitle: 'Flight Data Operations Analyst',
       organization: 'SkyHarbor International Airport',
