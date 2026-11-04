@@ -54,9 +54,9 @@ export const SchemaExplorer: React.FC = () => {
   return (
     <>
       <div
-        className={`h-full flex flex-col ${
-          isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900/90 border-slate-800 text-slate-200'
-        } border-l overflow-hidden w-full lg:w-[280px] flex-shrink-0 transition-colors duration-150`}
+        className={`h-full w-full flex flex-col ${
+          isLight ? 'bg-white text-slate-800' : 'bg-slate-900/90 text-slate-200'
+        } overflow-hidden transition-colors duration-150`}
       >
         {/* Header */}
         <div

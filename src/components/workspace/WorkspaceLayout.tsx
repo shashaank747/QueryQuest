@@ -20,6 +20,38 @@ import {
   ListTodo,
 } from 'lucide-react';
 
+const DEFAULT_LEFT_WIDTH = 380;
+const DEFAULT_RIGHT_WIDTH = 280;
+const MIN_LEFT_WIDTH = 240;
+const MIN_RIGHT_WIDTH = 200;
+const MIN_CENTER_WIDTH = 360;
+
+const getInitialLeftWidth = (): number => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('queryquest_left_width');
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed >= MIN_LEFT_WIDTH && parsed <= 700) {
+        return parsed;
+      }
+    }
+  }
+  return DEFAULT_LEFT_WIDTH;
+};
+
+const getInitialRightWidth = (): number => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('queryquest_right_width');
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed >= MIN_RIGHT_WIDTH && parsed <= 600) {
+        return parsed;
+      }
+    }
+  }
+  return DEFAULT_RIGHT_WIDTH;
+};
+
 export const WorkspaceLayout: React.FC = () => {
   const { activeWorld } = useWorldStore();
   const { initializeForWorld } = useSqlStore();
@@ -34,12 +66,85 @@ export const WorkspaceLayout: React.FC = () => {
   const [activeMobileTab, setActiveMobileTab] = useState<'mission' | 'editor' | 'schema'>('editor');
   const [isReportOpen, setIsReportOpen] = useState(false);
 
+  // Resizable sidebar states
+  const [leftWidth, setLeftWidth] = useState<number>(getInitialLeftWidth);
+  const [rightWidth, setRightWidth] = useState<number>(getInitialRightWidth);
+  const [isDraggingLeft, setIsDraggingLeft] = useState(false);
+  const [isDraggingRight, setIsDraggingRight] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
+
   useEffect(() => {
     if (activeWorld) {
       initializeForWorld(activeWorld);
       loadMissionsForWorld(activeWorld);
     }
   }, [activeWorld]);
+
+  // Window resize handler
+  useEffect(() => {
+    const handleResize = () => {
+      const windowWidth = window.innerWidth;
+      setIsDesktop(windowWidth >= 1024);
+
+      setLeftWidth((prev) => {
+        const maxLeft = Math.max(MIN_LEFT_WIDTH, windowWidth - rightWidth - MIN_CENTER_WIDTH);
+        return Math.min(Math.max(prev, MIN_LEFT_WIDTH), maxLeft);
+      });
+      setRightWidth((prev) => {
+        const maxRight = Math.max(MIN_RIGHT_WIDTH, windowWidth - leftWidth - MIN_CENTER_WIDTH);
+        return Math.min(Math.max(prev, MIN_RIGHT_WIDTH), maxRight);
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [leftWidth, rightWidth]);
+
+  // Mouse drag handler for splitters
+  useEffect(() => {
+    if (!isDraggingLeft && !isDraggingRight) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const windowWidth = window.innerWidth;
+
+      if (isDraggingLeft) {
+        const maxLeft = Math.max(MIN_LEFT_WIDTH, windowWidth - rightWidth - MIN_CENTER_WIDTH);
+        const newWidth = Math.min(Math.max(e.clientX, MIN_LEFT_WIDTH), maxLeft);
+        setLeftWidth(newWidth);
+        localStorage.setItem('queryquest_left_width', String(newWidth));
+      } else if (isDraggingRight) {
+        const maxRight = Math.max(MIN_RIGHT_WIDTH, windowWidth - leftWidth - MIN_CENTER_WIDTH);
+        const newWidth = Math.min(Math.max(windowWidth - e.clientX, MIN_RIGHT_WIDTH), maxRight);
+        setRightWidth(newWidth);
+        localStorage.setItem('queryquest_right_width', String(newWidth));
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingLeft(false);
+      setIsDraggingRight(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDraggingLeft, isDraggingRight, leftWidth, rightWidth]);
+
+  const handleResetLeft = () => {
+    setLeftWidth(DEFAULT_LEFT_WIDTH);
+    localStorage.setItem('queryquest_left_width', String(DEFAULT_LEFT_WIDTH));
+  };
+
+  const handleResetRight = () => {
+    setRightWidth(DEFAULT_RIGHT_WIDTH);
+    localStorage.setItem('queryquest_right_width', String(DEFAULT_RIGHT_WIDTH));
+  };
 
   if (!activeWorld) return null;
 
@@ -94,23 +199,46 @@ export const WorkspaceLayout: React.FC = () => {
       </div>
 
       {/* Main 3-Column Workspace */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         {/* Left Column: Mission Panel */}
         <div
+          style={isDesktop ? { width: `${leftWidth}px` } : undefined}
           className={`${
-            activeMobileTab === 'mission' ? 'flex' : 'hidden'
-          } lg:flex h-full`}
+            activeMobileTab === 'mission' ? 'flex w-full' : 'hidden'
+          } lg:flex h-full flex-shrink-0 overflow-hidden relative`}
         >
           <MissionPanel />
+        </div>
+
+        {/* Left Splitter Resizer Handle */}
+        <div
+          onMouseDown={() => setIsDraggingLeft(true)}
+          onDoubleClick={handleResetLeft}
+          className={`hidden lg:flex w-1.5 relative z-20 cursor-col-resize select-none items-center justify-center transition-colors group flex-shrink-0 ${
+            isDraggingLeft
+              ? 'bg-emerald-500'
+              : isLight
+              ? 'bg-slate-200 hover:bg-emerald-500/50'
+              : 'bg-slate-800 hover:bg-emerald-500/50'
+          }`}
+          title="Drag to resize Mission Panel (Double-click to reset)"
+        >
+          <div
+            className={`w-0.5 h-7 rounded-full transition-colors ${
+              isDraggingLeft
+                ? 'bg-white'
+                : isLight
+                ? 'bg-slate-400 group-hover:bg-emerald-600'
+                : 'bg-slate-600 group-hover:bg-emerald-400'
+            }`}
+          />
         </div>
 
         {/* Center Column: SQL Editor (top 52%) + Query Results (bottom 48%) */}
         <div
           className={`${
             activeMobileTab === 'editor' ? 'flex' : 'hidden'
-          } lg:flex flex-1 flex-col h-full min-w-0 border-r ${
-            isLight ? 'border-slate-200' : 'border-slate-800'
-          }`}
+          } lg:flex flex-1 flex-col h-full min-w-[320px] overflow-hidden`}
         >
           <div className={`h-[52%] border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
             <SqlEditor />
@@ -120,14 +248,47 @@ export const WorkspaceLayout: React.FC = () => {
           </div>
         </div>
 
+        {/* Right Splitter Resizer Handle */}
+        <div
+          onMouseDown={() => setIsDraggingRight(true)}
+          onDoubleClick={handleResetRight}
+          className={`hidden lg:flex w-1.5 relative z-20 cursor-col-resize select-none items-center justify-center transition-colors group flex-shrink-0 ${
+            isDraggingRight
+              ? 'bg-emerald-500'
+              : isLight
+              ? 'bg-slate-200 hover:bg-emerald-500/50'
+              : 'bg-slate-800 hover:bg-emerald-500/50'
+          }`}
+          title="Drag to resize Schema Explorer (Double-click to reset)"
+        >
+          <div
+            className={`w-0.5 h-7 rounded-full transition-colors ${
+              isDraggingRight
+                ? 'bg-white'
+                : isLight
+                ? 'bg-slate-400 group-hover:bg-emerald-600'
+                : 'bg-slate-600 group-hover:bg-emerald-400'
+            }`}
+          />
+        </div>
+
         {/* Right Column: Schema Explorer */}
         <div
+          style={isDesktop ? { width: `${rightWidth}px` } : undefined}
           className={`${
-            activeMobileTab === 'schema' ? 'flex' : 'hidden'
-          } lg:flex h-full`}
+            activeMobileTab === 'schema' ? 'flex w-full' : 'hidden'
+          } lg:flex h-full flex-shrink-0 overflow-hidden relative`}
         >
           <SchemaExplorer />
         </div>
+
+        {/* Transparent global drag shield to prevent event drops over Monaco/text */}
+        {(isDraggingLeft || isDraggingRight) && (
+          <div
+            className="fixed inset-0 z-50 cursor-col-resize select-none"
+            style={{ userSelect: 'none', cursor: 'col-resize' }}
+          />
+        )}
       </div>
 
       {/* World Completion Modal */}
