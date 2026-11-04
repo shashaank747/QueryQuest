@@ -45,6 +45,7 @@ export const WORLDS_REGISTRY: WorldDefinition[] = [
     tagline: 'Audit bulk pallets, track cross-dock shipments, and reconcile inventory discrepancies.',
     description:
       'Step into a high-throughput distribution center. Analyze purchase orders, carrier dispatches, and warehouse reorder thresholds.',
+    thumbnailUrl: '/images/warehouse-world.jpg',
     storyIntro: {
       roleTitle: 'Logistics Data Specialist',
       organization: 'Apex Global Logistics Hub',
