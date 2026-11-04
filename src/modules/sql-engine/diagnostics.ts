@@ -60,3 +60,4 @@ export function generateSqlDiagnostic(errorMessage: string, sql: string): string
 
   return `Database error: ${errorMessage}. Review your query structure and the schema explorer.`;
 }
+

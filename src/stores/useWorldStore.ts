@@ -66,3 +66,4 @@ export const useWorldStore = create<WorldState>((set, get) => ({
     }
   },
 }));
+

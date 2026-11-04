@@ -1,4 +1,5 @@
 import React from 'react';
+import { useThemeStore } from '../../stores/useThemeStore';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'success';
@@ -17,8 +18,11 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
+  const { theme } = useThemeStore();
+  const isLight = theme === 'slate-100';
+
   const baseClasses =
-    'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
+    'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
 
   const sizeClasses = {
     sm: 'text-xs px-2.5 py-1.5 gap-1.5',
@@ -27,23 +31,31 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const variantClasses = {
-    primary:
-      'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/50 focus:ring-emerald-500 border border-emerald-500/30',
-    success:
-      'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-950/50 focus:ring-green-500 border border-green-500/30',
-    secondary:
-      'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/60 focus:ring-slate-500 shadow-sm',
-    outline:
-      'bg-transparent hover:bg-slate-800/60 text-slate-300 border border-slate-700 focus:ring-slate-500',
-    ghost:
-      'bg-transparent hover:bg-slate-800/50 text-slate-400 hover:text-slate-200 focus:ring-slate-500',
-    danger:
-      'bg-rose-600/90 hover:bg-rose-500 text-white shadow-lg shadow-rose-950/40 focus:ring-rose-500 border border-rose-500/30',
+    primary: isLight
+      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 focus:ring-emerald-500 border border-emerald-600'
+      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/50 focus:ring-emerald-500 border border-emerald-500/30',
+    success: isLight
+      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 focus:ring-emerald-500 border border-emerald-600'
+      : 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-950/50 focus:ring-green-500 border border-green-500/30',
+    secondary: isLight
+      ? 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-sm focus:ring-slate-400'
+      : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/60 focus:ring-slate-500 shadow-sm',
+    outline: isLight
+      ? 'bg-transparent hover:bg-slate-200/50 text-slate-700 border border-slate-300 focus:ring-slate-400'
+      : 'bg-transparent hover:bg-slate-800/60 text-slate-300 border border-slate-700 focus:ring-slate-500',
+    ghost: isLight
+      ? 'bg-transparent hover:bg-slate-200/60 text-slate-600 hover:text-slate-900 focus:ring-slate-400'
+      : 'bg-transparent hover:bg-slate-800/50 text-slate-400 hover:text-slate-200 focus:ring-slate-500',
+    danger: isLight
+      ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/20 focus:ring-rose-500 border border-rose-600'
+      : 'bg-rose-600/90 hover:bg-rose-500 text-white shadow-lg shadow-rose-950/40 focus:ring-rose-500 border border-rose-500/30',
   };
+
+  const ringOffsetClass = isLight ? 'focus:ring-offset-slate-100' : 'focus:ring-offset-slate-900';
 
   return (
     <button
-      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      className={`${baseClasses} ${ringOffsetClass} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >
@@ -75,3 +87,4 @@ export const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
+

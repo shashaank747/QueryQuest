@@ -103,3 +103,4 @@ export const useUserStore = create<UserState>((set, get) => ({
     await persistenceService.saveUserProfile(updated);
   },
 }));
+

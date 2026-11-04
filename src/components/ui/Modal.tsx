@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useThemeStore } from '../../stores/useThemeStore';
 
 interface ModalProps {
   isOpen: boolean;
@@ -18,6 +19,9 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   maxWidth = '2xl',
 }) => {
+  const { theme } = useThemeStore();
+  const isLight = theme === 'slate-100';
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -41,20 +45,40 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto backdrop-blur-sm animate-in fade-in duration-150 ${
+      isLight ? 'bg-slate-900/40' : 'bg-slate-950/80'
+    }`}>
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors border ${
+          isLight
+            ? 'bg-white border-slate-200 text-slate-800 shadow-slate-200/50'
+            : 'bg-slate-900 border-slate-800 text-slate-100'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/80 bg-slate-900/60">
+        <div className={`flex items-center justify-between px-6 py-4 border-b ${
+          isLight
+            ? 'border-slate-200 bg-slate-50/80'
+            : 'border-slate-800/80 bg-slate-900/60'
+        }`}>
           <div>
-            <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">{title}</h3>
-            {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+            <h3 className={`text-lg font-bold flex items-center gap-2 ${
+              isLight ? 'text-slate-900' : 'text-slate-100'
+            }`}>{title}</h3>
+            {subtitle && (
+              <p className={`text-xs mt-0.5 ${
+                isLight ? 'text-slate-500' : 'text-slate-400'
+              }`}>{subtitle}</p>
+            )}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors"
+            className={`p-1.5 rounded-lg transition-colors ${
+              isLight
+                ? 'text-slate-400 hover:text-slate-800 hover:bg-slate-200/60'
+                : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
+            }`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -66,3 +90,4 @@ export const Modal: React.FC<ModalProps> = ({
     </div>
   );
 };
+

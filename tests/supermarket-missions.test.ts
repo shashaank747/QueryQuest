@@ -109,3 +109,4 @@ describe('World 1: Supermarket Operations Missions & SQL Solutions', () => {
     expect(rows[1][1]).toBeGreaterThanOrEqual(rows[2][1]);
   });
 });
+

@@ -126,3 +126,4 @@ npm run preview
 - [ ] World 3: Warehouse Management (Pallet staging, cross-docking, supplier lead times)
 - [ ] World 4: Hospital Administration (Doctor appointments, emergency admissions, bed allocation)
 - [ ] World 5: Bank Operations (ACID transactions, atomic transfers, audit log fraud detection)
+

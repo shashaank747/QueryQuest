@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useWorldStore } from '../../stores/useWorldStore';
 import { useSqlStore } from '../../stores/useSqlStore';
 import { useMissionStore } from '../../stores/useMissionStore';
+import { useThemeStore } from '../../stores/useThemeStore';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { MissionPanel } from './MissionPanel';
 import { SqlEditor } from './SqlEditor';
@@ -22,6 +23,8 @@ import {
 export const WorkspaceLayout: React.FC = () => {
   const { activeWorld } = useWorldStore();
   const { initializeForWorld } = useSqlStore();
+  const { theme } = useThemeStore();
+  const isLight = theme === 'slate-100';
   const {
     loadMissionsForWorld,
     isWorldCompletedModalOpen,
@@ -41,17 +44,25 @@ export const WorkspaceLayout: React.FC = () => {
   if (!activeWorld) return null;
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
+    <div
+      className={`h-screen w-screen flex flex-col ${
+        isLight ? 'bg-slate-100 text-slate-800' : 'bg-slate-950 text-slate-100'
+      } overflow-hidden transition-colors duration-150`}
+    >
       {/* Workspace Header */}
       <WorkspaceHeader />
 
       {/* Mobile Tab Switcher */}
-      <div className="flex lg:hidden items-center justify-around border-b border-slate-800 bg-slate-900 py-1.5 px-2 text-xs">
+      <div
+        className={`flex lg:hidden items-center justify-around border-b ${
+          isLight ? 'border-slate-200 bg-white text-slate-700' : 'border-slate-800 bg-slate-900 text-slate-300'
+        } py-1.5 px-2 text-xs`}
+      >
         <button
           onClick={() => setActiveMobileTab('mission')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold ${
             activeMobileTab === 'mission'
-              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
               : 'text-slate-400'
           }`}
         >
@@ -62,7 +73,7 @@ export const WorkspaceLayout: React.FC = () => {
           onClick={() => setActiveMobileTab('editor')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold ${
             activeMobileTab === 'editor'
-              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
               : 'text-slate-400'
           }`}
         >
@@ -73,7 +84,7 @@ export const WorkspaceLayout: React.FC = () => {
           onClick={() => setActiveMobileTab('schema')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold ${
             activeMobileTab === 'schema'
-              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
               : 'text-slate-400'
           }`}
         >
@@ -97,9 +108,11 @@ export const WorkspaceLayout: React.FC = () => {
         <div
           className={`${
             activeMobileTab === 'editor' ? 'flex' : 'hidden'
-          } lg:flex flex-1 flex-col h-full min-w-0 border-r border-slate-800`}
+          } lg:flex flex-1 flex-col h-full min-w-0 border-r ${
+            isLight ? 'border-slate-200' : 'border-slate-800'
+          }`}
         >
-          <div className="h-[52%] border-b border-slate-800">
+          <div className={`h-[52%] border-b ${isLight ? 'border-slate-200' : 'border-slate-800'}`}>
             <SqlEditor />
           </div>
           <div className="h-[48%]">

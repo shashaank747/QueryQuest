@@ -32,3 +32,4 @@ CREATE TABLE IF NOT EXISTS employees (
   hire_date TEXT NOT NULL
 );
 `;
+

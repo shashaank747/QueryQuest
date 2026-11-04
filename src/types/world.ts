@@ -51,3 +51,4 @@ export interface WorldProgress {
   unlockedAt?: number;
   completedAt?: number;
 }
+

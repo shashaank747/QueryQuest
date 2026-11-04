@@ -43,3 +43,4 @@ export interface ValidationContext {
   getSchema: () => Promise<Record<string, any>>;
   getTableData: (tableName: string, limit?: number) => Promise<any[]>;
 }
+

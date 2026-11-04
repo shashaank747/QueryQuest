@@ -32,3 +32,4 @@ export interface MissionProgress {
   hintsRevealed: number; // 0 to 3
   bestSql?: string;
 }
+

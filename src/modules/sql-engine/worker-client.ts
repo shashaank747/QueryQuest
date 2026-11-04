@@ -183,3 +183,4 @@ export class SqlWorkerClient {
 
 // Singleton worker instance
 export const sqlEngine = new SqlWorkerClient();
+

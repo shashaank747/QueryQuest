@@ -58,3 +58,4 @@ export interface QueryHistoryItem {
   rowsReturned?: number;
   executionTimeMs?: number;
 }
+

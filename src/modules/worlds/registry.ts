@@ -148,3 +148,4 @@ export const WORLDS_REGISTRY: WorldDefinition[] = [
 export function getWorldById(id: string): WorldDefinition | undefined {
   return WORLDS_REGISTRY.find((w) => w.id === id);
 }
+

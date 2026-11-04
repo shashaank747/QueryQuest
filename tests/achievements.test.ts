@@ -30,3 +30,4 @@ describe('Gamification System', () => {
     expect(firstQuery?.xpReward).toBe(50);
   });
 });
+

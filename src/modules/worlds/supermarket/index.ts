@@ -104,3 +104,4 @@ export const supermarketWorld: WorldDefinition = {
     ],
   },
 };
+

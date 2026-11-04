@@ -22,3 +22,4 @@ export interface Achievement {
   isUnlocked?: boolean;
   unlockedAt?: number;
 }
+

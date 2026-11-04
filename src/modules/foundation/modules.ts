@@ -186,3 +186,4 @@ JOIN HighValueOrders hvo ON o.order_id = hvo.order_id;`,
     keyConcepts: ['Subqueries (Scalar & Correlated)', 'Common Table Expressions (CTEs)', 'CASE expressions', 'Views'],
   },
 ];
+

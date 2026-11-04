@@ -60,3 +60,4 @@ export function calculateLevel(xp: number): { level: number; currentLevelXp: num
 
   return { level, currentLevelXp, nextLevelXp, progressPercent };
 }
+
