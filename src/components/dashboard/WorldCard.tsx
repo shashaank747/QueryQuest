@@ -58,37 +58,85 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           : 'bg-slate-900/40 border-slate-800/60 opacity-80'
       }`}
     >
-      {/* Top Banner & Category */}
-      <div className="p-6 pb-4">
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div
-            className={`w-12 h-12 rounded-xl flex items-center justify-center border ${
-              world.isAvailable
-                ? isLight
-                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600'
-                  : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
-                : isLight
-                ? 'bg-slate-200/70 border-slate-300 text-slate-500'
-                : 'bg-slate-800 border-slate-700 text-slate-500'
-            }`}
-          >
-            {iconComponentMap[world.iconName] || <ShoppingCart className="w-6 h-6" />}
+      {/* Reference Image Header if present */}
+      {world.thumbnailUrl && (
+        <div className="relative w-full h-44 overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-slate-900 group">
+          <img
+            src={world.thumbnailUrl}
+            alt={world.name}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          {/* Subtle gradient vignette */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-black/30" />
+
+          {/* Top badges on image */}
+          <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-900/80 text-emerald-400 border border-emerald-500/30 backdrop-blur-sm">
+              Live Reference
+            </span>
+            <div className="flex items-center gap-1.5">
+              <Badge variant={difficultyVariants[world.difficulty] || 'slate'} size="sm">
+                {world.difficulty}
+              </Badge>
+              <div className="px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-sm border border-slate-700/60 flex items-center gap-1 text-[11px] text-white font-medium">
+                <Clock className="w-3 h-3 text-slate-300" />
+                <span>{world.estimatedTime}</span>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Badge variant={difficultyVariants[world.difficulty] || 'slate'} size="sm">
-              {world.difficulty}
-            </Badge>
+          {/* Floating icon overlapping bottom edge */}
+          <div className="absolute -bottom-4 left-6">
             <div
-              className={`flex items-center gap-1 text-[11px] ${
-                isLight ? 'text-slate-500' : 'text-slate-400'
-              } font-medium`}
+              className={`w-11 h-11 rounded-xl flex items-center justify-center border shadow-lg ${
+                world.isAvailable
+                  ? isLight
+                    ? 'bg-white border-slate-200 text-emerald-600'
+                    : 'bg-slate-900 border-slate-700 text-emerald-400'
+                  : isLight
+                  ? 'bg-white border-slate-200 text-indigo-600 shadow-slate-200/50'
+                  : 'bg-slate-900 border-slate-700 text-indigo-400'
+              }`}
             >
-              <Clock className="w-3 h-3" />
-              <span>{world.estimatedTime}</span>
+              {iconComponentMap[world.iconName] || <Landmark className="w-5 h-5" />}
             </div>
           </div>
         </div>
+      )}
+
+      {/* Top Banner & Category */}
+      <div className={`p-6 ${world.thumbnailUrl ? 'pt-7' : ''} pb-4`}>
+        {!world.thumbnailUrl && (
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div
+              className={`w-12 h-12 rounded-xl flex items-center justify-center border ${
+                world.isAvailable
+                  ? isLight
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600'
+                    : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                  : isLight
+                  ? 'bg-slate-200/70 border-slate-300 text-slate-500'
+                  : 'bg-slate-800 border-slate-700 text-slate-500'
+              }`}
+            >
+              {iconComponentMap[world.iconName] || <ShoppingCart className="w-6 h-6" />}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Badge variant={difficultyVariants[world.difficulty] || 'slate'} size="sm">
+                {world.difficulty}
+              </Badge>
+              <div
+                className={`flex items-center gap-1 text-[11px] ${
+                  isLight ? 'text-slate-500' : 'text-slate-400'
+                } font-medium`}
+              >
+                <Clock className="w-3 h-3" />
+                <span>{world.estimatedTime}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Industry & Title */}
         <div className="text-[11px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400/90 uppercase mb-1">

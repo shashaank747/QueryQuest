@@ -115,6 +115,7 @@ export const WORLDS_REGISTRY: WorldDefinition[] = [
     tagline: 'Audit ledger balances, execute atomic money transfers, and flag suspicious transactions.',
     description:
       'Join a premier commercial bank. Master transaction ACID properties, simulate fund transfers with ROLLBACK protection, and trace audit logs.',
+    thumbnailUrl: '/images/bank-world.jpg',
     storyIntro: {
       roleTitle: 'Core Banking Database Analyst',
       organization: 'Apex National Trust',

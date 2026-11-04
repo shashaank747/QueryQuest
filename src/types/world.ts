@@ -23,6 +23,7 @@ export interface WorldDefinition {
   industry: string;
   tagline: string;
   description: string;
+  thumbnailUrl?: string;
   storyIntro: {
     roleTitle: string;
     organization: string;
