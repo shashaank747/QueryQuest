@@ -17,6 +17,7 @@ export const ShortcutModal: React.FC<ShortcutModalProps> = ({
   const shortcuts = [
     { key: 'Ctrl + Enter / ⌘ + Enter', desc: 'Execute current SQL query in terminal' },
     { key: 'Ctrl + Shift + Enter', desc: 'Submit query for mission validation' },
+    { key: 'Ctrl + A / ⌘ + A', desc: 'Select all query text in editor' },
     { key: 'Ctrl + /', desc: 'Toggle SQL comment (-- line comment)' },
     { key: 'Esc', desc: 'Close any active modal or table preview' },
     { key: 'Tab / Shift + Tab', desc: 'Indent / Unindent SQL line' },

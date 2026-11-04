@@ -174,6 +174,24 @@ export const SqlEditor: React.FC = () => {
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
 
+          {/* Select all text */}
+          <button
+            onClick={() => {
+              if (editorRef.current) {
+                editorRef.current.focus();
+                editorRef.current.trigger('keyboard', 'editor.action.selectAll', null);
+              }
+            }}
+            className={`px-2 py-1 rounded-lg ${
+              isLight
+                ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+            } transition-colors text-[11px] font-medium`}
+            title="Select all text (Ctrl+A / ⌘+A)"
+          >
+            Select All
+          </button>
+
           {/* Clear editor */}
           <button
             onClick={handleClear}
@@ -209,6 +227,8 @@ export const SqlEditor: React.FC = () => {
             minimap: { enabled: false },
             fontSize: 13,
             lineNumbers: 'on',
+            selectOnLineNumbers: true,
+            dragAndDrop: false,
             scrollBeyondLastLine: false,
             automaticLayout: true,
             tabSize: 2,
@@ -219,6 +239,7 @@ export const SqlEditor: React.FC = () => {
             cursorBlinking: 'smooth',
             smoothScrolling: true,
             suggestOnTriggerCharacters: true,
+            multiCursorModifier: 'alt',
           }}
         />
       </div>
