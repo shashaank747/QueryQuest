@@ -46,6 +46,16 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
     Advanced: 'rose',
   };
 
+  const accentColors: Record<string, { light: string; dark: string }> = {
+    emerald: { light: 'text-emerald-600', dark: 'text-emerald-400' },
+    sky: { light: 'text-sky-600', dark: 'text-sky-400' },
+    amber: { light: 'text-amber-600', dark: 'text-amber-400' },
+    rose: { light: 'text-rose-600', dark: 'text-rose-400' },
+    indigo: { light: 'text-indigo-600', dark: 'text-indigo-400' },
+  };
+
+  const activeColor = accentColors[world.accentColor] || accentColors.emerald;
+
   return (
     <div
       className={`group relative rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden ${
@@ -89,13 +99,9 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           <div className="absolute -bottom-4 left-6">
             <div
               className={`w-11 h-11 rounded-xl flex items-center justify-center border shadow-lg ${
-                world.isAvailable
-                  ? isLight
-                    ? 'bg-white border-slate-200 text-emerald-600'
-                    : 'bg-slate-900 border-slate-700 text-emerald-400'
-                  : isLight
-                  ? 'bg-white border-slate-200 text-indigo-600 shadow-slate-200/50'
-                  : 'bg-slate-900 border-slate-700 text-indigo-400'
+                isLight
+                  ? `bg-white border-slate-200 ${activeColor.light} shadow-slate-200/50`
+                  : `bg-slate-900 border-slate-700 ${activeColor.dark}`
               }`}
             >
               {iconComponentMap[world.iconName] || <Landmark className="w-5 h-5" />}

@@ -80,6 +80,7 @@ export const WORLDS_REGISTRY: WorldDefinition[] = [
     tagline: 'Manage patient admissions, doctor schedules, and ward bed allocations.',
     description:
       'Coordinate clinical department workflows, doctor appointments, emergency bed allocations, and confidential medical billing.',
+    thumbnailUrl: '/images/hospital-world.jpg',
     storyIntro: {
       roleTitle: 'Healthcare Information Analyst',
       organization: 'Metro General Hospital System',
