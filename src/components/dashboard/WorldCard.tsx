@@ -399,42 +399,19 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
         }`}
       >
         {world.isAvailable ? (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="primary"
-              className="flex-1 py-1.5 text-xs"
-              data-no-flip
-              onClick={() => setActiveWorld(world.id)}
-              icon={<ArrowRight className="w-3.5 h-3.5" />}
-            >
-              {progress.completedMissionsCount > 0 ? 'Resume' : 'Enter World'}
-            </Button>
-            <Button
-              variant="secondary"
-              className="py-1.5 text-xs"
-              data-no-flip
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsFlipped(false);
-              }}
-            >
-              ← Front
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            className="w-full py-1.5 text-xs"
+            data-no-flip
+            onClick={() => setActiveWorld(world.id)}
+            icon={<ArrowRight className="w-3.5 h-3.5" />}
+          >
+            {progress.completedMissionsCount > 0 ? 'Resume Operations' : 'Enter World'}
+          </Button>
         ) : (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              className="flex-1 py-1.5 text-xs"
-              data-no-flip
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsFlipped(false);
-              }}
-            >
-              ← Flip Back to Overview
-            </Button>
-          </div>
+          <Button variant="secondary" className="w-full py-1.5 text-xs" disabled data-no-flip>
+            <Lock className="w-3 h-3 mr-1" /> Preview Only (Coming Soon)
+          </Button>
         )}
       </div>
     </div>
