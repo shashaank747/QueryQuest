@@ -88,7 +88,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
     >
       {/* Visual Thumbnail Cover Banner */}
       {world.thumbnailUrl ? (
-        <div className="relative w-full h-36 overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-slate-950 flex-shrink-0">
+        <div className="relative w-full h-44 overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-slate-950 flex-shrink-0">
           <img
             src={world.thumbnailUrl}
             alt={world.name}
@@ -457,7 +457,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
       stiffness={180}
       damping={22}
       width="100%"
-      height={440}
+      height={460}
       depth={14}
       radius={26}
       background={isLight ? '#ffffff' : '#0f172a'}
