@@ -26,11 +26,11 @@ interface WorldCardProps {
 }
 
 const iconComponentMap: Record<string, React.ReactNode> = {
-  ShoppingCart: <ShoppingCart className="w-5 h-5" />,
-  Plane: <Plane className="w-5 h-5" />,
-  Boxes: <Boxes className="w-5 h-5" />,
-  Activity: <Activity className="w-5 h-5" />,
-  Landmark: <Landmark className="w-5 h-5" />,
+  ShoppingCart: <ShoppingCart className="w-4 h-4" />,
+  Plane: <Plane className="w-4 h-4" />,
+  Boxes: <Boxes className="w-4 h-4" />,
+  Activity: <Activity className="w-4 h-4" />,
+  Landmark: <Landmark className="w-4 h-4" />,
 };
 
 const difficultyVariants: Record<string, 'emerald' | 'amber' | 'rose'> = {
@@ -65,7 +65,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
   // Front Face Component
   const frontContent = (
     <div
-      className={`w-full h-full flex flex-col justify-between border rounded-[20px] overflow-hidden select-none transition-colors duration-200 ${
+      className={`w-full h-full flex flex-col justify-between border rounded-[18px] overflow-hidden select-none transition-colors duration-200 ${
         world.isAvailable
           ? isLight
             ? 'bg-white border-slate-200/90 shadow-sm'
@@ -77,7 +77,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
     >
       {/* Visual Thumbnail Cover Banner */}
       {world.thumbnailUrl ? (
-        <div className="relative w-full h-44 overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-slate-950 flex-shrink-0">
+        <div className="relative w-full h-36 overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-slate-950 flex-shrink-0">
           <img
             src={world.thumbnailUrl}
             alt={world.name}
@@ -87,13 +87,13 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-black/35 pointer-events-none" />
 
           {/* Top badges on image */}
-          <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-auto">
+          <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-auto">
             {world.isAvailable ? (
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 backdrop-blur-md">
+              <span className="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 backdrop-blur-md">
                 Live Case Study
               </span>
             ) : (
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-900/80 text-slate-400 border border-slate-700/50 backdrop-blur-md">
+              <span className="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-slate-900/80 text-slate-400 border border-slate-700/50 backdrop-blur-md">
                 Roadmap Preview
               </span>
             )}
@@ -102,7 +102,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
               <Badge variant={difficultyVariants[world.difficulty] || 'slate'} size="sm">
                 {world.difficulty}
               </Badge>
-              <div className="px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-slate-700/60 flex items-center gap-1 text-[11px] text-white font-medium">
+              <div className="px-1.5 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-slate-700/60 flex items-center gap-1 text-[10.5px] text-white font-medium">
                 <Clock className="w-3 h-3 text-slate-300" />
                 <span>{world.estimatedTime}</span>
               </div>
@@ -116,41 +116,41 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
                 title="Flip card for world details"
                 className="p-1 rounded-full bg-slate-900/80 hover:bg-emerald-600 text-slate-200 hover:text-white border border-slate-700/70 hover:border-emerald-400 transition-colors backdrop-blur-md flex items-center justify-center cursor-pointer"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-3 h-3" />
               </button>
             </div>
           </div>
 
           {/* Floating category icon overlapping bottom edge */}
-          <div className="absolute -bottom-4 left-5 pointer-events-none">
+          <div className="absolute -bottom-3 left-4 pointer-events-none">
             <div
-              className={`w-11 h-11 rounded-xl flex items-center justify-center border shadow-lg ${
+              className={`w-9 h-9 rounded-xl flex items-center justify-center border shadow-md ${
                 isLight
                   ? `bg-white border-slate-200 ${activeColor.light} shadow-slate-200/60`
                   : `bg-slate-900 border-slate-700 ${activeColor.dark} shadow-black/50`
               }`}
             >
-              {iconComponentMap[world.iconName] || <Landmark className="w-5 h-5" />}
+              {iconComponentMap[world.iconName] || <Landmark className="w-4 h-4" />}
             </div>
           </div>
         </div>
       ) : (
         /* Fallback if no thumbnail */
-        <div className="p-5 pb-0 flex items-start justify-between">
+        <div className="p-4 pb-0 flex items-start justify-between">
           <div
-            className={`w-11 h-11 rounded-xl flex items-center justify-center border ${
+            className={`w-9 h-9 rounded-xl flex items-center justify-center border ${
               isLight
                 ? `bg-white border-slate-200 ${activeColor.light}`
                 : `bg-slate-900 border-slate-700 ${activeColor.dark}`
             }`}
           >
-            {iconComponentMap[world.iconName] || <ShoppingCart className="w-5 h-5" />}
+            {iconComponentMap[world.iconName] || <ShoppingCart className="w-4 h-4" />}
           </div>
           <div className="flex items-center gap-1.5">
             <Badge variant={difficultyVariants[world.difficulty] || 'slate'} size="sm">
               {world.difficulty}
             </Badge>
-            <div className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-medium flex items-center gap-1">
+            <div className="px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10.5px] font-medium flex items-center gap-1">
               <Clock className="w-3 h-3" />
               <span>{world.estimatedTime}</span>
             </div>
@@ -164,20 +164,20 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
               title="Flip card for world details"
               className="p-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 text-slate-600 dark:text-slate-300 hover:text-white border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center cursor-pointer"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-3 h-3" />
             </button>
           </div>
         </div>
       )}
 
       {/* Middle Content */}
-      <div className={`p-5 ${world.thumbnailUrl ? 'pt-6' : 'pt-3'} pb-3 flex-1 flex flex-col justify-between`}>
+      <div className={`px-4 ${world.thumbnailUrl ? 'pt-4' : 'pt-2'} pb-1.5 flex-1 flex flex-col justify-between`}>
         <div>
-          <div className="text-[11px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase mb-1">
+          <div className="text-[10px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase mb-0.5">
             {world.industry}
           </div>
           <h3
-            className={`text-xl font-bold tracking-tight ${
+            className={`text-lg font-bold tracking-tight leading-snug ${
               isLight ? 'text-slate-900' : 'text-slate-100'
             }`}
           >
@@ -186,18 +186,18 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           <p
             className={`text-xs ${
               isLight ? 'text-slate-600' : 'text-slate-400'
-            } mt-1.5 line-clamp-2 leading-relaxed`}
+            } mt-1 line-clamp-2 leading-relaxed`}
           >
             {world.tagline || world.description}
           </p>
         </div>
 
         {/* SQL Topics Tags preview */}
-        <div className="flex flex-wrap gap-1.5 mt-3">
+        <div className="flex flex-wrap gap-1 mt-2">
           {world.sqlTopics.slice(0, 3).map((topic, i) => (
             <span
               key={i}
-              className={`text-[10px] px-2 py-0.5 rounded-md ${
+              className={`text-[9.5px] px-2 py-0.5 rounded-md ${
                 isLight
                   ? 'bg-slate-100 text-slate-700 border border-slate-200'
                   : 'bg-slate-800 text-slate-300 border border-slate-700/60'
@@ -208,7 +208,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           ))}
           {world.sqlTopics.length > 3 && (
             <span
-              className={`text-[10px] px-1.5 py-0.5 rounded-md ${
+              className={`text-[9.5px] px-1.5 py-0.5 rounded-md ${
                 isLight ? 'bg-slate-100 text-slate-500' : 'bg-slate-800 text-slate-500'
               } font-mono`}
             >
@@ -220,21 +220,21 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
       {/* Footer & Primary Action */}
       <div
-        className={`p-5 pt-3 border-t ${
+        className={`px-4 py-2.5 border-t ${
           isLight ? 'border-slate-100 bg-slate-50/70' : 'border-slate-800/60 bg-slate-950/30'
         }`}
       >
         {world.isAvailable ? (
           <div>
             <div
-              className={`flex items-center justify-between text-xs ${
+              className={`flex items-center justify-between text-[11px] ${
                 isLight ? 'text-slate-600' : 'text-slate-400'
-              } mb-2`}
+              } mb-1.5`}
             >
               <span className="font-medium">
                 {progress.isCompleted ? (
                   <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> All 10 Missions Completed
+                    <CheckCircle2 className="w-3 h-3" /> All 10 Missions Completed
                   </span>
                 ) : (
                   `${progress.completedMissionsCount} of ${progress.totalMissionsCount} Missions`
@@ -247,9 +247,9 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
             {/* Progress Bar */}
             <div
-              className={`w-full h-2 ${
+              className={`w-full h-1.5 ${
                 isLight ? 'bg-slate-200' : 'bg-slate-800'
-              } rounded-full overflow-hidden mb-3`}
+              } rounded-full overflow-hidden mb-2`}
             >
               <div
                 className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300 rounded-full"
@@ -259,10 +259,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
             <Button
               variant="primary"
-              className="w-full"
+              className="w-full py-1.5 text-xs"
               data-no-flip
               onClick={() => setActiveWorld(world.id)}
-              icon={<ArrowRight className="w-4 h-4" />}
+              icon={<ArrowRight className="w-3.5 h-3.5" />}
             >
               {progress.completedMissionsCount > 0 ? 'Resume Operations' : 'Enter World'}
             </Button>
@@ -270,23 +270,23 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
         ) : (
           <div>
             <div
-              className={`flex items-center justify-between text-xs ${
+              className={`flex items-center justify-between text-[11px] ${
                 isLight ? 'text-slate-500' : 'text-slate-500'
-              } mb-3`}
+              } mb-2`}
             >
-              <span className="flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5" /> Coming in Next Phase
+              <span className="flex items-center gap-1">
+                <Lock className="w-3 h-3" /> Coming in Next Phase
               </span>
-              <span className="font-mono text-[11px]">Roadmap</span>
+              <span className="font-mono text-[10px]">Roadmap</span>
             </div>
-            <Button variant="secondary" className="w-full" disabled data-no-flip>
+            <Button variant="secondary" className="w-full py-1.5 text-xs" disabled data-no-flip>
               Preview Only
             </Button>
           </div>
         )}
 
         {/* Subtle Hint */}
-        <div className="text-[10px] text-center text-slate-400 dark:text-slate-500 mt-2 flex items-center justify-center gap-1">
+        <div className="text-[9.5px] text-center text-slate-400 dark:text-slate-500 mt-1 flex items-center justify-center gap-1">
           <span>Click card or drag to inspect dossier</span>
           <RotateCcw className="w-2.5 h-2.5 opacity-60" />
         </div>
@@ -297,7 +297,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
   // Back Face Component (Full Dossier & Architecture Specs)
   const backContent = (
     <div
-      className={`w-full h-full flex flex-col justify-between p-5 border rounded-[20px] overflow-hidden select-none transition-colors duration-200 ${
+      className={`w-full h-full flex flex-col justify-between p-4 border rounded-[18px] overflow-hidden select-none transition-colors duration-200 ${
         isLight
           ? 'bg-gradient-to-br from-white via-slate-50 to-slate-100/90 border-slate-200 text-slate-800'
           : 'bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 border-slate-800 text-slate-100'
@@ -305,10 +305,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
     >
       {/* Dossier Header */}
       <div>
-        <div className="flex items-center justify-between gap-2 mb-2.5">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
-            <Briefcase className="w-3.5 h-3.5" />
-            <span className="truncate max-w-[190px]">{world.storyIntro.roleTitle}</span>
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold">
+            <Briefcase className="w-3 h-3" />
+            <span className="truncate max-w-[180px]">{world.storyIntro.roleTitle}</span>
           </div>
           <button
             type="button"
@@ -317,20 +317,20 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
               e.stopPropagation();
               setIsFlipped(false);
             }}
-            className="px-2 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
+            className="px-2 py-0.5 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
           >
             <span>← Front</span>
           </button>
         </div>
 
         {/* Organization & DB spec */}
-        <div className="flex items-center gap-1.5 text-slate-900 dark:text-white font-bold text-sm">
-          <Building2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+        <div className="flex items-center gap-1.5 text-slate-900 dark:text-white font-bold text-xs">
+          <Building2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
           <span className="truncate">{world.storyIntro.organization}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-[11px] mt-1.5">
-          <div className="px-2 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800/80 font-mono text-slate-700 dark:text-slate-300 flex items-center gap-1 border border-slate-300/60 dark:border-slate-700/60">
+        <div className="flex items-center gap-2 text-[10.5px] mt-1">
+          <div className="px-1.5 py-0.5 rounded bg-slate-200/80 dark:bg-slate-800/80 font-mono text-slate-700 dark:text-slate-300 flex items-center gap-1 border border-slate-300/60 dark:border-slate-700/60">
             <Database className="w-3 h-3 text-emerald-500" />
             <span>{world.dbFileName}</span>
           </div>
@@ -340,30 +340,30 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
       </div>
 
       {/* Dossier Scrollable Middle Area */}
-      <div className="flex-1 my-3 space-y-3 overflow-y-auto pr-1">
+      <div className="flex-1 my-2 space-y-2 overflow-y-auto pr-1">
         {/* Scenario Background */}
         <div
-          className={`p-2.5 rounded-xl border text-xs leading-relaxed ${
+          className={`p-2 rounded-xl border text-xs leading-relaxed ${
             isLight
               ? 'bg-slate-100/70 border-slate-200 text-slate-700'
               : 'bg-slate-950/60 border-slate-800 text-slate-300'
           }`}
         >
-          <div className="text-[10px] uppercase font-bold tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">
+          <div className="text-[9.5px] uppercase font-bold tracking-wider text-emerald-600 dark:text-emerald-400 mb-0.5">
             Operational Context
           </div>
-          <p className="line-clamp-3 text-[11.5px] leading-relaxed">{world.storyIntro.background}</p>
+          <p className="line-clamp-2 text-[11px] leading-relaxed">{world.storyIntro.background}</p>
         </div>
 
         {/* Key Responsibilities */}
         <div>
-          <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">
+          <div className="text-[9.5px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1">
             Key Responsibilities
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             {world.storyIntro.keyResponsibilities.slice(0, 3).map((item, idx) => (
-              <div key={idx} className="flex items-start gap-1.5 text-xs leading-snug">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <div key={idx} className="flex items-start gap-1 text-[11px] leading-snug">
+                <CheckCircle2 className="w-3 h-3 text-emerald-500 flex-shrink-0 mt-0.5" />
                 <span className={isLight ? 'text-slate-700' : 'text-slate-300'}>{item}</span>
               </div>
             ))}
@@ -372,16 +372,16 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
         {/* SQL Topics Covered */}
         <div>
-          <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">
+          <div className="text-[9.5px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1">
             Mastered SQL Concepts ({world.sqlTopics.length})
           </div>
           <div className="flex flex-wrap gap-1">
             {world.sqlTopics.map((topic, idx) => (
               <span
                 key={idx}
-                className={`text-[10px] px-2 py-0.5 rounded font-mono border ${
+                className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono border ${
                   isLight
-                    ? 'bg-white border-slate-200 text-slate-700 shadow-2xs'
+                    ? 'bg-white border-slate-200 text-slate-700'
                     : 'bg-slate-800/80 border-slate-700/60 text-slate-300'
                 }`}
               >
@@ -394,7 +394,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
       {/* Dossier Footer Actions */}
       <div
-        className={`pt-3 border-t ${
+        className={`pt-2 border-t ${
           isLight ? 'border-slate-200' : 'border-slate-800'
         }`}
       >
@@ -402,15 +402,16 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           <div className="flex items-center gap-2">
             <Button
               variant="primary"
-              className="flex-1"
+              className="flex-1 py-1.5 text-xs"
               data-no-flip
               onClick={() => setActiveWorld(world.id)}
-              icon={<ArrowRight className="w-4 h-4" />}
+              icon={<ArrowRight className="w-3.5 h-3.5" />}
             >
-              {progress.completedMissionsCount > 0 ? 'Resume Operations' : 'Enter World'}
+              {progress.completedMissionsCount > 0 ? 'Resume' : 'Enter World'}
             </Button>
             <Button
               variant="secondary"
+              className="py-1.5 text-xs"
               data-no-flip
               onClick={(e) => {
                 e.stopPropagation();
@@ -424,7 +425,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           <div className="flex items-center gap-2">
             <Button
               variant="secondary"
-              className="flex-1"
+              className="flex-1 py-1.5 text-xs"
               data-no-flip
               onClick={(e) => {
                 e.stopPropagation();
@@ -457,9 +458,9 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
       stiffness={180}
       damping={22}
       width="100%"
-      height={530}
+      height={440}
       depth={14}
-      radius={20}
+      radius={18}
       background={isLight ? '#ffffff' : '#0f172a'}
       color={isLight ? '#0f172a' : '#f8fafc'}
       edgeBackground={isLight ? '#e2e8f0' : '#1e293b'}

@@ -1,8 +1,8 @@
 .flip-card {
   --fc-w: 100%;
-  --fc-h: 490px;
+  --fc-h: 440px;
   --fc-depth: 14px;
-  --fc-radius: 20px;
+  --fc-radius: 18px;
   --fc-bg: #ffffff;
   --fc-ink: #0f172a;
   --fc-edge-bg: #1e293b;
