@@ -87,7 +87,7 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   width = '100%',
   height = 490,
   depth = 14,
-  radius = 20,
+  radius = 26,
   background = '#ffffff',
   color = '#0f172a',
   edgeBackground,

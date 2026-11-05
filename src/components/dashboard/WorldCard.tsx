@@ -65,7 +65,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
   // Front Face Component
   const frontContent = (
     <div
-      className={`w-full h-full flex flex-col justify-between border rounded-[18px] overflow-hidden select-none transition-colors duration-200 ${
+      className={`w-full h-full flex flex-col justify-between border rounded-[26px] overflow-hidden select-none transition-colors duration-200 ${
         world.isAvailable
           ? isLight
             ? 'bg-white border-slate-200/90 shadow-sm'
@@ -297,7 +297,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
   // Back Face Component (Full Dossier & Architecture Specs)
   const backContent = (
     <div
-      className={`w-full h-full flex flex-col justify-between p-4 border rounded-[18px] overflow-hidden select-none transition-colors duration-200 ${
+      className={`w-full h-full flex flex-col justify-between p-4 border rounded-[26px] overflow-hidden select-none transition-colors duration-200 ${
         isLight
           ? 'bg-gradient-to-br from-white via-slate-50 to-slate-100/90 border-slate-200 text-slate-800'
           : 'bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 border-slate-800 text-slate-100'
@@ -448,7 +448,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
       width="100%"
       height={440}
       depth={14}
-      radius={18}
+      radius={26}
       background={isLight ? '#ffffff' : '#0f172a'}
       color={isLight ? '#0f172a' : '#f8fafc'}
       edgeBackground={isLight ? '#e2e8f0' : '#1e293b'}
