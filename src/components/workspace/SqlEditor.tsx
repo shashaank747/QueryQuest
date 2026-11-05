@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
 import { useSqlStore } from '../../stores/useSqlStore';
 import { useMissionStore } from '../../stores/useMissionStore';
@@ -25,8 +25,46 @@ export const SqlEditor: React.FC = () => {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const editorRef = useRef<any>(null);
 
+  // Remeasure fonts on window focus to ensure perfect cursor positioning
+  useEffect(() => {
+    const handleFocus = () => {
+      const monacoGlobal = (window as any).monaco;
+      if (monacoGlobal?.editor?.remeasureFonts) {
+        monacoGlobal.editor.remeasureFonts();
+        if (editorRef.current) {
+          editorRef.current.layout();
+        }
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
   const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
+
+    // Fix Monaco cursor misalignment (where cursor lags behind letters):
+    // 1. Immediate remeasure
+    monaco.editor.remeasureFonts();
+
+    // 2. Remeasure once browser document fonts finish loading
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        monaco.editor.remeasureFonts();
+        editor.layout();
+      });
+    }
+
+    // 3. Staggered remeasure to guarantee exact font advance width
+    setTimeout(() => {
+      monaco.editor.remeasureFonts();
+      editor.layout();
+    }, 150);
+
+    setTimeout(() => {
+      monaco.editor.remeasureFonts();
+      editor.layout();
+    }, 500);
 
     // Define keyboard shortcuts
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
@@ -233,7 +271,11 @@ export const SqlEditor: React.FC = () => {
             automaticLayout: true,
             tabSize: 2,
             wordWrap: 'on',
-            fontFamily: '"Fira Code", "JetBrains Mono", Consolas, monospace',
+            fontFamily: 'Consolas, "Fira Code", "JetBrains Mono", Menlo, Monaco, "Courier New", monospace',
+            letterSpacing: 0,
+            fontLigatures: false,
+            cursorStyle: 'line',
+            cursorWidth: 2,
             padding: { top: 12, bottom: 12 },
             renderLineHighlight: 'all',
             cursorBlinking: 'smooth',

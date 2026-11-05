@@ -12,6 +12,15 @@
     @apply bg-slate-950 text-slate-100;
   }
 
+  /* Ensure Monaco editor has clean monospace font metrics without inherited body font features */
+  .monaco-editor,
+  .monaco-editor .view-lines,
+  .monaco-editor .view-line,
+  .monaco-editor .view-line span {
+    font-feature-settings: normal !important;
+    letter-spacing: 0 !important;
+  }
+
   /* Custom sleek scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
