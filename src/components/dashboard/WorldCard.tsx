@@ -458,9 +458,13 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
       damping={22}
       width="100%"
       height={530}
+      depth={14}
       radius={20}
       background={isLight ? '#ffffff' : '#0f172a'}
       color={isLight ? '#0f172a' : '#f8fafc'}
+      edgeBackground={isLight ? '#e2e8f0' : '#1e293b'}
+      edgeBorder={isLight ? '#cbd5e1' : '#334155'}
+      edgeHighlight={isLight ? '#ffffff' : '#475569'}
       shadow={true}
       shadowColor={isLight ? '#94a3b8' : '#000000'}
       shadowOpacity={isLight ? 0.25 : 0.55}

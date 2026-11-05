@@ -1,9 +1,13 @@
 .flip-card {
   --fc-w: 100%;
   --fc-h: 490px;
+  --fc-depth: 14px;
   --fc-radius: 20px;
   --fc-bg: #ffffff;
   --fc-ink: #0f172a;
+  --fc-edge-bg: #1e293b;
+  --fc-edge-border: #334155;
+  --fc-edge-highlight: #64748b;
   --fc-shadow: #000000;
   --fc-shadow-o: 0.15;
   --fc-glare: 0.22;
@@ -55,6 +59,7 @@
   transform-style: preserve-3d;
 }
 
+/* Front & Back Faces with 3D Z-offset depth */
 .flip-card__face {
   position: absolute;
   inset: 0;
@@ -70,12 +75,111 @@
   -webkit-user-drag: none;
 }
 
+.flip-card__face--front {
+  transform: translateZ(calc(var(--fc-depth, 14px) / 2));
+}
+
 .flip-card__face--back {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(calc(var(--fc-depth, 14px) / 2));
 }
 
 .flip-card[data-axis='x'] .flip-card__face--back {
-  transform: rotateX(180deg);
+  transform: rotateX(180deg) translateZ(calc(var(--fc-depth, 14px) / 2));
+}
+
+/* 3D Physical Side Walls connecting Front & Back Faces */
+.flip-card__side {
+  position: absolute;
+  pointer-events: none;
+  background: var(--fc-edge-bg);
+  box-sizing: border-box;
+}
+
+.flip-card__side--left {
+  left: calc(-1 * var(--fc-depth, 14px) / 2);
+  top: var(--fc-radius);
+  bottom: var(--fc-radius);
+  width: var(--fc-depth, 14px);
+  transform-origin: center center;
+  transform: rotateY(-90deg);
+  background: linear-gradient(
+    to bottom,
+    var(--fc-edge-highlight) 0%,
+    var(--fc-edge-bg) 18%,
+    var(--fc-edge-bg) 82%,
+    var(--fc-edge-highlight) 100%
+  );
+  border-top: 1px solid var(--fc-edge-border);
+  border-bottom: 1px solid var(--fc-edge-border);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.flip-card__side--right {
+  right: calc(-1 * var(--fc-depth, 14px) / 2);
+  top: var(--fc-radius);
+  bottom: var(--fc-radius);
+  width: var(--fc-depth, 14px);
+  transform-origin: center center;
+  transform: rotateY(90deg);
+  background: linear-gradient(
+    to bottom,
+    var(--fc-edge-highlight) 0%,
+    var(--fc-edge-bg) 18%,
+    var(--fc-edge-bg) 82%,
+    var(--fc-edge-highlight) 100%
+  );
+  border-top: 1px solid var(--fc-edge-border);
+  border-bottom: 1px solid var(--fc-edge-border);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.flip-card__side--top {
+  top: calc(-1 * var(--fc-depth, 14px) / 2);
+  left: var(--fc-radius);
+  right: var(--fc-radius);
+  height: var(--fc-depth, 14px);
+  transform-origin: center center;
+  transform: rotateX(90deg);
+  background: linear-gradient(
+    to right,
+    var(--fc-edge-highlight) 0%,
+    var(--fc-edge-bg) 18%,
+    var(--fc-edge-bg) 82%,
+    var(--fc-edge-highlight) 100%
+  );
+  border-left: 1px solid var(--fc-edge-border);
+  border-right: 1px solid var(--fc-edge-border);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.flip-card__side--bottom {
+  bottom: calc(-1 * var(--fc-depth, 14px) / 2);
+  left: var(--fc-radius);
+  right: var(--fc-radius);
+  height: var(--fc-depth, 14px);
+  transform-origin: center center;
+  transform: rotateX(-90deg);
+  background: linear-gradient(
+    to right,
+    var(--fc-edge-highlight) 0%,
+    var(--fc-edge-bg) 18%,
+    var(--fc-edge-bg) 82%,
+    var(--fc-edge-highlight) 100%
+  );
+  border-left: 1px solid var(--fc-edge-border);
+  border-right: 1px solid var(--fc-edge-border);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* 3D Curved Corner Extrusion Slices */
+.flip-card__slice {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--fc-radius);
+  background: var(--fc-edge-bg);
+  border: 1px solid var(--fc-edge-border);
+  pointer-events: none;
+  box-sizing: border-box;
 }
 
 .flip-card__glare {
@@ -96,7 +200,7 @@
 }
 
 .flip-card[data-fade] .flip-card__face {
-  transform: none;
+  transform: none !important;
   opacity: 0;
   backface-visibility: visible;
   -webkit-backface-visibility: visible;
@@ -106,4 +210,9 @@
 .flip-card[data-fade='front'] .flip-card__face--front,
 .flip-card[data-fade='back'] .flip-card__face--back {
   opacity: 1;
+}
+
+.flip-card[data-fade] .flip-card__side,
+.flip-card[data-fade] .flip-card__slice {
+  display: none !important;
 }

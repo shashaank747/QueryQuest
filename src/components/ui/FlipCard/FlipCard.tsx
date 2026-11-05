@@ -41,9 +41,13 @@ export interface FlipCardProps {
   damping?: number;
   width?: number | string;
   height?: number | string;
+  depth?: number;
   radius?: number;
   background?: string;
   color?: string;
+  edgeBackground?: string;
+  edgeBorder?: string;
+  edgeHighlight?: string;
   shadow?: boolean;
   shadowColor?: string;
   shadowOpacity?: number;
@@ -82,9 +86,13 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   damping = 20,
   width = '100%',
   height = 490,
+  depth = 14,
   radius = 20,
   background = '#ffffff',
   color = '#0f172a',
+  edgeBackground,
+  edgeBorder,
+  edgeHighlight,
   shadow = true,
   shadowColor = '#000000',
   shadowOpacity = 0.2,
@@ -269,6 +277,27 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   const widthStyle = typeof width === 'number' ? `${width}px` : width;
   const heightStyle = typeof height === 'number' ? `${height}px` : height;
 
+  // Generate 3D interior corner slices for rounded edge extrusion
+  const isDark =
+    background.startsWith('#0') ||
+    background.startsWith('#1') ||
+    background.startsWith('#2') ||
+    background.includes('rgb(1') ||
+    background.includes('rgb(0');
+  const defaultEdgeBg = isDark ? '#1e293b' : '#e2e8f0';
+  const defaultEdgeBorder = isDark ? '#334155' : '#cbd5e1';
+  const defaultEdgeHighlight = isDark ? '#64748b' : '#ffffff';
+
+  const resolvedEdgeBg = edgeBackground || defaultEdgeBg;
+  const resolvedEdgeBorder = edgeBorder || defaultEdgeBorder;
+  const resolvedEdgeHighlight = edgeHighlight || defaultEdgeHighlight;
+
+  const sliceCount = depth > 0 ? Math.max(0, Math.min(15, Math.round(depth) - 1)) : 0;
+  const slices = Array.from({ length: sliceCount }, (_, i) => {
+    const z = -depth / 2 + ((i + 1) * depth) / (sliceCount + 1);
+    return Math.round(z * 10) / 10;
+  });
+
   return (
     <div
       ref={rootRef}
@@ -300,9 +329,13 @@ export const FlipCard: React.FC<FlipCardProps> = ({
       style={{
         '--fc-w': widthStyle,
         '--fc-h': heightStyle,
+        '--fc-depth': `${depth}px`,
         '--fc-radius': `${radius}px`,
         '--fc-bg': background,
         '--fc-ink': color,
+        '--fc-edge-bg': resolvedEdgeBg,
+        '--fc-edge-border': resolvedEdgeBorder,
+        '--fc-edge-highlight': resolvedEdgeHighlight,
         '--fc-shadow': shadowColor,
         '--fc-shadow-o': shadowOpacity,
         '--fc-glare': glareOpacity,
@@ -316,6 +349,26 @@ export const FlipCard: React.FC<FlipCardProps> = ({
         />
       ) : null}
       <motion.div className="flip-card__rotor" style={reduce ? undefined : rotorStyle}>
+        {/* 3D Physical Corner Slices */}
+        {depth > 0 && !reduce && slices.map((z, idx) => (
+          <div
+            key={idx}
+            className="flip-card__slice"
+            aria-hidden="true"
+            style={{ transform: `translateZ(${z}px)` }}
+          />
+        ))}
+
+        {/* 3D Physical Edge Walls */}
+        {depth > 0 && !reduce && (
+          <>
+            <div className="flip-card__side flip-card__side--left" aria-hidden="true" />
+            <div className="flip-card__side flip-card__side--right" aria-hidden="true" />
+            <div className="flip-card__side flip-card__side--top" aria-hidden="true" />
+            <div className="flip-card__side flip-card__side--bottom" aria-hidden="true" />
+          </>
+        )}
+
         <div
           className="flip-card__face flip-card__face--front"
           aria-hidden={shown}
