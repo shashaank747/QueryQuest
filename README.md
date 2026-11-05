@@ -1,22 +1,45 @@
 # QueryQuest
 
 <p align="center">
-  <img src="public/logo.png" alt="QueryQuest - Learn SQL Through Real-World Missions" width="420" />
+  <img src="public/logo.png" alt="QueryQuest - Learn SQL Through Real-World Missions" width="380" />
 </p>
 
-> **Real-world problems. SQL-powered solutions.**
+<p align="center">
+  <strong>Real-world problems. SQL-powered solutions.</strong>
+</p>
 
-QueryQuest is a modern, game-based SQL learning platform where students learn SQL by stepping into authentic business environments called **Worlds** and solving realistic operational problems.
+<p align="center">
+  <a href="#-getting-started"><img src="https://img.shields.io/badge/Status-Playable_MVP-10b981.svg" alt="Status" /></a>
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/SQLite-WASM_In--Browser-0284c7.svg" alt="SQLite WASM" /></a>
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/Editor-Monaco_IDE-6366f1.svg" alt="Monaco Editor" /></a>
+  <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-amber.svg" alt="License" /></a>
+</p>
 
-Instead of reading dry tutorials or answering disconnected trivia, students enter virtual organizations as junior database analysts, inspect live database schemas, write genuine SQL queries, troubleshoot broken inventory workflows, and compile dynamic executive business reports.
+QueryQuest is a modern, game-based SQL learning simulation where students learn SQL by stepping into authentic business environments called **Worlds** and solving realistic operational breakdowns.
 
-QueryQuest executes **real SQLite queries inside your browser via WebAssembly**, guaranteeing that every query runs against an authentic relational database engine.
+Instead of reading dry tutorials or answering disconnected multiple-choice quizzes, students enter virtual organizations as database analysts, inspect live database schemas, write genuine SQL queries, troubleshoot broken inventory workflows, and compile dynamic executive business reports.
+
+QueryQuest executes **real SQLite queries inside your browser via WebAssembly**, guaranteeing that every query runs against an authentic relational database engine with zero server latency.
+
+---
+
+## 🎴 3D Collectible World Cards
+
+The dashboard presents world environments as interactive **3D collectible physical cards**:
+
+- **Front Face**: High-resolution operational environment cover banner, company role, difficulty level, estimated completion time, target SQL concepts, mission progress bar, and immediate "Enter World" action.
+- **Back Face (Operational Dossier)**: Company profile, database file name (`supermarket.db`), operational context brief, key analyst responsibilities, and mastered SQL topics.
+- **Physical 3D Slab Depth**: Physical 14px slab thickness with realistic 3D edge walls, giving the cards a solid, collectible feel.
+- **Gentle 3D Tilt**: Subtle cursor tilt dynamics reacting smoothly as your mouse glides over corners.
+- **Card Flip Mechanics**: 1-click flip button or drag gesture with smooth spring animations.
+- **Auto-Reset Safety Timer**: Cards flipped to the dossier face automatically flip back to the front after 60 seconds of inactivity.
+- **Zero Scrollbars**: Compact, cleanly balanced layouts with 26px rounded corners designed to fit within boundaries without internal scrolling.
 
 ---
 
 ## 📸 Industry Worlds & Case Studies
 
-QueryQuest features five distinct industry worlds, each designed around realistic relational database scenarios and authentic case study reference environments:
+QueryQuest features five distinct industry worlds, each designed around realistic relational database scenarios and authentic reference environments:
 
 | World | Industry | Reference Environment | Difficulty | Time | SQL Focus | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -40,25 +63,26 @@ QueryQuest features five distinct industry worlds, each designed around realisti
 
 ### 2. Professional Monaco SQL Editor & IDE
 - **Syntax Highlighting & Autocomplete**: Complete SQLite grammar highlighting with SQL keyword suggestions.
+- **Pixel-Perfect Caret Alignment**: Monaco font metrics are dynamically remeasured (`remeasureFonts()`) on mount and font load, ensuring zero cursor drift across long queries.
+- **Isolated Monospace Typography**: Employs `Consolas`, `Fira Code`, and native monospace stacks with strict `letter-spacing: 0` and disabled font ligatures for consistent character advance widths.
 - **Resizable 3-Column Layout**:
   - **Left Sidebar**: Mission Briefing, storyline, business problem, and progressive hints.
-  - **Center Column**: Monaco SQL Editor (top 52%) + Live Query Results Terminal (bottom 48%).
+  - **Center Column**: Monaco SQL Editor (top) + Live Query Results Terminal (bottom).
   - **Right Sidebar**: Database Schema Explorer.
 - **Smart Drag Splitters**:
-  - Interactive resizers between left/center and center/right panels with hover/active grip indicators.
-  - **Strict Minimum Width Constraints**: Left sidebar is limited to stay open at a minimum of **240px**; Right sidebar is limited to stay open at a minimum of **200px**; Center compiler is guaranteed at least **360px** of breathing room (sidebars cannot be collapsed to zero).
-  - **Double-Click to Reset**: Double-clicking splitters snaps panels back to their default widths (380px left, 280px right).
-  - **Persistent Dimensions**: Custom widths are saved to `localStorage` (`queryquest_left_width`, `queryquest_right_width`).
-  - **Full-Screen Drag Shield**: Transparent overlay prevents Monaco editor from capturing mouse events during drag gestures.
+  - Interactive resizers between panels with hover/active grip indicators.
+  - **Strict Constraints**: Left sidebar minimum **240px**; Right sidebar minimum **200px**; Center compiler guaranteed at least **360px**.
+  - **Double-Click Reset**: Snaps panels back to default widths (380px left, 280px right).
+  - **Persistent Dimensions**: Custom widths saved to `localStorage` (`queryquest_left_width`, `queryquest_right_width`).
+  - **Drag Shield**: Transparent overlay prevents editor from capturing mouse events during resize gestures.
 - **Editor Controls**:
-  - **Run Query** (`Ctrl+Enter` / `⌘+Enter`): Executes the SQL query in sandbox scratchpad mode.
-  - **Submit Objective** (`Ctrl+Shift+Enter` / `⌘+Shift+Enter`): Runs query through the multi-solution validation engine against mission objectives.
-  - **Select All** button (`Ctrl+A` / `⌘+A`): One-click full text selection.
-  - **Reset to Starter** (`RotateCcw`): Re-populates the editor with the mission's default SQL blueprint.
+  - **Run Query** (`Ctrl+Enter` / `⌘+Enter`): Executes SQL in scratchpad mode.
+  - **Submit Objective** (`Ctrl+Shift+Enter` / `⌘+Shift+Enter`): Evaluates query against mission objectives.
+  - **Select All** button (`Ctrl+A` / `⌘+A`): One-click full query selection.
+  - **Reset to Starter** (`RotateCcw`): Restores the mission's default SQL blueprint.
   - **Clear**: Clears the editor canvas.
   - **Query History**: Inspects the last 15 executed queries with execution time, row count, status, and click-to-load.
-  - **Keyboard Shortcuts Modal**: Built-in reference for hotkeys.
-  - **Accidental Drag Protection**: Configured with `dragAndDrop: false` and `selectOnLineNumbers: true` for clean text highlighting.
+  - **Keyboard Shortcuts Modal**: Quick-reference modal for hotkeys.
 
 ### 3. Intelligent Mission Validation Engine
 - Validates **actual database results and state changes**, not superficial string matching or brittle regular expressions.
@@ -75,17 +99,30 @@ QueryQuest features five distinct industry worlds, each designed around realisti
   - `TABLE_EXISTS`: Inspects SQLite schema catalog to confirm tables were created with proper column types and constraints.
   - `DML_STATE_CHECK`: Runs secondary inspection queries to verify that `INSERT`, `UPDATE`, or `DELETE` statements mutated target rows without violating foreign keys.
 
-### 4. Interactive Database Schema Explorer
+### 4. Real-Time World Performance & Analytics Modal
+- **Header "Performance" Pill**: Interactive pill in the workspace navigation bar for on-demand performance telemetry.
+- **Progress Tracking**: Completed missions count, percentage progress bar, and remaining mission counters.
+- **Live Time Tracking**: Measures exact active problem-solving seconds per task and overall cumulative world time.
+- **Mistakes & Error Log**:
+  - Automatically captures query syntax errors, runtime failures, and failed validation checks.
+  - Calculates live query accuracy percentage.
+  - **Interactive Mistakes Breakdown**: Expand any task row to view the historical list of exact error messages encountered during that mission.
+- **Assistance Reliance**: Tracks progressive hint usage (0 to 3) per task.
+- **Performance Rank & Assessment**: Computes operational rankings (*SQL Apprentice*, *Junior Database Technician*, *Operational SQL Specialist*, *Principal Data Architect*).
+- **Mastered SQL Concepts**: Visual tags of all SQL keywords practiced in completed tasks.
+- **Winning SQL Query**: Displays the student's passing SQL query with a 1-click clipboard copy button.
+
+### 5. Interactive Database Schema Explorer
 - **Collapsible Table Tree**: Displays all tables in the active world database with live row counts.
 - **Instant Search Filter**: Quickly find tables in complex enterprise schemas.
 - **Detailed Column Inspector**:
   - Column name and SQLite data type (`INTEGER`, `TEXT`, `REAL`, etc.).
   - Visual badges: `PK` (Primary Key in amber), `FK` (Foreign Key in sky blue), `NOT NULL`, `DEFAULT`.
-- **Table Data Preview Modal**: Click the eye icon next to any table to preview its first 100 records in a tabular modal without writing a query manually.
+- **Table Data Preview Modal**: Click the eye icon next to any table to preview its records in a tabular modal without writing a query manually.
 - **One-Click Insert**: Click any table or column name to insert it directly into the Monaco editor.
 - **Live Catalog Refresh**: Reloads catalog dynamically after `CREATE TABLE`, `ALTER TABLE`, or `DROP TABLE` operations.
 
-### 5. Progressive Hints & Diagnostic Feedback
+### 6. Progressive Hints & Diagnostic Feedback
 - **Educational SQLite Diagnostics**: Translates raw SQLite error messages into targeted guidance:
   - `no such table` &rarr; Suggests checking exact table spelling or creating it first.
   - `no such column` &rarr; Suggests valid column names and table aliases.
@@ -98,7 +135,7 @@ QueryQuest features five distinct industry worlds, each designed around realisti
   - Tier 3: Complete SQL blueprint snippet.
 - **Full Solution Breakdown**: Step-by-step explanations available upon mission completion or after 3 attempts.
 
-### 6. Dynamic Executive Business Reports
+### 7. Dynamic Executive Business Reports
 - Generates live business audit reports calculated entirely from real SQL queries on the active database:
   - **Executive Briefing Memo**: Narrative briefing for senior management.
   - **KPI Stat Counters**: Total gross revenue, stock units on hand, active reorder alerts.
@@ -107,7 +144,7 @@ QueryQuest features five distinct industry worlds, each designed around realisti
   - **Procurement Reorder List**: Flags low-stock items with shelf and bin locations.
   - **Print / PDF Export**: Formatted for executive sharing.
 
-### 7. SQL Foundation Reference Hub
+### 8. SQL Foundation Reference Hub
 Integrated 9-module reference guide with practical blueprints and SQLite dialect rules:
 - **Module 1**: Database Fundamentals (Tables, rows, schemas, primary keys, relationships).
 - **Module 2**: Data Types (`INTEGER`, `TEXT`, `REAL`, `BLOB`, `NULL`, date/time handling).
@@ -119,19 +156,19 @@ Integrated 9-module reference guide with practical blueprints and SQLite dialect
 - **Module 8**: Aggregate Functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`, `GROUP BY`, `HAVING`).
 - **Module 9**: Advanced SQL (Subqueries, Common Table Expressions `WITH`, `CASE`, `UNION`, Views).
 
-### 8. Adaptive Themes (`slate-100` Light & `slate-950` Dark)
+### 9. Adaptive Themes (`slate-100` Light & `slate-950` Dark)
 - **Default Theme**: **Slate-100 Light Mode** (`#f1f5f9`), crisp white surface cards (`bg-white`), dark slate typography, and emerald accents.
 - **Header Theme Toggle**: Switch seamlessly between `slate-100` light and `slate-950` dark mode.
 - **Monaco Synchronization**: Editor switches automatically between `vs` and `vs-dark` themes.
 - **Persistence**: Theme selection is saved to `localStorage` (`queryquest_theme`).
 
-### 9. Gamification & Audio Synthesizer
+### 10. Gamification & Audio Synthesizer
 - **XP Progression & Levels**: Earn XP for solving missions, running queries, and completing worlds.
 - **Badges & Achievements**: Unlock milestones like *First Query Executed*, *Workspace Architect*, *Join Master*, *Audit Specialist*, and *Report Producer*.
 - **Procedural Sound Engine**: Powered by the Web Audio API without any external MP3/WAV downloads. Synthesizes click feedback, run query sounds, success chimes, and level-up flourishes. Can be muted anytime via the header toggle.
 
-### 10. Offline Persistence (IndexedDB)
-- Uses `idb` to persist complete SQLite database binary snapshots (`Uint8Array`) per world.
+### 11. Offline Persistence (IndexedDB)
+- Uses `idb` to persist complete SQLite database binary snapshots (`Uint8Array`) and mission telemetry per world.
 - Changes survive browser reloads and offline sessions.
 - **Workspace Reset**: Includes a "Reset DB" feature to re-seed initial clean datasets at any time.
 
@@ -142,15 +179,15 @@ Integrated 9-module reference guide with practical blueprints and SQLite dialect
 Students join **FreshMart Hypermarkets Ltd.** as a Junior Database Executive under Operations Manager Devendra.
 
 ### Database Schema (9 Tables)
-1. `products` (product_id, product_name, category_id, supplier_id, unit_price, cost_price, barcode, status)
-2. `categories` (category_id, category_name, department, description)
-3. `suppliers` (supplier_id, company_name, contact_name, phone, email, city)
-4. `customers` (customer_id, first_name, last_name, email, phone, loyalty_tier)
-5. `employees` (employee_id, first_name, last_name, role, department, salary, hire_date)
-6. `orders` (order_id, customer_id, employee_id, order_date, total_amount, status)
-7. `order_items` (item_id, order_id, product_id, quantity, unit_price, discount)
-8. `payments` (payment_id, order_id, payment_method, amount, payment_date, status)
-9. `inventory` (inventory_id, product_id, quantity_on_hand, reorder_level, shelf_location, last_restocked)
+1. `products` (`product_id`, `product_name`, `category_id`, `supplier_id`, `unit_price`, `cost_price`, `barcode`, `status`)
+2. `categories` (`category_id`, `category_name`, `department`, `description`)
+3. `suppliers` (`supplier_id`, `company_name`, `contact_name`, `phone`, `email`, `city`)
+4. `customers` (`customer_id`, `first_name`, `last_name`, `email`, `phone`, `loyalty_tier`)
+5. `employees` (`employee_id`, `first_name`, `last_name`, `role`, `department`, `salary`, `hire_date`)
+6. `orders` (`order_id`, `customer_id`, `employee_id`, `order_date`, `total_amount`, `status`)
+7. `order_items` (`item_id`, `order_id`, `product_id`, `quantity`, `unit_price`, `discount`)
+8. `payments` (`payment_id`, `order_id`, `payment_method`, `amount`, `payment_date`, `status`)
+9. `inventory` (`inventory_id`, `product_id`, `quantity_on_hand`, `reorder_level`, `shelf_location`, `last_restocked`)
 
 ### Missions
 1. **Initialize Supermarket Store Workspace**: `CREATE TABLE store_branches` with `INTEGER PRIMARY KEY` and `NOT NULL` constraints.
@@ -170,21 +207,21 @@ Students join **FreshMart Hypermarkets Ltd.** as a Junior Database Executive und
 
 | Metric | Measurement |
 | :--- | :--- |
-| **Gzipped JavaScript Bundle** | **~103 kB** (`dist/assets/index-*.js`) |
-| **Gzipped CSS Bundle** | **~7.3 kB** (`dist/assets/index-*.css`) |
+| **Gzipped JavaScript Bundle** | **~167 kB** (`dist/assets/index-*.js` including Monaco, SQLite WASM client, Lucide icons) |
+| **Gzipped CSS Bundle** | **~9.1 kB** (`dist/assets/index-*.css`) |
 | **Web Worker Bundle** | **44.4 kB** (`dist/assets/sql.worker-*.js`) |
 | **Initial Boot Time** | **< 300 ms** in modern browsers |
-| **Main Thread Overhead** | **0 ms** during query execution (dedicated worker) |
+| **Main Thread Overhead** | **0 ms** during query execution (isolated Web Worker) |
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **UI & State**: React 18, TypeScript, Tailwind CSS, Zustand, Lucide Icons
-- **SQL Editor**: Monaco Editor (`@monaco-editor/react`)
+- **UI & Framework**: React 18, TypeScript, Tailwind CSS, Zustand, Lucide Icons
+- **SQL Editor**: Monaco Editor (`@monaco-editor/react`) with dynamic remeasuring & Consolas monospace stack
 - **SQL Engine**: SQLite 3 compiled to WebAssembly via `sql.js` (Web Worker isolation)
 - **Local Persistence**: IndexedDB (`idb`)
-- **Audio**: Web Audio API Procedural Synthesizer
+- **Audio Synthesizer**: Web Audio API Procedural Synthesizer
 - **Testing**: Vitest, React Testing Library, Playwright
 - **Build Tooling**: Vite 6, PostCSS, TypeScript 5
 
@@ -200,8 +237,8 @@ Students join **FreshMart Hypermarkets Ltd.** as a Junior Database Executive und
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/quest-quary.git
-cd quest-quary
+git clone https://github.com/shashaank747/QueryQuest.git
+cd QueryQuest
 
 # Install dependencies
 npm install
@@ -248,6 +285,13 @@ npm run preview
 
 ---
 
+## 👨‍💻 Creator & Engineering
+
+Designed & Developed by **Shashaank Sajjanar**  
+GitHub: [@shashaank747](https://github.com/shashaank747)
+
+---
+
 ## 📄 License
 
-QueryQuest is licensed under the **MIT License**.
+QueryQuest is open-source software licensed under the **MIT License**.
