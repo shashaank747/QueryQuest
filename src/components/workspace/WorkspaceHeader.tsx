@@ -57,6 +57,14 @@ export const WorkspaceHeader: React.FC = () => {
             <span className="hidden sm:inline">Worlds</span>
           </Button>
 
+          <img
+            src="/logo.png"
+            alt="QueryQuest"
+            className="h-7 w-auto object-contain cursor-pointer hover:scale-105 transition-transform hidden sm:block select-none"
+            onClick={() => setActiveWorld(null)}
+            title="Return to Worlds Dashboard"
+          />
+
           <div className={`h-4 w-px ${isLight ? 'bg-slate-200' : 'bg-slate-800'} hidden sm:block`} />
 
           <div className="flex items-center gap-2">

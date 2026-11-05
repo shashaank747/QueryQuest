@@ -1,5 +1,9 @@
 # QueryQuest
 
+<p align="center">
+  <img src="public/logo.png" alt="QueryQuest - Learn SQL Through Real-World Missions" width="420" />
+</p>
+
 > **Real-world problems. SQL-powered solutions.**
 
 QueryQuest is a modern, game-based SQL learning platform where students learn SQL by stepping into authentic business environments called **Worlds** and solving realistic operational problems.
