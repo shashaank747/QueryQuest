@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WorldDefinition } from '../../types/world';
 import { useWorldStore } from '../../stores/useWorldStore';
 import { useThemeStore } from '../../stores/useThemeStore';
@@ -52,6 +52,17 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
   const { theme } = useThemeStore();
   const isLight = theme === 'slate-100';
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Auto-flip back to front after 60 seconds if not turned back by the user
+  useEffect(() => {
+    if (!isFlipped) return;
+
+    const timer = setTimeout(() => {
+      setIsFlipped(false);
+    }, 60000);
+
+    return () => clearTimeout(timer);
+  }, [isFlipped]);
 
   const progress = worldProgress[world.id] || {
     completedMissionsCount: 0,
