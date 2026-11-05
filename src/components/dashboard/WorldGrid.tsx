@@ -17,15 +17,7 @@ export const WorldGrid: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
       {/* Hero Section */}
-      <div className="mb-10 text-center max-w-3xl mx-auto flex flex-col items-center">
-        <div className="mb-6 group">
-          <img
-            src="/logo.png"
-            alt="QueryQuest - Learn SQL Through Real-World Missions"
-            className="w-52 sm:w-68 md:w-76 h-auto object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105 select-none"
-          />
-        </div>
-
+      <div className="mb-10 text-center max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold mb-4">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Interactive Business Case Studies</span>
