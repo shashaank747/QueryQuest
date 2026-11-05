@@ -339,8 +339,8 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
         </div>
       </div>
 
-      {/* Dossier Scrollable Middle Area */}
-      <div className="flex-1 my-2 space-y-2 overflow-y-auto pr-1">
+      {/* Dossier Middle Area (Fits cleanly without scrolling) */}
+      <div className="flex-1 flex flex-col justify-between my-2 overflow-hidden">
         {/* Scenario Background */}
         <div
           className={`p-2 rounded-xl border text-xs leading-relaxed ${
@@ -376,7 +376,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
             Mastered SQL Concepts ({world.sqlTopics.length})
           </div>
           <div className="flex flex-wrap gap-1">
-            {world.sqlTopics.map((topic, idx) => (
+            {world.sqlTopics.slice(0, 8).map((topic, idx) => (
               <span
                 key={idx}
                 className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono border ${
@@ -388,6 +388,17 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
                 {topic}
               </span>
             ))}
+            {world.sqlTopics.length > 8 && (
+              <span
+                className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono border ${
+                  isLight
+                    ? 'bg-slate-100 border-slate-200 text-slate-500'
+                    : 'bg-slate-800 border-slate-700 text-slate-400'
+                }`}
+              >
+                +{world.sqlTopics.length - 8} more
+              </span>
+            )}
           </div>
         </div>
       </div>
