@@ -25,6 +25,7 @@ interface MissionState {
   advanceToNextMission: () => void;
   closeWorldCompletedModal: () => void;
   resetMissionsProgress: (world: WorldDefinition) => Promise<void>;
+  getMissionTimeSpent: (missionId: string) => number;
 }
 
 export const useMissionStore = create<MissionState>((set, get) => ({
@@ -48,6 +49,10 @@ export const useMissionStore = create<MissionState>((set, get) => ({
           status: idx === 0 ? 'unlocked' : 'locked',
           attemptsCount: 0,
           hintsRevealed: 0,
+          timeSpentSeconds: 0,
+          errorsCount: 0,
+          mistakes: [],
+          sessionStartedAt: idx === 0 ? Date.now() : undefined,
         };
       }
     });
@@ -58,6 +63,13 @@ export const useMissionStore = create<MissionState>((set, get) => ({
     );
     if (!initialMission && missions.length > 0) {
       initialMission = missions[0];
+    }
+
+    if (initialMission && progressMap[initialMission.id]?.status !== 'completed') {
+      progressMap[initialMission.id] = {
+        ...progressMap[initialMission.id],
+        sessionStartedAt: Date.now(),
+      };
     }
 
     set({
@@ -74,24 +86,65 @@ export const useMissionStore = create<MissionState>((set, get) => ({
   },
 
   selectMission: (missionId: string) => {
-    const { missions, progressMap } = get();
-    const mission = missions.find((m) => m.id === missionId);
-    if (!mission) return;
+    const { activeMission, missions, progressMap } = get();
+    const activeWorld = useWorldStore.getState().activeWorld;
+    const targetMission = missions.find((m) => m.id === missionId);
+    if (!targetMission) return;
 
     // Check if locked
-    const prog = progressMap[missionId];
-    if (prog?.status === 'locked') return;
+    const targetProg = progressMap[missionId];
+    if (targetProg?.status === 'locked') return;
+
+    const now = Date.now();
+    const updatedMap: Record<string, MissionProgress> = { ...progressMap };
+
+    // Accumulate elapsed seconds on previous active mission if it wasn't completed
+    if (activeMission && activeMission.id !== missionId) {
+      const prevProg = updatedMap[activeMission.id];
+      if (prevProg && prevProg.status !== 'completed' && prevProg.sessionStartedAt) {
+        const elapsed = Math.round((now - prevProg.sessionStartedAt) / 1000);
+        const updatedPrev: MissionProgress = {
+          ...prevProg,
+          timeSpentSeconds: (prevProg.timeSpentSeconds || 0) + elapsed,
+          sessionStartedAt: undefined,
+        };
+        updatedMap[activeMission.id] = updatedPrev;
+        if (activeWorld) {
+          persistenceService.saveMissionProgress(activeWorld.id, activeMission.id, updatedPrev);
+        }
+      }
+    }
+
+    // Set sessionStartedAt on target mission if not completed
+    const currentTargetProg = updatedMap[missionId] || {
+      missionId,
+      status: 'unlocked',
+      attemptsCount: 0,
+      hintsRevealed: 0,
+      timeSpentSeconds: 0,
+      errorsCount: 0,
+      mistakes: [],
+    };
+
+    if (currentTargetProg.status !== 'completed') {
+      const updatedTarget: MissionProgress = {
+        ...currentTargetProg,
+        sessionStartedAt: now,
+      };
+      updatedMap[missionId] = updatedTarget;
+    }
 
     set({
-      activeMission: mission,
+      activeMission: targetMission,
       validationFeedback: null,
+      progressMap: updatedMap,
     });
 
     // If completed and has bestSql, set that, otherwise set placeholder
-    if (prog?.bestSql) {
-      useSqlStore.getState().setQuery(prog.bestSql);
-    } else if (mission.initialSqlPlaceholder) {
-      useSqlStore.getState().setQuery(mission.initialSqlPlaceholder);
+    if (currentTargetProg?.bestSql) {
+      useSqlStore.getState().setQuery(currentTargetProg.bestSql);
+    } else if (targetMission.initialSqlPlaceholder) {
+      useSqlStore.getState().setQuery(targetMission.initialSqlPlaceholder);
     }
   },
 
@@ -140,7 +193,35 @@ export const useMissionStore = create<MissionState>((set, get) => ({
     // 1. Run the query through the SQL executor
     const response = await useSqlStore.getState().runQuery();
 
+    const currentProg = progressMap[activeMission.id] || {
+      missionId: activeMission.id,
+      status: 'unlocked',
+      attemptsCount: 0,
+      hintsRevealed: 0,
+      timeSpentSeconds: 0,
+      errorsCount: 0,
+      mistakes: [],
+    };
+
     if (!response.success) {
+      const errorMsg = response.hint || response.error || 'Execution failed';
+      const existingMistakes = currentProg.mistakes || [];
+      const updatedMistakes = existingMistakes.includes(errorMsg)
+        ? existingMistakes
+        : [...existingMistakes, errorMsg];
+
+      const updatedProg: MissionProgress = {
+        ...currentProg,
+        attemptsCount: currentProg.attemptsCount + 1,
+        errorsCount: (currentProg.errorsCount || 0) + 1,
+        mistakes: updatedMistakes.slice(-10),
+      };
+
+      const updatedMap = {
+        ...progressMap,
+        [activeMission.id]: updatedProg,
+      };
+
       set({
         isValidating: false,
         validationFeedback: {
@@ -150,7 +231,15 @@ export const useMissionStore = create<MissionState>((set, get) => ({
             hint: response.hint || response.error,
           },
         },
+        progressMap: updatedMap,
       });
+
+      await persistenceService.saveMissionProgress(
+        activeWorld.id,
+        activeMission.id,
+        updatedProg
+      );
+
       return false;
     }
 
@@ -171,13 +260,6 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       validationContext
     );
 
-    const currentProg = progressMap[activeMission.id] || {
-      missionId: activeMission.id,
-      status: 'unlocked',
-      attemptsCount: 0,
-      hintsRevealed: 0,
-    };
-
     if (feedback.passed) {
       // Mission Success!
       // Trigger festive celebration confetti
@@ -192,12 +274,20 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       }
 
       const wasAlreadyCompleted = currentProg.status === 'completed';
+      const now = Date.now();
+      const sessionSeconds = currentProg.sessionStartedAt
+        ? Math.max(1, Math.round((now - currentProg.sessionStartedAt) / 1000))
+        : 0;
+      const finalTimeSpent = (currentProg.timeSpentSeconds || 0) + sessionSeconds;
+
       const updatedProg: MissionProgress = {
         ...currentProg,
         status: 'completed',
-        completedAt: Date.now(),
+        completedAt: now,
         attemptsCount: currentProg.attemptsCount + 1,
         bestSql: response.query,
+        timeSpentSeconds: Math.max(1, finalTimeSpent),
+        sessionStartedAt: undefined,
       };
 
       const updatedMap: Record<string, MissionProgress> = {
@@ -214,6 +304,10 @@ export const useMissionStore = create<MissionState>((set, get) => ({
           status: 'unlocked',
           attemptsCount: 0,
           hintsRevealed: 0,
+          timeSpentSeconds: 0,
+          errorsCount: 0,
+          mistakes: [],
+          sessionStartedAt: now,
         };
         await persistenceService.saveMissionProgress(
           activeWorld.id,
@@ -259,9 +353,17 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       return true;
     } else {
       // Objective not met
+      const mistakeMsg = feedback.message + (feedback.details?.hint ? ` (${feedback.details.hint})` : '');
+      const existingMistakes = currentProg.mistakes || [];
+      const updatedMistakes = existingMistakes.includes(mistakeMsg)
+        ? existingMistakes
+        : [...existingMistakes, mistakeMsg];
+
       const updatedProg: MissionProgress = {
         ...currentProg,
         attemptsCount: currentProg.attemptsCount + 1,
+        errorsCount: (currentProg.errorsCount || 0) + 1,
+        mistakes: updatedMistakes.slice(-10),
       };
 
       set({
@@ -297,12 +399,17 @@ export const useMissionStore = create<MissionState>((set, get) => ({
 
   resetMissionsProgress: async (world: WorldDefinition) => {
     const freshMap: Record<string, MissionProgress> = {};
+    const now = Date.now();
     world.missions.forEach((m, idx) => {
       freshMap[m.id] = {
         missionId: m.id,
         status: idx === 0 ? 'unlocked' : 'locked',
         attemptsCount: 0,
         hintsRevealed: 0,
+        timeSpentSeconds: 0,
+        errorsCount: 0,
+        mistakes: [],
+        sessionStartedAt: idx === 0 ? now : undefined,
       };
     });
 
@@ -321,6 +428,16 @@ export const useMissionStore = create<MissionState>((set, get) => ({
     }
 
     await useWorldStore.getState().refreshWorldProgress(world.id);
+  },
+
+  getMissionTimeSpent: (missionId: string): number => {
+    const prog = get().progressMap[missionId];
+    if (!prog) return 0;
+    let total = prog.timeSpentSeconds || 0;
+    if (prog.status !== 'completed' && prog.sessionStartedAt) {
+      total += Math.max(0, Math.round((Date.now() - prog.sessionStartedAt) / 1000));
+    }
+    return total;
   },
 }));
 

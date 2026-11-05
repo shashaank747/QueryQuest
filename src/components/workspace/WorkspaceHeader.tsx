@@ -12,8 +12,10 @@ import {
   Database,
   Sun,
   Moon,
+  Activity,
 } from 'lucide-react';
 import { BusinessReportModal } from '../report/BusinessReportModal';
+import { PerformanceModal } from './PerformanceModal';
 
 export const WorkspaceHeader: React.FC = () => {
   const { activeWorld, setActiveWorld } = useWorldStore();
@@ -21,6 +23,7 @@ export const WorkspaceHeader: React.FC = () => {
   const { resetDatabase, isInitializing } = useSqlStore();
   const { theme, toggleTheme } = useThemeStore();
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isPerformanceOpen, setIsPerformanceOpen] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   const isLight = theme === 'slate-100';
@@ -126,6 +129,20 @@ export const WorkspaceHeader: React.FC = () => {
             <span className="hidden sm:inline">Reset DB</span>
           </Button>
 
+          {/* Performance Pill */}
+          <button
+            onClick={() => setIsPerformanceOpen(true)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all border shadow-sm ${
+              isLight
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400'
+                : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25'
+            }`}
+            title="View World Performance & Analytics"
+          >
+            <Activity className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+            <span>Performance</span>
+          </button>
+
           {/* Business Report */}
           <Button
             variant="secondary"
@@ -138,6 +155,13 @@ export const WorkspaceHeader: React.FC = () => {
           </Button>
         </div>
       </header>
+
+      {/* Performance Modal */}
+      <PerformanceModal
+        isOpen={isPerformanceOpen}
+        onClose={() => setIsPerformanceOpen(false)}
+        world={activeWorld}
+      />
 
       {/* Report Modal */}
       <BusinessReportModal

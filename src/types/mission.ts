@@ -31,5 +31,9 @@ export interface MissionProgress {
   attemptsCount: number;
   hintsRevealed: number; // 0 to 3
   bestSql?: string;
+  timeSpentSeconds?: number;
+  errorsCount?: number;
+  mistakes?: string[];
+  sessionStartedAt?: number;
 }
 
