@@ -5,7 +5,7 @@ import { useThemeStore } from '../stores/useThemeStore';
 import { Header } from '../components/dashboard/Header';
 import { WorldGrid } from '../components/dashboard/WorldGrid';
 import { WorkspaceLayout } from '../components/workspace/WorkspaceLayout';
-import { Heart, ExternalLink } from 'lucide-react';
+import { Code2, ExternalLink } from 'lucide-react';
 
 export const App: React.FC = () => {
   const { activeWorld, initWorlds } = useWorldStore();
@@ -56,9 +56,8 @@ export const App: React.FC = () => {
 
           {/* Made by Credits */}
           <div className="flex items-center gap-1.5 text-xs">
-            <span>Made with</span>
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 animate-pulse" />
-            <span>by</span>
+            <Code2 className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Designed & Developed by</span>
             <a
               href="https://github.com/shashaank747"
               target="_blank"
