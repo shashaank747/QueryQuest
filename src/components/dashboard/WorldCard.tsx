@@ -449,11 +449,11 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
       flipOnClick={true}
       draggable={true}
       tilt={true}
-      tiltMax={10}
+      tiltMax={3.5}
       glare={true}
-      glareOpacity={isLight ? 0.2 : 0.28}
-      hoverScale={1.02}
-      perspective={1200}
+      glareOpacity={isLight ? 0.16 : 0.22}
+      hoverScale={1.015}
+      perspective={1400}
       stiffness={180}
       damping={22}
       width="100%"
