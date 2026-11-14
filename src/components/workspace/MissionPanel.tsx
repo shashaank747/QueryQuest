@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMissionStore } from '../../stores/useMissionStore';
 import { useThemeStore } from '../../stores/useThemeStore';
 import { Button } from '../ui/Button';
@@ -11,6 +11,7 @@ import {
   Briefcase,
   AlertTriangle,
   ChevronDown,
+  Check,
 } from 'lucide-react';
 
 export const MissionPanel: React.FC = () => {
@@ -27,6 +28,37 @@ export const MissionPanel: React.FC = () => {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
+
+  // Restore user's manual checklist ticks for this mission
+  useEffect(() => {
+    if (typeof window !== 'undefined' && activeMission) {
+      try {
+        const saved = localStorage.getItem(`qq_checklist_${activeMission.id}`);
+        if (saved) {
+          setCheckedItems(JSON.parse(saved));
+        } else {
+          setCheckedItems({});
+        }
+      } catch (e) {
+        setCheckedItems({});
+      }
+    }
+  }, [activeMission?.id]);
+
+  const toggleChecklistItem = (idx: number) => {
+    setCheckedItems((prev) => {
+      const updated = { ...prev, [idx]: !prev[idx] };
+      if (typeof window !== 'undefined' && activeMission) {
+        try {
+          localStorage.setItem(`qq_checklist_${activeMission.id}`, JSON.stringify(updated));
+        } catch (e) {
+          // Ignored
+        }
+      }
+      return updated;
+    });
+  };
 
   if (!activeMission) return null;
 
@@ -202,37 +234,73 @@ export const MissionPanel: React.FC = () => {
 
         {/* Checklist */}
         <div className="space-y-2">
-          <span
-            className={`font-bold ${
-              isLight ? 'text-slate-600' : 'text-slate-400'
-            } text-[11px] uppercase tracking-wider block`}
-          >
-            Task Checklist
-          </span>
+          <div className="flex items-center justify-between">
+            <span
+              className={`font-bold ${
+                isLight ? 'text-slate-600' : 'text-slate-400'
+              } text-[11px] uppercase tracking-wider block`}
+            >
+              Task Checklist
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">
+              Optional self-check
+            </span>
+          </div>
           <div className="space-y-1.5">
-            {activeMission.checklist.map((item, idx) => (
-              <div
-                key={idx}
-                className={`flex items-start gap-2 ${
-                  isLight
-                    ? 'bg-slate-50 border-slate-200 text-slate-700'
-                    : 'bg-slate-950/40 border-slate-800/60 text-slate-300'
-                } p-2 rounded-lg border`}
-              >
+            {activeMission.checklist.map((item, idx) => {
+              const isChecked = isCompleted || Boolean(checkedItems[idx]);
+
+              return (
                 <div
-                  className={`w-4 h-4 rounded border ${
-                    isLight ? 'border-slate-300 bg-white' : 'border-slate-700 bg-slate-850'
-                  } flex items-center justify-center flex-shrink-0 mt-0.5`}
+                  key={idx}
+                  onClick={() => toggleChecklistItem(idx)}
+                  role="checkbox"
+                  aria-checked={isChecked}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault();
+                      toggleChecklistItem(idx);
+                    }
+                  }}
+                  className={`flex items-start gap-2.5 p-2 rounded-lg border transition-all duration-150 cursor-pointer select-none ${
+                    isChecked
+                      ? isLight
+                        ? 'bg-emerald-50/70 border-emerald-300/80 text-emerald-950 shadow-xs'
+                        : 'bg-emerald-950/25 border-emerald-700/50 text-emerald-200'
+                      : isLight
+                      ? 'bg-slate-50 hover:bg-white hover:border-slate-300 border-slate-200 text-slate-700'
+                      : 'bg-slate-950/40 hover:bg-slate-900/60 hover:border-slate-700 border-slate-800/60 text-slate-300'
+                  }`}
+                  title="Click to check or uncheck this task requirement"
                 >
-                  {isCompleted ? (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  ) : (
-                    <div className={`w-1.5 h-1.5 rounded-full ${isLight ? 'bg-slate-400' : 'bg-slate-600'}`} />
-                  )}
+                  <div
+                    className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
+                      isChecked
+                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                        : isLight
+                        ? 'border-slate-300 bg-white hover:border-emerald-500'
+                        : 'border-slate-700 bg-slate-900 hover:border-emerald-500'
+                    }`}
+                  >
+                    {isChecked ? (
+                      <Check className="w-3 h-3 stroke-[3]" />
+                    ) : null}
+                  </div>
+                  <span
+                    className={`leading-snug transition-colors text-xs ${
+                      isChecked
+                        ? isLight
+                          ? 'text-emerald-900 font-medium'
+                          : 'text-emerald-200 font-medium'
+                        : ''
+                    }`}
+                  >
+                    {item}
+                  </span>
                 </div>
-                <span className="leading-snug">{item}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
