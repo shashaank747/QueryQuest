@@ -9,18 +9,29 @@
 </p>
 
 <p align="center">
-  <a href="#-getting-started"><img src="https://img.shields.io/badge/Status-Playable_MVP-10b981.svg" alt="Status" /></a>
-  <a href="https://query-quest-livid.vercel.app/"><img src="https://img.shields.io/badge/Deploy-Vercel-black.svg?logo=vercel" alt="Vercel Deployment" /></a>
-  <a href="#-technology-stack"><img src="https://img.shields.io/badge/SQLite-WASM_In--Browser-0284c7.svg" alt="SQLite WASM" /></a>
-  <a href="#-technology-stack"><img src="https://img.shields.io/badge/Editor-Monaco_IDE-6366f1.svg" alt="Monaco Editor" /></a>
-  <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-amber.svg" alt="License" /></a>
+  <a href="https://query-quest-livid.vercel.app/"><img src="https://img.shields.io/badge/Live_Demo-query--quest--livid.vercel.app-10b981.svg?style=flat-square&logo=vercel" alt="Live Demo on Vercel" /></a>
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/SQLite-WASM_In--Browser-0284c7.svg?style=flat-square" alt="SQLite WASM" /></a>
+  <a href="#-technology-stack"><img src="https://img.shields.io/badge/Editor-Monaco_IDE-6366f1.svg?style=flat-square" alt="Monaco Editor" /></a>
+  <a href="#-test-suite-execution"><img src="https://img.shields.io/badge/Tests-18_Passed-emerald.svg?style=flat-square" alt="Test Status" /></a>
+  <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License" /></a>
 </p>
+
+---
+
+## 🌐 Live Application
+
+Play QueryQuest instantly in your browser with zero installation:  
+👉 **[https://query-quest-livid.vercel.app/](https://query-quest-livid.vercel.app/)**
+
+> **Zero Server Overhead**: The entire relational database engine runs client-side inside your browser using **SQLite 3 compiled to WebAssembly**. All queries, schema mutations, and data persistence happen locally with 0ms server latency.
+
+---
+
+## 📖 Overview
 
 QueryQuest is a modern, game-based SQL learning simulation where students learn SQL by stepping into authentic business environments called **Worlds** and solving realistic operational breakdowns.
 
-Instead of reading dry tutorials or answering disconnected multiple-choice quizzes, students enter virtual organizations as database analysts, inspect live database schemas, write genuine SQL queries, troubleshoot broken inventory workflows, and compile dynamic executive business reports.
-
-QueryQuest executes **real SQLite queries inside your browser via WebAssembly**, guaranteeing that every query runs against an authentic relational database engine with zero server latency.
+Instead of reading dry tutorials or answering disconnected multiple-choice quizzes, students enter virtual organizations as database analysts, inspect live relational schemas, write genuine SQL queries, troubleshoot broken inventory workflows, and compile dynamic executive business reports.
 
 ---
 
@@ -28,7 +39,7 @@ QueryQuest executes **real SQLite queries inside your browser via WebAssembly**,
 
 The dashboard presents world environments as interactive **3D collectible physical cards**:
 
-- **Front Face**: High-resolution operational environment cover banner, company role, difficulty level, estimated completion time, target SQL concepts, mission progress bar, and immediate "Enter World" action.
+- **Front Face**: High-resolution operational environment cover banner (`h-44`), company role, difficulty level, estimated completion time, target SQL concepts, mission progress bar, and immediate "Enter World" action.
 - **Back Face (Operational Dossier)**: Company profile, database file name (`supermarket.db`), operational context brief, key analyst responsibilities, and mastered SQL topics.
 - **Physical 3D Slab Depth**: Physical 14px slab thickness with realistic 3D edge walls, giving the cards a solid, collectible feel.
 - **Gentle 3D Tilt**: Subtle cursor tilt dynamics reacting smoothly as your mouse glides over corners.
@@ -218,13 +229,14 @@ Students join **FreshMart Hypermarkets Ltd.** as a Junior Database Executive und
 
 ## 🛠️ Technology Stack
 
-- **UI & Framework**: React 18, TypeScript, Tailwind CSS, Zustand, Lucide Icons
+- **UI & Framework**: React 18, TypeScript, Tailwind CSS, Zustand, Lucide Icons, Motion
 - **SQL Editor**: Monaco Editor (`@monaco-editor/react`) with dynamic remeasuring & Consolas monospace stack
 - **SQL Engine**: SQLite 3 compiled to WebAssembly via `sql.js` (Web Worker isolation)
 - **Local Persistence**: IndexedDB (`idb`)
 - **Audio Synthesizer**: Web Audio API Procedural Synthesizer
 - **Testing**: Vitest, React Testing Library, Playwright
 - **Build Tooling**: Vite 6, PostCSS, TypeScript 5
+- **Cloud Hosting**: Vercel Edge Network (`vercel.json` SPA routing, WASM headers, immutable caching)
 
 ---
 
@@ -272,6 +284,19 @@ npm run preview
 
 ---
 
+## 🚀 Deploy to Vercel
+
+QueryQuest is pre-configured for automated zero-config deployment on Vercel:
+
+1. Push your repository to GitHub (`shashaank747/QueryQuest`).
+2. Import the repository in [Vercel](https://vercel.com/new).
+3. Vercel automatically detects the **Vite** framework and utilizes [`vercel.json`](vercel.json) to handle:
+   - Single Page Application routing (rewrites to `/index.html`)
+   - `application/wasm` MIME-type headers for `sql-wasm.wasm`
+   - Cache-Control optimizations for hashed assets
+
+---
+
 ## ⌨️ Keyboard Shortcuts Reference
 
 | Shortcut | Description |
@@ -289,7 +314,8 @@ npm run preview
 ## 👨‍💻 Creator & Engineering
 
 Designed & Developed by **Shashaank Sajjanar**  
-GitHub: [@shashaank747](https://github.com/shashaank747)
+- **GitHub**: [@shashaank747](https://github.com/shashaank747)  
+- **Live App**: [https://query-quest-livid.vercel.app/](https://query-quest-livid.vercel.app/)
 
 ---
 
