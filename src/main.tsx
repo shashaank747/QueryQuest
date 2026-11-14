@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app/App';
 import './index.css';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useSqlStore } from './stores/useSqlStore';
 import { useMissionStore } from './stores/useMissionStore';
 import { useUserStore } from './stores/useUserStore';
@@ -20,5 +21,6 @@ if (typeof window !== 'undefined') {
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <App />
+    <SpeedInsights />
   </React.StrictMode>
 );
