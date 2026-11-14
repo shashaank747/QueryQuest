@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSqlStore } from '../../stores/useSqlStore';
 import { useMissionStore } from '../../stores/useMissionStore';
 import { useThemeStore } from '../../stores/useThemeStore';
@@ -13,10 +13,11 @@ import {
   Check,
   Info,
   Layers,
+  Trash2,
 } from 'lucide-react';
 
 export const QueryResults: React.FC = () => {
-  const { lastResponse, isExecuting, history } = useSqlStore();
+  const { lastResponse, isExecuting, history, clearHistory } = useSqlStore();
   const { validationFeedback, activeMission, missions, advanceToNextMission } = useMissionStore();
   const { theme } = useThemeStore();
   const isLight = theme === 'slate-100';
@@ -27,6 +28,21 @@ export const QueryResults: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'results' | 'output' | 'validation'>('results');
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
   const [copiedQueryId, setCopiedQueryId] = useState<string | null>(null);
+  const [historyScope, setHistoryScope] = useState<'mission' | 'all'>('mission');
+
+  // Reset tab and action inspector selection whenever active mission changes
+  useEffect(() => {
+    setActiveTab('results');
+    setSelectedHistoryId(null);
+  }, [activeMission?.id]);
+
+  // Filter history: by default show queries for the current active task
+  const displayedHistory = useMemo(() => {
+    if (historyScope === 'all' || !activeMission) {
+      return history;
+    }
+    return history.filter((h) => h.missionId === activeMission.id);
+  }, [history, historyScope, activeMission?.id]);
 
   // Auto-switch tabs based on execution result
   useEffect(() => {
@@ -41,12 +57,12 @@ export const QueryResults: React.FC = () => {
     }
   }, [lastResponse, validationFeedback]);
 
-  // Only auto-select history item if a query was run in this session
+  // Auto-select latest history item when a query is executed in this session
   useEffect(() => {
-    if (lastResponse && history.length > 0 && !selectedHistoryId) {
-      setSelectedHistoryId(history[0].id);
+    if (lastResponse && displayedHistory.length > 0 && !selectedHistoryId) {
+      setSelectedHistoryId(displayedHistory[0].id);
     }
-  }, [history, selectedHistoryId, lastResponse]);
+  }, [displayedHistory, selectedHistoryId, lastResponse]);
 
   const handleCopySql = (id: string, sql: string) => {
     navigator.clipboard.writeText(sql);
@@ -55,7 +71,9 @@ export const QueryResults: React.FC = () => {
   };
 
   const selectedItem: QueryHistoryItem | undefined =
-    selectedHistoryId ? history.find((h) => h.id === selectedHistoryId) : (lastResponse ? history[0] : undefined);
+    selectedHistoryId
+      ? displayedHistory.find((h) => h.id === selectedHistoryId) || history.find((h) => h.id === selectedHistoryId)
+      : (lastResponse ? displayedHistory[0] : undefined);
 
   const resultTable = lastResponse?.results?.[0];
   const rowCount = resultTable?.values?.length || 0;
@@ -146,13 +164,13 @@ export const QueryResults: React.FC = () => {
           >
             <Terminal className="w-3.5 h-3.5 text-emerald-500" />
             <span>Action Output</span>
-            {history.length > 0 && (
+            {displayedHistory.length > 0 && (
               <span
                 className={`text-[10px] font-mono px-1 rounded ${
                   isLight ? 'bg-slate-200 text-slate-700' : 'bg-slate-700 text-slate-300'
                 }`}
               >
-                {history.length}
+                {displayedHistory.length}
               </span>
             )}
           </button>
@@ -223,7 +241,49 @@ export const QueryResults: React.FC = () => {
         {/* ==================== 1. ACTION OUTPUT (MySQL Workbench Grid) ==================== */}
         {activeTab === 'output' && (
           <div className="flex-1 flex flex-col overflow-hidden">
-            {history.length === 0 ? (
+            {/* Action Output Controls Bar */}
+            <div
+              className={`h-7 px-3 border-b ${
+                isLight ? 'bg-slate-100/70 border-slate-200 text-slate-600' : 'bg-slate-900/70 border-slate-800 text-slate-400'
+              } flex items-center justify-between text-[11px] flex-shrink-0 select-none`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[10px] uppercase tracking-wider text-slate-500">History:</span>
+                <button
+                  onClick={() => setHistoryScope('mission')}
+                  className={`px-2 py-0.5 rounded text-[10px] transition-colors ${
+                    historyScope === 'mission'
+                      ? isLight ? 'bg-white text-slate-900 font-bold shadow-xs' : 'bg-slate-800 text-white font-bold'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  Current Task ({history.filter((h) => h.missionId === activeMission?.id).length})
+                </button>
+                <button
+                  onClick={() => setHistoryScope('all')}
+                  className={`px-2 py-0.5 rounded text-[10px] transition-colors ${
+                    historyScope === 'all'
+                      ? isLight ? 'bg-white text-slate-900 font-bold shadow-xs' : 'bg-slate-800 text-white font-bold'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  All Tasks ({history.length})
+                </button>
+              </div>
+
+              {history.length > 0 && (
+                <button
+                  onClick={() => clearHistory()}
+                  className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-rose-500 transition-colors"
+                  title="Clear all action output history"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  <span>Clear Output</span>
+                </button>
+              )}
+            </div>
+
+            {displayedHistory.length === 0 ? (
               <div
                 className={`flex-1 flex flex-col items-center justify-center p-6 text-center text-xs ${
                   isLight ? 'text-slate-400 bg-slate-50/50' : 'text-slate-500 bg-slate-900/30'
@@ -232,8 +292,18 @@ export const QueryResults: React.FC = () => {
                 <Terminal className="w-8 h-8 opacity-40 mb-2" />
                 <p className="font-semibold text-slate-600 dark:text-slate-400">Action Output Ready</p>
                 <p className="text-[11px] mt-0.5 max-w-sm">
-                  Execute statements in the SQL editor (Ctrl+Enter). Each query action, duration, and response message will be recorded here.
+                  {historyScope === 'mission'
+                    ? `No actions recorded for ${activeMission?.title || 'this task'} yet. Execute statements in the editor to view actions and responses.`
+                    : 'Execute statements in the SQL editor (Ctrl+Enter). Each query action, duration, and response message will be recorded here.'}
                 </p>
+                {historyScope === 'mission' && history.length > 0 && (
+                  <button
+                    onClick={() => setHistoryScope('all')}
+                    className="mt-3 text-[11px] text-sky-600 dark:text-sky-400 font-semibold hover:underline"
+                  >
+                    View {history.length} action(s) from previous tasks →
+                  </button>
+                )}
               </div>
             ) : (
               <div className="flex-1 flex flex-col overflow-hidden">
@@ -261,7 +331,7 @@ export const QueryResults: React.FC = () => {
                         isLight ? 'divide-slate-100' : 'divide-slate-800/60'
                       }`}
                     >
-                      {history.map((item, idx) => {
+                      {displayedHistory.map((item, idx) => {
                         const isSelected = selectedItem?.id === item.id;
                         const durationSec = ((item.executionTimeMs || 0) / 1000).toFixed(3);
                         const timeStr = new Date(item.timestamp).toLocaleTimeString();
@@ -295,7 +365,7 @@ export const QueryResults: React.FC = () => {
 
                             {/* Sequence # */}
                             <td className="px-2 py-1.5 text-center text-slate-400 text-[11px]">
-                              {history.length - idx}
+                              {displayedHistory.length - idx}
                             </td>
 
                             {/* Time */}
@@ -468,7 +538,23 @@ export const QueryResults: React.FC = () => {
         {/* ==================== 2. RESULT GRID (Tabular Dataset) ==================== */}
         {activeTab === 'results' && (
           <div className="flex-1 flex flex-col overflow-hidden">
-            {!resultTable || rowCount === 0 ? (
+            {!lastResponse ? (
+              <div
+                className={`flex-1 flex flex-col items-center justify-center p-6 text-center text-xs ${
+                  isLight ? 'text-slate-400 bg-slate-50/50' : 'text-slate-500 bg-slate-900/30'
+                }`}
+              >
+                <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-2.5">
+                  <Table className="w-5 h-5 text-emerald-500" />
+                </div>
+                <p className="font-semibold text-slate-700 dark:text-slate-300">
+                  Ready for {activeMission?.title || 'Task'}
+                </p>
+                <p className="text-[11px] mt-1 max-w-sm text-slate-500 dark:text-slate-400">
+                  Write your SQL in the editor and click <strong className="text-emerald-600 dark:text-emerald-400 font-semibold">Run</strong> (or press Ctrl+Enter). Query results will appear here.
+                </p>
+              </div>
+            ) : !resultTable || rowCount === 0 ? (
               <div
                 className={`flex-1 flex flex-col items-center justify-center p-6 text-center text-xs ${
                   isLight ? 'text-slate-400 bg-slate-50/50' : 'text-slate-500 bg-slate-900/30'

@@ -61,5 +61,6 @@ export interface QueryHistoryItem {
   message?: string;
   error?: string;
   hint?: string;
+  missionId?: string;
 }
 

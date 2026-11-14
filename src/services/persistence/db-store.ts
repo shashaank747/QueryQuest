@@ -166,6 +166,20 @@ export const persistenceService = {
     }
   },
 
+  async clearQueryHistory(worldId: string): Promise<void> {
+    try {
+      const db = await getDB();
+      const all = await db.getAll('query_history');
+      for (const item of all) {
+        if (item.worldId === worldId) {
+          await db.delete('query_history', item.id);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to clear query history:', e);
+    }
+  },
+
   // Save User Profile
   async saveUserProfile(profile: UserProfile): Promise<void> {
     try {

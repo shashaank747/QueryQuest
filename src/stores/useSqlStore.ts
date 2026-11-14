@@ -26,8 +26,12 @@ interface SqlState {
     results: SqlQueryResult[];
   } | null;
   activeWorldId: string | null;
+  activeMissionId: string | null;
 
   setQuery: (query: string) => void;
+  setActiveMissionId: (missionId: string | null) => void;
+  clearResults: () => void;
+  clearHistory: () => Promise<void>;
   initializeForWorld: (world: WorldDefinition) => Promise<void>;
   runQuery: (sqlToRun?: string) => Promise<SqlExecutionResponse>;
   refreshSchema: () => Promise<void>;
@@ -47,8 +51,18 @@ export const useSqlStore = create<SqlState>((set, get) => ({
   history: [],
   activeTablePreview: null,
   activeWorldId: null,
+  activeMissionId: null,
 
   setQuery: (query: string) => set({ query }),
+  setActiveMissionId: (missionId: string | null) => set({ activeMissionId: missionId }),
+  clearResults: () => set({ lastResponse: null }),
+  clearHistory: async () => {
+    const { activeWorldId } = get();
+    if (activeWorldId) {
+      await persistenceService.clearQueryHistory(activeWorldId);
+    }
+    set({ history: [], lastResponse: null });
+  },
 
   initializeForWorld: async (world: WorldDefinition) => {
     set({ isInitializing: true, activeWorldId: world.id, lastResponse: null });
@@ -87,7 +101,7 @@ export const useSqlStore = create<SqlState>((set, get) => ({
   },
 
   runQuery: async (sqlToRun?: string) => {
-    const { query, activeWorldId, refreshSchema } = get();
+    const { query, activeWorldId, activeMissionId, refreshSchema } = get();
     const targetSql = (sqlToRun !== undefined ? sqlToRun : query).trim();
 
     if (!targetSql) {
@@ -154,6 +168,7 @@ export const useSqlStore = create<SqlState>((set, get) => ({
         message,
         error: response.error,
         hint: response.hint,
+        missionId: activeMissionId || undefined,
       };
 
       if (activeWorldId) {
@@ -210,6 +225,7 @@ export const useSqlStore = create<SqlState>((set, get) => ({
         executionTimeMs: 0,
         message: err?.message || String(err),
         error: err?.message || String(err),
+        missionId: activeMissionId || undefined,
       };
       set((state) => ({
         isExecuting: false,

@@ -80,6 +80,10 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       validationFeedback: null,
     });
 
+    // Reset SQL execution response and track current active mission
+    useSqlStore.getState().clearResults();
+    useSqlStore.getState().setActiveMissionId(initialMission?.id || null);
+
     // Set editor text to initial placeholder
     if (initialMission?.initialSqlPlaceholder) {
       useSqlStore.getState().setQuery(initialMission.initialSqlPlaceholder);
@@ -140,6 +144,10 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       validationFeedback: null,
       progressMap: updatedMap,
     });
+
+    // Reset SQL execution response and track current active mission
+    useSqlStore.getState().clearResults();
+    useSqlStore.getState().setActiveMissionId(targetMission.id);
 
     // If completed and has bestSql, set that, otherwise set placeholder
     if (currentTargetProg?.bestSql) {
