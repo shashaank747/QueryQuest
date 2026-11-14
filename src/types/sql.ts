@@ -54,8 +54,12 @@ export interface QueryHistoryItem {
   query: string;
   timestamp: number;
   success: boolean;
+  action?: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'CREATE' | 'ALTER' | 'DROP' | 'TRANSACTION' | 'OTHER';
   rowsAffected?: number;
   rowsReturned?: number;
   executionTimeMs?: number;
+  message?: string;
+  error?: string;
+  hint?: string;
 }
 

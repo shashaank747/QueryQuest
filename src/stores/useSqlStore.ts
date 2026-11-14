@@ -125,15 +125,34 @@ export const useSqlStore = create<SqlState>((set, get) => ({
     try {
       const response = await sqlEngine.execute(targetSql);
 
+      // Format Workbench-style action response message
+      let message = '';
+      if (response.success) {
+        if (response.action === 'SELECT') {
+          const count = response.results?.[0]?.values?.length || 0;
+          message = `${count} row(s) returned`;
+        } else if (['INSERT', 'UPDATE', 'DELETE'].includes(response.action)) {
+          message = `${response.rowsAffected} row(s) affected`;
+        } else {
+          message = `0 row(s) affected`;
+        }
+      } else {
+        message = response.error || 'Execution failed';
+      }
+
       // Record in query history
       const historyItem: QueryHistoryItem = {
         id: Math.random().toString(36).substring(2, 9),
         query: targetSql,
         timestamp: Date.now(),
         success: response.success,
+        action: response.action,
         rowsAffected: response.rowsAffected,
         rowsReturned: response.results?.[0]?.values?.length || 0,
         executionTimeMs: response.executionTimeMs,
+        message,
+        error: response.error,
+        hint: response.hint,
       };
 
       if (activeWorldId) {
@@ -179,7 +198,23 @@ export const useSqlStore = create<SqlState>((set, get) => ({
         executionTimeMs: 0,
         error: err?.message || String(err),
       };
-      set({ isExecuting: false, lastResponse: failRes });
+      const failHistoryItem: QueryHistoryItem = {
+        id: Math.random().toString(36).substring(2, 9),
+        query: targetSql,
+        timestamp: Date.now(),
+        success: false,
+        action: 'OTHER',
+        rowsAffected: 0,
+        rowsReturned: 0,
+        executionTimeMs: 0,
+        message: err?.message || String(err),
+        error: err?.message || String(err),
+      };
+      set((state) => ({
+        isExecuting: false,
+        lastResponse: failRes,
+        history: [failHistoryItem, ...state.history].slice(0, 40),
+      }));
       return failRes;
     }
   },
