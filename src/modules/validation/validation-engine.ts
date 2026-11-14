@@ -13,7 +13,12 @@ export class ValidationEngine {
     rules: ValidationRule[],
     context: ValidationContext
   ): Promise<ValidationFeedback> {
-    if (!context.executionResponse.success) {
+    const isCreateTable = /^\s*create\s+table/i.test(context.executionResponse.query);
+    const isTableAlreadyExists = /already exists/i.test(context.executionResponse.error || '');
+    const hasTableExistsRule = rules.some((r) => r.type === 'TABLE_EXISTS');
+    const allowExistingTable = isCreateTable && isTableAlreadyExists && hasTableExistsRule;
+
+    if (!context.executionResponse.success && !allowExistingTable) {
       return {
         passed: false,
         message: 'Your query resulted in a SQL error. Correct the syntax error before submitting.',

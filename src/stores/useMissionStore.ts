@@ -210,7 +210,8 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       const hasTableExistsRule = activeMission.validationRules.some((r) => r.type === 'TABLE_EXISTS');
 
       if (isCreateTable && isTableAlreadyExists && hasTableExistsRule) {
-        // Table was already created in a previous execution — proceed directly to validation
+        // Table was already created in a previous execution — treat as success for downstream validation
+        response.success = true;
       } else {
         const errorMsg = response.hint || response.error || 'Execution failed';
         const existingMistakes = currentProg.mistakes || [];
