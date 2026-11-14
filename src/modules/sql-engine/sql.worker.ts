@@ -36,7 +36,12 @@ async function initSql(binary?: Uint8Array) {
   }
 
   if (binary && binary.byteLength > 0) {
-    db = new SQL.Database(binary);
+    try {
+      db = new SQL.Database(binary);
+    } catch (e) {
+      console.warn('Failed to load database binary snapshot, initializing fresh database:', e);
+      db = new SQL.Database();
+    }
   } else {
     db = new SQL.Database();
   }
@@ -118,7 +123,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessage>) => {
 
       case 'EXECUTE': {
         if (!db || !isInitialized) {
-          throw new Error('Database is not initialized.');
+          await initSql();
         }
 
         const sql = payload.sql || '';
@@ -128,6 +133,14 @@ self.onmessage = async (e: MessageEvent<WorkerMessage>) => {
         // Disallow dangerous external actions or simulated commands not in SQLite
         if (/^\s*drop\s+database/i.test(sql)) {
           throw new Error('DROP DATABASE is not supported. Use DROP TABLE to remove specific tables.');
+        }
+
+        if (/^\s*create\s+database/i.test(sql)) {
+          throw new Error('In SQLite, the database is already created and connected. You do not need to run CREATE DATABASE — proceed directly with CREATE TABLE.');
+        }
+
+        if (/^\s*use\s+[\w_]+/i.test(sql)) {
+          throw new Error('In SQLite, the active world database is already connected. You do not need to run USE — execute your queries directly.');
         }
 
         // Execute query

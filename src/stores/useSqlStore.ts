@@ -10,6 +10,7 @@ import { sqlEngine } from '../modules/sql-engine/worker-client';
 import { persistenceService } from '../services/persistence/db-store';
 import { soundService } from '../services/sound/sound-effects';
 import { useUserStore } from './useUserStore';
+import { useWorldStore } from './useWorldStore';
 
 interface SqlState {
   query: string;
@@ -99,6 +100,23 @@ export const useSqlStore = create<SqlState>((set, get) => ({
       };
       set({ lastResponse: emptyRes });
       return emptyRes;
+    }
+
+    // If database engine is currently initializing, wait for it before executing
+    if (get().isInitializing) {
+      let waitCount = 0;
+      while (get().isInitializing && waitCount < 40) {
+        await new Promise((r) => setTimeout(r, 100));
+        waitCount++;
+      }
+    }
+
+    // If still not ready, attempt auto-initialization for current active world
+    if (!get().isReady) {
+      const activeWorld = useWorldStore.getState().activeWorld;
+      if (activeWorld) {
+        await get().initializeForWorld(activeWorld);
+      }
     }
 
     set({ isExecuting: true });

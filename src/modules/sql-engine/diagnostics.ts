@@ -7,6 +7,19 @@ export function generateSqlDiagnostic(errorMessage: string, sql: string): string
   const err = errorMessage.toLowerCase();
   const trimmed = sql.trim();
 
+  // SQLite Architecture & Scope diagnostics
+  if (/^\s*create\s+database/i.test(trimmed)) {
+    return `In SQLite, each world operates in its own isolated database file that is already loaded and active. You do NOT need to run "CREATE DATABASE" — simply create tables directly with CREATE TABLE.`;
+  }
+
+  if (/^\s*use\s+/i.test(trimmed)) {
+    return `In SQLite, the active world database is already connected. You do NOT need to run "USE [database]" — run your queries directly against the existing tables.`;
+  }
+
+  if (/drop\s+database/i.test(trimmed)) {
+    return `SQLite operates in an isolated world file. DROP DATABASE is not supported; use DROP TABLE to remove specific tables.`;
+  }
+
   if (err.includes('syntax error')) {
     const nearMatch = errorMessage.match(/near\s+["'](.*?)["']/i);
     if (nearMatch && nearMatch[1]) {
@@ -52,10 +65,6 @@ export function generateSqlDiagnostic(errorMessage: string, sql: string): string
 
   if (err.includes('misuse of aggregate:')) {
     return `Misuse of aggregate function: In SQL, aggregate functions like COUNT(), SUM(), AVG() cannot be placed directly inside a WHERE clause. Use a HAVING clause or subquery instead.`;
-  }
-
-  if (/drop\s+database/i.test(trimmed)) {
-    return `SQLite operates in an isolated world file. DROP DATABASE is not supported; use DROP TABLE to remove specific tables.`;
   }
 
   return `Database error: ${errorMessage}. Review your query structure and the schema explorer.`;

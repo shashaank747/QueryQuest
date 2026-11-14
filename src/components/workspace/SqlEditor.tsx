@@ -16,7 +16,7 @@ import {
 import { ShortcutModal } from './ShortcutModal';
 
 export const SqlEditor: React.FC = () => {
-  const { query, setQuery, runQuery, isExecuting, history } = useSqlStore();
+  const { query, setQuery, runQuery, isExecuting, isInitializing, history } = useSqlStore();
   const { submitMissionQuery, isValidating, activeMission } = useMissionStore();
   const { theme } = useThemeStore();
   const isLight = theme === 'slate-100';
@@ -110,12 +110,13 @@ export const SqlEditor: React.FC = () => {
             variant="secondary"
             size="sm"
             onClick={() => runQuery()}
-            isLoading={isExecuting}
+            isLoading={isExecuting || isInitializing}
+            disabled={isInitializing}
             icon={<Play className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500" />}
-            title="Execute query without completing mission (Ctrl+Enter)"
+            title={isInitializing ? "Initializing SQLite engine..." : "Execute query without completing mission (Ctrl+Enter)"}
             className="text-xs font-semibold hover:border-emerald-500/40"
           >
-            Run
+            {isInitializing ? "Initializing..." : "Run"}
           </Button>
 
           {/* Submit Objective Button */}
@@ -123,9 +124,10 @@ export const SqlEditor: React.FC = () => {
             variant="primary"
             size="sm"
             onClick={() => submitMissionQuery()}
-            isLoading={isValidating || isExecuting}
+            isLoading={isValidating || isExecuting || isInitializing}
+            disabled={isInitializing}
             icon={<CheckCircle className="w-3.5 h-3.5" />}
-            title="Submit query for objective evaluation (Ctrl+Shift+Enter)"
+            title={isInitializing ? "Initializing SQLite engine..." : "Submit query for objective evaluation (Ctrl+Shift+Enter)"}
             className="text-xs font-bold"
           >
             Submit Objective

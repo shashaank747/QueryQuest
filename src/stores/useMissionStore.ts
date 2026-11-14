@@ -204,43 +204,52 @@ export const useMissionStore = create<MissionState>((set, get) => ({
     };
 
     if (!response.success) {
-      const errorMsg = response.hint || response.error || 'Execution failed';
-      const existingMistakes = currentProg.mistakes || [];
-      const updatedMistakes = existingMistakes.includes(errorMsg)
-        ? existingMistakes
-        : [...existingMistakes, errorMsg];
+      // Check if this failure is because the table was already created in a previous Run attempt
+      const isCreateTable = /^\s*create\s+table/i.test(response.query);
+      const isTableAlreadyExists = /already exists/i.test(response.error || '');
+      const hasTableExistsRule = activeMission.validationRules.some((r) => r.type === 'TABLE_EXISTS');
 
-      const updatedProg: MissionProgress = {
-        ...currentProg,
-        attemptsCount: currentProg.attemptsCount + 1,
-        errorsCount: (currentProg.errorsCount || 0) + 1,
-        mistakes: updatedMistakes.slice(-10),
-      };
+      if (isCreateTable && isTableAlreadyExists && hasTableExistsRule) {
+        // Table was already created in a previous execution — proceed directly to validation
+      } else {
+        const errorMsg = response.hint || response.error || 'Execution failed';
+        const existingMistakes = currentProg.mistakes || [];
+        const updatedMistakes = existingMistakes.includes(errorMsg)
+          ? existingMistakes
+          : [...existingMistakes, errorMsg];
 
-      const updatedMap = {
-        ...progressMap,
-        [activeMission.id]: updatedProg,
-      };
+        const updatedProg: MissionProgress = {
+          ...currentProg,
+          attemptsCount: currentProg.attemptsCount + 1,
+          errorsCount: (currentProg.errorsCount || 0) + 1,
+          mistakes: updatedMistakes.slice(-10),
+        };
 
-      set({
-        isValidating: false,
-        validationFeedback: {
-          passed: false,
-          message: 'Query failed to execute.',
-          details: {
-            hint: response.hint || response.error,
+        const updatedMap = {
+          ...progressMap,
+          [activeMission.id]: updatedProg,
+        };
+
+        set({
+          isValidating: false,
+          validationFeedback: {
+            passed: false,
+            message: 'Query failed to execute.',
+            details: {
+              hint: response.hint || response.error,
+            },
           },
-        },
-        progressMap: updatedMap,
-      });
+          progressMap: updatedMap,
+        });
 
-      await persistenceService.saveMissionProgress(
-        activeWorld.id,
-        activeMission.id,
-        updatedProg
-      );
+        await persistenceService.saveMissionProgress(
+          activeWorld.id,
+          activeMission.id,
+          updatedProg
+        );
 
-      return false;
+        return false;
+      }
     }
 
     // 2. Validate against Mission validation rules

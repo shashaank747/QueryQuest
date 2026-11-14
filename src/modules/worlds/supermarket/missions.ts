@@ -7,11 +7,11 @@ export const SUPERMARKET_MISSIONS: Mission[] = [
     title: 'Initialize Supermarket Store Workspace',
     role: 'Junior Database Executive',
     storyline:
-      'Welcome to FreshMart Hypermarkets! The leadership team is transitioning from manual binders to SQLite. Your first assignment from Manager Devendra is to establish our store registry schema.',
+      'Welcome to FreshMart Hypermarkets! The leadership team is transitioning from manual binders to SQLite. The database environment (supermarket.db) is already connected and active for you. Your first assignment from Manager Devendra is to establish our store registry schema.',
     businessProblem:
       'The company operates multiple city branches, but branch data is currently unorganized. We need a reliable relational table to register each branch location.',
     objective:
-      'Create a table named "store_branches" with columns: branch_id (INTEGER PRIMARY KEY), branch_name (TEXT NOT NULL), city (TEXT NOT NULL), and opening_year (INTEGER).',
+      'Create a table named "store_branches" with columns: branch_id (INTEGER PRIMARY KEY), branch_name (TEXT NOT NULL), city (TEXT NOT NULL), and opening_year (INTEGER). Note: In SQLite, you do not need "CREATE DATABASE" — run "CREATE TABLE" directly.',
     requiredOutcome:
       'A new table named store_branches with the specified column definitions and PRIMARY KEY constraint.',
     checklist: [
@@ -23,7 +23,7 @@ export const SUPERMARKET_MISSIONS: Mission[] = [
     ],
     sqlTopics: ['CREATE TABLE', 'PRIMARY KEY', 'Data Types', 'NOT NULL'],
     hints: [
-      'Begin your query with CREATE TABLE store_branches (...).',
+      'In SQLite, the active database is already open. Do not write "CREATE DATABASE" — begin directly with CREATE TABLE store_branches (...).',
       'Inside parentheses, declare each column separated by commas. Mark branch_id as INTEGER PRIMARY KEY.',
       'CREATE TABLE store_branches (\n  branch_id INTEGER PRIMARY KEY,\n  branch_name TEXT NOT NULL,\n  city TEXT NOT NULL,\n  opening_year INTEGER\n);',
     ],
