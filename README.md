@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="#-getting-started"><img src="https://img.shields.io/badge/Status-Playable_MVP-10b981.svg" alt="Status" /></a>
-  <a href="https://queryquest-one.vercel.app"><img src="https://img.shields.io/badge/Deploy-Vercel-black.svg?logo=vercel" alt="Vercel Deployment" /></a>
+  <a href="https://query-quest-livid.vercel.app/"><img src="https://img.shields.io/badge/Deploy-Vercel-black.svg?logo=vercel" alt="Vercel Deployment" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/SQLite-WASM_In--Browser-0284c7.svg" alt="SQLite WASM" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/Editor-Monaco_IDE-6366f1.svg" alt="Monaco Editor" /></a>
   <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-amber.svg" alt="License" /></a>
