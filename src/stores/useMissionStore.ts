@@ -190,8 +190,21 @@ export const useMissionStore = create<MissionState>((set, get) => ({
 
     set({ isValidating: true });
 
-    // 1. Run the query through the SQL executor
-    const response = await useSqlStore.getState().runQuery();
+    // Check if the current query has already been run by the user
+    // "submit objective will not rerun the already executed code"
+    const currentQuery = useSqlStore.getState().query.trim();
+    const lastResponse = useSqlStore.getState().lastResponse;
+
+    let response = lastResponse;
+    const wasAlreadyRun = Boolean(
+      lastResponse &&
+      lastResponse.query &&
+      lastResponse.query.trim() === currentQuery
+    );
+
+    if (!wasAlreadyRun) {
+      response = await useSqlStore.getState().runQuery(currentQuery);
+    }
 
     const currentProg = progressMap[activeMission.id] || {
       missionId: activeMission.id,
@@ -203,17 +216,17 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       mistakes: [],
     };
 
-    if (!response.success) {
+    if (!response || !response.success) {
       // Check if this failure is because the table was already created in a previous Run attempt
-      const isCreateTable = /^\s*create\s+table/i.test(response.query);
-      const isTableAlreadyExists = /already exists/i.test(response.error || '');
+      const isCreateTable = /^\s*create\s+table/i.test(response?.query || currentQuery);
+      const isTableAlreadyExists = /already exists/i.test(response?.error || '');
       const hasTableExistsRule = activeMission.validationRules.some((r) => r.type === 'TABLE_EXISTS');
 
       if (isCreateTable && isTableAlreadyExists && hasTableExistsRule) {
         // Table was already created in a previous execution — treat as success for downstream validation
-        response.success = true;
+        if (response) response.success = true;
       } else {
-        const errorMsg = response.hint || response.error || 'Execution failed';
+        const errorMsg = response?.hint || response?.error || 'Execution failed';
         const existingMistakes = currentProg.mistakes || [];
         const updatedMistakes = existingMistakes.includes(errorMsg)
           ? existingMistakes
@@ -237,7 +250,7 @@ export const useMissionStore = create<MissionState>((set, get) => ({
             passed: false,
             message: 'Query failed to execute.',
             details: {
-              hint: response.hint || response.error,
+              hint: response?.hint || response?.error,
             },
           },
           progressMap: updatedMap,
@@ -255,8 +268,14 @@ export const useMissionStore = create<MissionState>((set, get) => ({
 
     // 2. Validate against Mission validation rules
     const validationContext = {
-      studentSql: response.query,
-      executionResponse: response,
+      studentSql: response?.query || currentQuery,
+      executionResponse: response || {
+        success: true,
+        query: currentQuery,
+        action: 'OTHER' as const,
+        rowsAffected: 0,
+        executionTimeMs: 0,
+      },
       executeSql: (sql: string) => sqlEngine.execute(sql),
       getSchema: () => sqlEngine.getSchema(),
       getTableData: async (tableName: string, limit = 50) => {
@@ -295,7 +314,7 @@ export const useMissionStore = create<MissionState>((set, get) => ({
         status: 'completed',
         completedAt: now,
         attemptsCount: currentProg.attemptsCount + 1,
-        bestSql: response.query,
+        bestSql: response ? response.query : currentQuery,
         timeSpentSeconds: Math.max(1, finalTimeSpent),
         sessionStartedAt: undefined,
       };
@@ -357,6 +376,11 @@ export const useMissionStore = create<MissionState>((set, get) => ({
         await useUserStore.getState().markWorldCompleted(activeWorld.id);
         await useUserStore.getState().unlockAchievement('supermarket_master');
         set({ isWorldCompletedModalOpen: true });
+      } else if (nextMission) {
+        // "if correct and expected output is there then next task will be shown"
+        setTimeout(() => {
+          get().selectMission(nextMission.id);
+        }, 1200);
       }
 
       await useWorldStore.getState().refreshWorldProgress(activeWorld.id);

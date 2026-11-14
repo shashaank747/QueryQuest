@@ -23,7 +23,28 @@ export const SqlEditor: React.FC = () => {
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [hasSelection, setHasSelection] = useState(false);
   const editorRef = useRef<any>(null);
+
+  const getTargetSql = (): string => {
+    if (editorRef.current) {
+      const editor = editorRef.current;
+      const model = editor.getModel();
+      const selection = editor.getSelection();
+      if (model && selection && !selection.isEmpty()) {
+        const selectedText = model.getValueInRange(selection).trim();
+        if (selectedText) {
+          return selectedText;
+        }
+      }
+    }
+    return query;
+  };
+
+  const handleRun = () => {
+    const targetSql = getTargetSql();
+    runQuery(targetSql);
+  };
 
   // Remeasure fonts on window focus to ensure perfect cursor positioning
   useEffect(() => {
@@ -66,9 +87,14 @@ export const SqlEditor: React.FC = () => {
       editor.layout();
     }, 500);
 
+    // Track selection changes to update "Run Selection" button state
+    editor.onDidChangeCursorSelection((e) => {
+      setHasSelection(!e.selection.isEmpty());
+    });
+
     // Define keyboard shortcuts
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      runQuery();
+      handleRun();
     });
 
     editor.addCommand(
@@ -109,14 +135,20 @@ export const SqlEditor: React.FC = () => {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => runQuery()}
+            onClick={handleRun}
             isLoading={isExecuting || isInitializing}
             disabled={isInitializing}
             icon={<Play className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500" />}
-            title={isInitializing ? "Initializing SQLite engine..." : "Execute query without completing mission (Ctrl+Enter)"}
+            title={
+              isInitializing
+                ? 'Initializing SQLite engine...'
+                : hasSelection
+                ? 'Execute selected text (Ctrl+Enter)'
+                : 'Execute query without completing mission (Ctrl+Enter)'
+            }
             className="text-xs font-semibold hover:border-emerald-500/40"
           >
-            {isInitializing ? "Initializing..." : "Run"}
+            {isInitializing ? 'Initializing...' : hasSelection ? 'Run Selection' : 'Run'}
           </Button>
 
           {/* Submit Objective Button */}

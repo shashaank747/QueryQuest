@@ -17,9 +17,12 @@ import {
 
 export const QueryResults: React.FC = () => {
   const { lastResponse, isExecuting, history } = useSqlStore();
-  const { validationFeedback } = useMissionStore();
+  const { validationFeedback, activeMission, missions, advanceToNextMission } = useMissionStore();
   const { theme } = useThemeStore();
   const isLight = theme === 'slate-100';
+
+  const currentIndex = activeMission ? missions.findIndex((m) => m.id === activeMission.id) : -1;
+  const nextMission = currentIndex >= 0 ? missions[currentIndex + 1] : undefined;
 
   const [activeTab, setActiveTab] = useState<'results' | 'output' | 'validation'>('output');
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
@@ -586,6 +589,20 @@ export const QueryResults: React.FC = () => {
                     : 'Objective Incomplete'}
                 </h4>
                 <p className="mt-1 leading-relaxed">{validationFeedback.message}</p>
+
+                {validationFeedback.passed && nextMission && (
+                  <div className="mt-3 flex items-center justify-between p-2 rounded-lg bg-emerald-100/70 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700/60">
+                    <span className="text-[11px] font-medium text-emerald-800 dark:text-emerald-200">
+                      Loading next task: <strong>{nextMission.title}</strong>...
+                    </span>
+                    <button
+                      onClick={() => advanceToNextMission()}
+                      className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors"
+                    >
+                      Next Task →
+                    </button>
+                  </div>
+                )}
 
                 {validationFeedback.details?.hint && (
                   <div
