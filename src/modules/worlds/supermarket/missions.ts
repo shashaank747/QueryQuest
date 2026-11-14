@@ -54,42 +54,42 @@ export const SUPERMARKET_MISSIONS: Mission[] = [
   {
     id: 'sm_m2',
     order: 2,
-    title: 'Create Product Categories Catalog',
+    title: 'Create Store Departments Registry',
     role: 'Junior Database Executive',
     storyline:
-      'Excellent job with the branches table! Now, Head of Merchandising Priya asks you to establish the product categorization schema so thousands of retail items can be cataloged properly.',
+      'Excellent job with the branches table! Now, Head of Merchandising Priya asks you to establish the hypermarket departments schema so major retail zones (Produce, Bakery, Electronics, Dairy, Household) can be cataloged properly.',
     businessProblem:
-      'Without an official categories table, cashiers and stock clerks cannot classify items, leading to billing confusion.',
+      'Without an official departments registry, staff cannot route inventory shipments to designated floor sections, causing stocking bottlenecks.',
     objective:
-      'Create a table named "categories" with category_id (INTEGER PRIMARY KEY AUTOINCREMENT), category_name (TEXT NOT NULL UNIQUE), and description (TEXT).',
+      'Create a table named "departments" with department_id (INTEGER PRIMARY KEY AUTOINCREMENT), department_name (TEXT NOT NULL UNIQUE), and description (TEXT).',
     requiredOutcome:
-      'Table categories with category_id as primary key and category_name constrained with UNIQUE.',
+      'Table departments with department_id as auto-incrementing primary key and department_name constrained with UNIQUE.',
     checklist: [
-      'CREATE TABLE categories',
-      'category_id INTEGER PRIMARY KEY AUTOINCREMENT',
-      'category_name TEXT NOT NULL UNIQUE',
+      'CREATE TABLE departments',
+      'department_id INTEGER PRIMARY KEY AUTOINCREMENT',
+      'department_name TEXT NOT NULL UNIQUE',
       'description TEXT',
     ],
     sqlTopics: ['CREATE TABLE', 'AUTOINCREMENT', 'UNIQUE constraint'],
     hints: [
-      'Syntax: CREATE TABLE categories (column_name TYPE CONSTRAINTS, ...);',
-      'For unique names, use: category_name TEXT NOT NULL UNIQUE',
-      'CREATE TABLE categories (\n  category_id INTEGER PRIMARY KEY AUTOINCREMENT,\n  category_name TEXT NOT NULL UNIQUE,\n  description TEXT\n);',
+      'Syntax: CREATE TABLE departments (column_name TYPE CONSTRAINTS, ...);',
+      'For unique names, use: department_name TEXT NOT NULL UNIQUE',
+      'CREATE TABLE departments (\n  department_id INTEGER PRIMARY KEY AUTOINCREMENT,\n  department_name TEXT NOT NULL UNIQUE,\n  description TEXT\n);',
     ],
-    sampleSolution: `CREATE TABLE categories (
-  category_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  category_name TEXT NOT NULL UNIQUE,
+    sampleSolution: `CREATE TABLE departments (
+  department_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  department_name TEXT NOT NULL UNIQUE,
   description TEXT
 );`,
     solutionExplanation:
-      'UNIQUE ensures no two categories share the same name, preventing accidental duplicate departments in the store.',
-    initialSqlPlaceholder: `-- Mission 2: Create categories table\nCREATE TABLE categories (\n  \n);`,
+      'UNIQUE ensures no two departments share the same name, preventing accidental duplicate departments in the store directory.',
+    initialSqlPlaceholder: `-- Mission 2: Create departments table\nCREATE TABLE departments (\n  \n);`,
     validationRules: [
       {
         type: 'TABLE_EXISTS',
-        description: 'Verify categories table structure',
-        expectedTable: 'categories',
-        expectedColumns: ['category_id', 'category_name', 'description'],
+        description: 'Verify departments table structure',
+        expectedTable: 'departments',
+        expectedColumns: ['department_id', 'department_name', 'description'],
       },
     ],
     xpReward: 100,

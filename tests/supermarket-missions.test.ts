@@ -35,6 +35,14 @@ describe('World 1: Supermarket Operations Missions & SQL Solutions', () => {
     expect(tables[0].values.length).toBe(1);
   });
 
+  it('Mission 2: departments table creation works', () => {
+    const m2 = SUPERMARKET_MISSIONS[1];
+    db.exec(m2.sampleSolution);
+    const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='departments';");
+    expect(tables.length).toBe(1);
+    expect(tables[0].values.length).toBe(1);
+  });
+
   it('Mission 3: Register vendor FreshRoots Organics', () => {
     const m3 = SUPERMARKET_MISSIONS[2];
     db.exec(m3.sampleSolution);
