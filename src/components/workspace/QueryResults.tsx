@@ -24,7 +24,7 @@ export const QueryResults: React.FC = () => {
   const currentIndex = activeMission ? missions.findIndex((m) => m.id === activeMission.id) : -1;
   const nextMission = currentIndex >= 0 ? missions[currentIndex + 1] : undefined;
 
-  const [activeTab, setActiveTab] = useState<'results' | 'output' | 'validation'>('output');
+  const [activeTab, setActiveTab] = useState<'results' | 'output' | 'validation'>('results');
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
   const [copiedQueryId, setCopiedQueryId] = useState<string | null>(null);
 
@@ -41,12 +41,12 @@ export const QueryResults: React.FC = () => {
     }
   }, [lastResponse, validationFeedback]);
 
-  // Default selected history item to latest
+  // Only auto-select history item if a query was run in this session
   useEffect(() => {
-    if (history.length > 0 && (!selectedHistoryId || !history.some((h) => h.id === selectedHistoryId))) {
+    if (lastResponse && history.length > 0 && !selectedHistoryId) {
       setSelectedHistoryId(history[0].id);
     }
-  }, [history, selectedHistoryId]);
+  }, [history, selectedHistoryId, lastResponse]);
 
   const handleCopySql = (id: string, sql: string) => {
     navigator.clipboard.writeText(sql);
@@ -55,7 +55,7 @@ export const QueryResults: React.FC = () => {
   };
 
   const selectedItem: QueryHistoryItem | undefined =
-    history.find((h) => h.id === selectedHistoryId) || history[0];
+    selectedHistoryId ? history.find((h) => h.id === selectedHistoryId) : (lastResponse ? history[0] : undefined);
 
   const resultTable = lastResponse?.results?.[0];
   const rowCount = resultTable?.values?.length || 0;
@@ -183,7 +183,7 @@ export const QueryResults: React.FC = () => {
 
         {/* Status Line */}
         <div className="flex items-center gap-3 text-[11px] font-mono">
-          {lastResponse && (
+          {lastResponse ? (
             <span
               className={`flex items-center gap-1 ${
                 lastResponse.success
@@ -201,6 +201,11 @@ export const QueryResults: React.FC = () => {
                   ? `${rowCount} row(s) returned`
                   : `${lastResponse.rowsAffected} row(s) affected`
                 : 'Query error'}
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 text-slate-500 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Ready
             </span>
           )}
 
@@ -328,7 +333,7 @@ export const QueryResults: React.FC = () => {
                 </div>
 
                 {/* Selected Action Inspector Panel (Docked at bottom of Action Output) */}
-                {selectedItem && (
+                {selectedItem ? (
                   <div
                     className={`h-40 border-t ${
                       isLight ? 'border-slate-200 bg-slate-50/70' : 'border-slate-800 bg-slate-900/60'
@@ -445,6 +450,14 @@ export const QueryResults: React.FC = () => {
                         </div>
                       )}
                     </div>
+                  </div>
+                ) : (
+                  <div
+                    className={`h-9 px-3 border-t ${
+                      isLight ? 'border-slate-200 bg-slate-50/50 text-slate-400' : 'border-slate-800 bg-slate-900/40 text-slate-500'
+                    } flex items-center text-[11px] font-mono`}
+                  >
+                    <span>Select an executed statement from the table above to inspect SQL details.</span>
                   </div>
                 )}
               </div>

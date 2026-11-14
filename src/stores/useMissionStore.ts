@@ -37,6 +37,7 @@ export const useMissionStore = create<MissionState>((set, get) => ({
   isWorldCompletedModalOpen: false,
 
   loadMissionsForWorld: async (world: WorldDefinition) => {
+    set({ validationFeedback: null });
     const saved = await persistenceService.loadWorldMissionProgress(world.id);
     const missions = world.missions;
     const progressMap: Record<string, MissionProgress> = { ...saved };

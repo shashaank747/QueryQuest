@@ -51,7 +51,7 @@ export const useSqlStore = create<SqlState>((set, get) => ({
   setQuery: (query: string) => set({ query }),
 
   initializeForWorld: async (world: WorldDefinition) => {
-    set({ isInitializing: true, activeWorldId: world.id });
+    set({ isInitializing: true, activeWorldId: world.id, lastResponse: null });
 
     try {
       // Check if a saved binary exists in IndexedDB
@@ -78,6 +78,7 @@ export const useSqlStore = create<SqlState>((set, get) => ({
         isInitializing: false,
         schema,
         history,
+        lastResponse: null,
       });
     } catch (err) {
       console.error('Failed to initialize SQL Engine for world:', err);

@@ -130,17 +130,37 @@ self.onmessage = async (e: MessageEvent<WorkerMessage>) => {
         const startTime = performance.now();
         const action = determineAction(sql);
 
+        // Strip SQL comments to inspect user intentions accurately
+        const strippedSql = sql
+          .replace(/--[^\n]*/g, '')
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .trim();
+
         // Disallow dangerous external actions or simulated commands not in SQLite
-        if (/^\s*drop\s+database/i.test(sql)) {
+        if (/^\s*drop\s+database/i.test(strippedSql)) {
           throw new Error('DROP DATABASE is not supported. Use DROP TABLE to remove specific tables.');
         }
 
-        if (/^\s*create\s+database/i.test(sql)) {
+        if (/^\s*create\s+database/i.test(strippedSql)) {
           throw new Error('In SQLite, the database is already created and connected. You do not need to run CREATE DATABASE — proceed directly with CREATE TABLE.');
         }
 
-        if (/^\s*use\s+[\w_]+/i.test(sql)) {
+        if (/^\s*use\s+[\w_]+/i.test(strippedSql)) {
           throw new Error('In SQLite, the active world database is already connected. You do not need to run USE — execute your queries directly.');
+        }
+
+        // Allow students to cleanly iterate on CREATE TABLE statements without "table already exists" error
+        const createTableRegex = /(?:^|;)\s*CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["`]?([a-zA-Z0-9_]+)["`]?/gi;
+        let match: RegExpExecArray | null;
+        while ((match = createTableRegex.exec(strippedSql)) !== null) {
+          const targetTable = match[1];
+          try {
+            db.exec(`PRAGMA foreign_keys = OFF;`);
+            db.exec(`DROP TABLE IF EXISTS "${targetTable}";`);
+            db.exec(`PRAGMA foreign_keys = ON;`);
+          } catch (e) {
+            // Ignored
+          }
         }
 
         // Execute query
