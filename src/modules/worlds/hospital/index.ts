@@ -27,7 +27,7 @@ export const hospitalWorld: WorldDefinition = {
   iconName: 'Activity',
   accentColor: 'rose',
   dbFileName: 'hospital.db',
-  sqlTopics: ['CREATE TABLE', 'INSERT', 'SELECT', 'WHERE', 'UPDATE', 'JOIN', 'GROUP BY', 'Aggregation'],
+  sqlTopics: ['Subqueries', 'Correlated Subqueries', 'EXISTS', 'Common Table Expressions (CTEs)', 'Window Functions', 'DENSE_RANK()', 'LAG()', 'ACID Transactions'],
   isAvailable: true,
   missions: HOSPITAL_MISSIONS,
   initialSchemaSql: HOSPITAL_BASE_SCHEMA,

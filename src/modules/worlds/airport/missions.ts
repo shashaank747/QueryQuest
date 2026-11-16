@@ -4,100 +4,44 @@ export const AIRPORT_MISSIONS: Mission[] = [
   {
     id: 'ap_m1',
     order: 1,
-    title: 'Deploy Runway Inspection Safety Log',
+    title: 'First Discovery: Correlate Flights with Carrier Profiles',
     role: 'Flight Data Operations Analyst',
     storyline:
-      'Welcome to SkyHarbor International Airport! Aviation safety protocols mandate automated relational logging for tarmac inspections. Lead Air Traffic Controller Maya asks you to establish the runway safety registry.',
+      'Welcome to SkyHarbor International Airport! Ground Control reports severe winter weather patterns triggering ground stops and departure holds across multiple flight corridors. Duty Manager Maya asks you to identify all delayed flights and match them with their operating airline names so carrier customer service counters can issue passenger meal and hotel vouchers.',
     businessProblem:
-      'Inspectors currently log runway tarmac condition checks on clipboards, resulting in blind spots during adverse weather and regulatory audit delays.',
+      'Flight records store carrier affiliations via numeric foreign keys (airline_id). Without joining against the central airlines directory, terminal concourse staff cannot determine which airline representatives must be summoned to address stranded passengers.',
     objective:
-      'Create a table named "runway_inspections" with inspection_id (INTEGER PRIMARY KEY AUTOINCREMENT), runway_name (TEXT NOT NULL), inspector_name (TEXT NOT NULL), surface_condition (TEXT NOT NULL), and friction_index (REAL).',
+      'Perform an INNER JOIN between "flights" (alias f) and "airlines" (alias a) on f.airline_id = a.airline_id. Select flight_number, airline_name, destination, and status for all flights where status = "Delayed".',
     requiredOutcome:
-      'A new runway_inspections table ready to store asphalt friction data and runway clearance logs.',
+      'A joined manifest of delayed flights displaying flight_number, airline_name, destination, and status.',
     checklist: [
-      'Use CREATE TABLE runway_inspections',
-      'Define inspection_id INTEGER PRIMARY KEY AUTOINCREMENT',
-      'Include runway_name TEXT NOT NULL',
-      'Include inspector_name TEXT NOT NULL',
-      'Include surface_condition TEXT NOT NULL',
-      'Include friction_index REAL',
+      'FROM flights f',
+      'JOIN airlines a ON f.airline_id = a.airline_id',
+      'SELECT f.flight_number, a.airline_name, f.destination, f.status',
+      'WHERE f.status = \'Delayed\'',
     ],
-    sqlTopics: ['CREATE TABLE', 'PRIMARY KEY', 'Column Constraints', 'REAL type'],
+    sqlTopics: ['INNER JOIN', 'ON Clause', 'Table Aliasing', 'WHERE Filtering'],
     hints: [
-      'Use CREATE TABLE runway_inspections (...) with appropriate columns.',
-      'Define inspection_id as INTEGER PRIMARY KEY AUTOINCREMENT.',
-      'CREATE TABLE runway_inspections (\n  inspection_id INTEGER PRIMARY KEY AUTOINCREMENT,\n  runway_name TEXT NOT NULL,\n  inspector_name TEXT NOT NULL,\n  surface_condition TEXT NOT NULL,\n  friction_index REAL\n);',
+      'Link the tables using `FROM flights f JOIN airlines a ON f.airline_id = a.airline_id`.',
+      'Filter the joined results using `WHERE f.status = \'Delayed\'` and select `f.flight_number, a.airline_name, f.destination, f.status`.',
+      "SELECT f.flight_number, a.airline_name, f.destination, f.status\nFROM flights f\nJOIN airlines a ON f.airline_id = a.airline_id\nWHERE f.status = 'Delayed';",
     ],
-    sampleSolution: `CREATE TABLE runway_inspections (
-  inspection_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  runway_name TEXT NOT NULL,
-  inspector_name TEXT NOT NULL,
-  surface_condition TEXT NOT NULL,
-  friction_index REAL
-);`,
+    sampleSolution: `SELECT f.flight_number, a.airline_name, f.destination, f.status
+FROM flights f
+JOIN airlines a ON f.airline_id = a.airline_id
+WHERE f.status = 'Delayed';`,
     solutionExplanation:
-      'Relational schemas enforce operational data integrity at the database layer. Creating the runway inspection registry provides a permanent audit trail for international civil aviation authorities.',
-    initialSqlPlaceholder: `-- Mission 1: Create runway safety inspections table\nCREATE TABLE runway_inspections (\n  \n);`,
+      'An INNER JOIN matches records between two tables whenever their join condition evaluates to true. Joining flights with airlines on airline_id pairs each flight with its carrier brand, enabling targeted delay triage.',
+    initialSqlPlaceholder: `-- Mission 1: First Relational INNER JOIN\n-- Link delayed flights to their operating airline names\nSELECT f.flight_number, a.airline_name, f.destination, f.status\nFROM flights f\nJOIN airlines a ON ...\nWHERE f.status = 'Delayed';`,
     validationRules: [
       {
-        type: 'TABLE_EXISTS',
-        description: 'Verify runway_inspections table exists with required columns',
-        expectedTable: 'runway_inspections',
-        expectedColumns: [
-          'inspection_id',
-          'runway_name',
-          'inspector_name',
-          'surface_condition',
-          'friction_index',
-        ],
+        type: 'SELECT_EXACT',
+        description: 'Verify delayed flights joined with airline names',
+        expectedQuery:
+          "SELECT f.flight_number, a.airline_name, f.destination, f.status FROM flights f JOIN airlines a ON f.airline_id = a.airline_id WHERE f.status = 'Delayed';",
       },
     ],
     xpReward: 100,
-    badge: {
-      id: 'table_architect',
-      title: 'Table Architect',
-      icon: 'Database',
-    },
-  },
-  {
-    id: 'ap_m2',
-    order: 2,
-    title: 'Register Trans-Atlantic Partner Airline',
-    role: 'Flight Data Operations Analyst',
-    storyline:
-      'SkyHarbor has signed an international terminal agreement with Celtic Express. Operations Director Vikram requests their registration into the central carrier directory.',
-    businessProblem:
-      'Without an active entry in the airlines registry, SkyHarbor radar systems cannot assign flight numbers or reconcile passenger manifest feeds for this carrier.',
-    objective:
-      'Insert a new row into "airlines" with: airline_id = 6, airline_name = "Celtic Express", iata_code = "CE", country = "Ireland", and fleet_size = 52.',
-    requiredOutcome:
-      'New carrier record registered in the airlines table with IATA code CE.',
-    checklist: [
-      'Use INSERT INTO airlines (...)',
-      'Specify airline_id, airline_name, iata_code, country, fleet_size',
-      'Provide matching values with strings enclosed in single quotes',
-    ],
-    sqlTopics: ['INSERT INTO', 'VALUES', 'Catalog Registration'],
-    hints: [
-      'Use INSERT INTO airlines (airline_id, airline_name, iata_code, country, fleet_size) VALUES (...);',
-      'Make sure string values like \'Celtic Express\' are wrapped in single quotes.',
-      "INSERT INTO airlines (airline_id, airline_name, iata_code, country, fleet_size) VALUES (6, 'Celtic Express', 'CE', 'Ireland', 52);",
-    ],
-    sampleSolution: `INSERT INTO airlines (airline_id, airline_name, iata_code, country, fleet_size)
-VALUES (6, 'Celtic Express', 'CE', 'Ireland', 52);`,
-    solutionExplanation:
-      'Inserting normalized records ensures downstream flight manifests can reliably establish foreign key relationships to carrier profiles.',
-    initialSqlPlaceholder: `-- Mission 2: Register Celtic Express into airlines\nINSERT INTO airlines (\n  airline_id, airline_name, iata_code, country, fleet_size\n) VALUES (\n  \n);`,
-    validationRules: [
-      {
-        type: 'ROW_EXISTS',
-        description: 'Verify Celtic Express is registered in airlines',
-        expectedTable: 'airlines',
-        expectedWhereClause: "iata_code = 'CE' AND airline_name = 'Celtic Express'",
-        expectedRowCount: 1,
-      },
-    ],
-    xpReward: 120,
     badge: {
       id: 'flight_tracker',
       title: 'Flight Radar Specialist',
@@ -105,41 +49,90 @@ VALUES (6, 'Celtic Express', 'CE', 'Ireland', 52);`,
     },
   },
   {
-    id: 'ap_m3',
-    order: 3,
-    title: 'Audit Delayed Flight Operations',
+    id: 'ap_m2',
+    order: 2,
+    title: 'Multi-Table Relational Chain: Terminal Gate Locator',
     role: 'Flight Data Operations Analyst',
     storyline:
-      'Ground control reports weather disruptions causing departure holds. The Duty Manager needs an immediate manifest of all flights flagged as Delayed.',
+      'Connecting passengers frequently get disoriented navigating between SkyHarbor terminals and concourses. Lead Dispatcher Vikram needs an automated display manifest that maps every scheduled flight to its designated physical terminal and concourse gate.',
     businessProblem:
-      'Passenger assistance kiosks and catering ground crews require an immediate list of delayed flights to redistribute gate personnel and dispatch passenger refreshments.',
+      'The flights table references gate_id, while terminal names and concourses reside two relational hops away in terminals via gates.terminal_id. To display complete routing instructions on concourse flight boards (FIDS), operations must link across all three normalized entities.',
     objective:
-      'Select flight_number, destination, scheduled_departure, and passenger_count from "flights" where status = "Delayed".',
+      'Chain two INNER JOINs linking "flights" (alias f) to "gates" (alias g) on f.gate_id = g.gate_id, and "gates" to "terminals" (alias t) on g.terminal_id = t.terminal_id. Select f.flight_number, t.terminal_name, g.gate_number, f.destination, and f.status.',
     requiredOutcome:
-      'A targeted table of delayed flights with their destination, scheduled time, and passenger count.',
+      'A comprehensive 3-table joined manifest resolving flight numbers through gates to terminal names.',
     checklist: [
-      'SELECT flight_number, destination, scheduled_departure, passenger_count',
-      'FROM flights',
-      'WHERE status = \'Delayed\'',
+      'FROM flights f',
+      'JOIN gates g ON f.gate_id = g.gate_id',
+      'JOIN terminals t ON g.terminal_id = t.terminal_id',
+      'SELECT f.flight_number, t.terminal_name, g.gate_number, f.destination, f.status',
     ],
-    sqlTopics: ['SELECT', 'WHERE clause', 'Status Filtering'],
+    sqlTopics: ['Multi-Table JOIN', 'Relational Chaining', 'Foreign Key Navigation'],
     hints: [
-      'Use SELECT column1, column2 FROM flights WHERE condition;',
-      'Filter with status = \'Delayed\'.',
-      "SELECT flight_number, destination, scheduled_departure, passenger_count FROM flights WHERE status = 'Delayed';",
+      'Chain the joins in sequence: start `FROM flights f JOIN gates g ON f.gate_id = g.gate_id` then `JOIN terminals t ON g.terminal_id = t.terminal_id`.',
+      'Specify table prefixes for each column: `f.flight_number, t.terminal_name, g.gate_number, f.destination, f.status`.',
+      'SELECT f.flight_number, t.terminal_name, g.gate_number, f.destination, f.status\nFROM flights f\nJOIN gates g ON f.gate_id = g.gate_id\nJOIN terminals t ON g.terminal_id = t.terminal_id;',
     ],
-    sampleSolution: `SELECT flight_number, destination, scheduled_departure, passenger_count
-FROM flights
-WHERE status = 'Delayed';`,
+    sampleSolution: `SELECT f.flight_number, t.terminal_name, g.gate_number, f.destination, f.status
+FROM flights f
+JOIN gates g ON f.gate_id = g.gate_id
+JOIN terminals t ON g.terminal_id = t.terminal_id;`,
     solutionExplanation:
-      'Filtering on the operational status attribute enables air traffic operations to rapidly triage grounded aircraft and isolate impacted travelers.',
-    initialSqlPlaceholder: `-- Mission 3: Query all delayed flights\nSELECT flight_number, destination, scheduled_departure, passenger_count\nFROM flights\nWHERE ...;`,
+      'Relational databases normalize data across separate entity tables to avoid redundancy. Chaining multiple JOINs reconstructs full operational contexts (flights -> gates -> terminals) without data duplication.',
+    initialSqlPlaceholder: `-- Mission 2: Multi-Table Relational Chain\n-- Map flights to physical gates and terminal names\nSELECT f.flight_number, t.terminal_name, g.gate_number, f.destination, f.status\nFROM flights f\nJOIN gates g ON ...\nJOIN terminals t ON ...;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify delayed flight records',
+        description: 'Verify 3-table relational join linking flights, gates, and terminals',
         expectedQuery:
-          "SELECT flight_number, destination, scheduled_departure, passenger_count FROM flights WHERE status = 'Delayed';",
+          'SELECT f.flight_number, t.terminal_name, g.gate_number, f.destination, f.status FROM flights f JOIN gates g ON f.gate_id = g.gate_id JOIN terminals t ON g.terminal_id = t.terminal_id;',
+      },
+    ],
+    xpReward: 120,
+    badge: {
+      id: 'join_master',
+      title: 'Join Master',
+      icon: 'GitFork',
+    },
+  },
+  {
+    id: 'ap_m3',
+    order: 3,
+    title: 'Unmatched Record Detection with LEFT JOIN',
+    role: 'Flight Data Operations Analyst',
+    storyline:
+      'Airport Ground Control is experiencing peak afternoon arrivals. With tarmac congestion growing, Ramp Operations Chief Carlos needs to discover all idle or unoccupied gates that currently have no active flights assigned to them.',
+    businessProblem:
+      'An INNER JOIN only returns gates that have matching flight assignments. Unmatched or idle gates are omitted! Operations must preserve all gate records and detect non-matches using a LEFT JOIN with an IS NULL filter.',
+    objective:
+      'Perform a LEFT JOIN from "gates" (alias g) to "flights" (alias f) on g.gate_id = f.gate_id. Filter for gates where f.flight_id IS NULL to isolate unassigned gates. Select g.gate_id, g.gate_number, and g.status.',
+    requiredOutcome:
+      'A list of gates that currently have zero flights assigned, showing gate_id, gate_number, and status.',
+    checklist: [
+      'Use FROM gates g',
+      'LEFT JOIN flights f ON g.gate_id = f.gate_id',
+      'WHERE f.flight_id IS NULL',
+      'SELECT g.gate_id, g.gate_number, g.status',
+    ],
+    sqlTopics: ['LEFT JOIN', 'Unmatched Records', 'IS NULL Filter', 'Outer Join Pattern'],
+    hints: [
+      'Start with `FROM gates g LEFT JOIN flights f ON g.gate_id = f.gate_id` so all gates are included even without flights.',
+      'Add `WHERE f.flight_id IS NULL` to filter down to only gates that have no matching flight row.',
+      'SELECT g.gate_id, g.gate_number, g.status\nFROM gates g\nLEFT JOIN flights f ON g.gate_id = f.gate_id\nWHERE f.flight_id IS NULL;',
+    ],
+    sampleSolution: `SELECT g.gate_id, g.gate_number, g.status
+FROM gates g
+LEFT JOIN flights f ON g.gate_id = f.gate_id
+WHERE f.flight_id IS NULL;`,
+    solutionExplanation:
+      'A LEFT OUTER JOIN retains all records from the left table (gates), populating right-table columns with NULL when no match exists. Filtering on `WHERE f.flight_id IS NULL` is the canonical SQL anti-join pattern for detecting unused resources.',
+    initialSqlPlaceholder: `-- Mission 3: Unmatched Record Detection with LEFT JOIN\n-- Find gates that have no active flights assigned\nSELECT g.gate_id, g.gate_number, g.status\nFROM gates g\nLEFT JOIN flights f ON ...\nWHERE f.flight_id IS NULL;`,
+    validationRules: [
+      {
+        type: 'SELECT_EXACT',
+        description: 'Verify unassigned gates detected via LEFT JOIN with IS NULL filter',
+        expectedQuery:
+          'SELECT g.gate_id, g.gate_number, g.status FROM gates g LEFT JOIN flights f ON g.gate_id = f.gate_id WHERE f.flight_id IS NULL;',
       },
     ],
     xpReward: 130,
@@ -147,40 +140,45 @@ WHERE status = 'Delayed';`,
   {
     id: 'ap_m4',
     order: 4,
-    title: 'Reassign Gate & Update Boarding Status',
+    title: 'Flight Capacity Classification with CASE WHEN',
     role: 'Flight Data Operations Analyst',
     storyline:
-      'Flight GA-305 (New York) was held on the tarmac, but departure clearance has been granted! Air traffic control assigns available gate B3 (gate_id = 6) and clears the flight to Boarding.',
+      'SkyHarbor Ground Handling and Passenger Logistics must allocate ground staff, boarding agents, and baggage handlers based on passenger volume. Operations Director Vikram requests a categorized flight capacity report.',
     businessProblem:
-      'Tarmac gate reassignments must be committed to the central database so automated airport display screens (FIDS) immediately direct passengers to the correct concourse.',
+      'Raw passenger counts do not immediately indicate operational staffing tiers. Dispatchers need standardized capacity tiers to allocate dual-jetway boarding stairs and extra gate check-in agents.',
     objective:
-      'Update "flights" to set gate_id = 6 and status = "Boarding" for the flight with flight_number = "GA-305".',
+      'Select flight_number, destination, passenger_count, and evaluate capacity tiers using a CASE statement: WHEN passenger_count >= 250 THEN "Heavy", WHEN passenger_count >= 150 THEN "Medium", ELSE "Light" END AS capacity_tier.',
     requiredOutcome:
-      'Flight GA-305 updated to Boarding status at gate_id 6.',
+      'A table of all flights with their raw passenger counts and classified capacity_tier.',
     checklist: [
-      'Use UPDATE flights',
-      'SET gate_id = 6, status = \'Boarding\'',
-      'WHERE flight_number = \'GA-305\'',
+      'SELECT flight_number, destination, passenger_count',
+      'Include CASE WHEN passenger_count >= 250 THEN \'Heavy\'',
+      'Include WHEN passenger_count >= 150 THEN \'Medium\'',
+      'Include ELSE \'Light\' END AS capacity_tier',
+      'FROM flights',
     ],
-    sqlTopics: ['UPDATE ... SET', 'WHERE clause', 'Status Transition'],
+    sqlTopics: ['CASE WHEN', 'Conditional Logic', 'Derived Columns', 'Data Categorization'],
     hints: [
-      'Syntax: UPDATE flights SET column1 = val1, column2 = val2 WHERE condition;',
-      'Set gate_id = 6 and status = \'Boarding\'.',
-      "UPDATE flights SET gate_id = 6, status = 'Boarding' WHERE flight_number = 'GA-305';",
+      'Use the CASE expression syntax: `CASE WHEN condition1 THEN val1 WHEN condition2 THEN val2 ELSE val3 END AS capacity_tier`.',
+      'Check `>= 250` for Heavy first, then `>= 150` for Medium, with ELSE \'Light\'.',
+      "SELECT flight_number, destination, passenger_count,\n  CASE\n    WHEN passenger_count >= 250 THEN 'Heavy'\n    WHEN passenger_count >= 150 THEN 'Medium'\n    ELSE 'Light'\n  END AS capacity_tier\nFROM flights;",
     ],
-    sampleSolution: `UPDATE flights
-SET gate_id = 6, status = 'Boarding'
-WHERE flight_number = 'GA-305';`,
+    sampleSolution: `SELECT flight_number, destination, passenger_count,
+  CASE
+    WHEN passenger_count >= 250 THEN 'Heavy'
+    WHEN passenger_count >= 150 THEN 'Medium'
+    ELSE 'Light'
+  END AS capacity_tier
+FROM flights;`,
     solutionExplanation:
-      'Direct atomic UPDATE operations keep live display boards synchronized with air traffic command decisions, avoiding passenger concourse confusion.',
-    initialSqlPlaceholder: `-- Mission 4: Reassign GA-305 to gate 6 and Boarding\nUPDATE flights\nSET gate_id = ..., status = ...\nWHERE flight_number = 'GA-305';`,
+      'The CASE statement brings branching conditional logic into SQL queries. Evaluating passenger thresholds into discrete labels transforms continuous operational metrics into actionable categories.',
+    initialSqlPlaceholder: `-- Mission 4: Conditional Logic with CASE WHEN\n-- Classify flights into capacity tiers\nSELECT flight_number, destination, passenger_count,\n  CASE\n    WHEN passenger_count >= 250 THEN 'Heavy'\n    WHEN ...\n    ELSE 'Light'\n  END AS capacity_tier\nFROM flights;`,
     validationRules: [
       {
-        type: 'ROW_EXISTS',
-        description: 'Verify GA-305 is updated to gate_id 6 and Boarding status',
-        expectedTable: 'flights',
-        expectedWhereClause: "flight_number = 'GA-305' AND gate_id = 6 AND status = 'Boarding'",
-        expectedRowCount: 1,
+        type: 'SELECT_EXACT',
+        description: 'Verify flight passenger capacity classification using CASE WHEN',
+        expectedQuery:
+          "SELECT flight_number, destination, passenger_count, CASE WHEN passenger_count >= 250 THEN 'Heavy' WHEN passenger_count >= 150 THEN 'Medium' ELSE 'Light' END AS capacity_tier FROM flights;",
       },
     ],
     xpReward: 140,
@@ -204,7 +202,7 @@ WHERE flight_number = 'GA-305';`,
       'WHERE b.weight_kg > 25.0',
       'ORDER BY b.weight_kg DESC',
     ],
-    sqlTopics: ['INNER JOIN', 'ON clause', 'ORDER BY DESC', 'Weight threshold'],
+    sqlTopics: ['INNER JOIN', 'ON clause', 'ORDER BY DESC', 'Weight Threshold Filtering'],
     hints: [
       'Join flights (f) and baggage (b) using ON f.flight_id = b.flight_id.',
       'Filter for weight_kg > 25.0 and order by weight_kg DESC.',
@@ -221,60 +219,57 @@ ORDER BY b.weight_kg DESC;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify joined heavy baggage manifest',
+        description: 'Verify joined heavy baggage manifest ordered descending',
         expectedQuery:
           'SELECT f.flight_number, f.destination, b.passenger_name, b.weight_kg FROM flights f JOIN baggage b ON f.flight_id = b.flight_id WHERE b.weight_kg > 25.0 ORDER BY b.weight_kg DESC;',
         orderSensitive: true,
       },
     ],
     xpReward: 160,
-    badge: {
-      id: 'join_master',
-      title: 'Join Master',
-      icon: 'GitFork',
-    },
   },
   {
     id: 'ap_m6',
     order: 6,
-    title: 'Analyze Terminal Passenger Throughput',
+    title: 'Terminal Throughput Summary with HAVING',
     role: 'Flight Data Operations Analyst',
     storyline:
-      'Airport CEO Sarah is preparing a terminal expansion proposal for civil aviation authorities. She needs a consolidated summary of total scheduled flights and total passengers routed through each terminal.',
+      'Airport CEO Sarah is preparing a terminal infrastructure expansion proposal for civil aviation authorities. She needs a consolidated summary of high-density concourses — specifically terminals routing more than 500 total passengers.',
     businessProblem:
-      'Concourse infrastructure investments depend on accurate passenger density metrics derived across terminals, gates, and flights.',
+      'Civil aviation grant allocations require identifying high-volume hubs. Operations must aggregate passenger volumes across terminals, gates, and flights, and filter out low-volume or inactive terminals using a HAVING threshold.',
     objective:
-      'Join "terminals", "gates", and "flights". Select terminal_name, COUNT(f.flight_id) AS total_flights, and SUM(f.passenger_count) AS total_passengers. Group by terminal_name and order by total_passengers descending.',
+      'Join "terminals" (alias t), "gates" (alias g) on t.terminal_id = g.terminal_id, and "flights" (alias f) on g.gate_id = f.gate_id. Select terminal_name, COUNT(f.flight_id) AS total_flights, and SUM(f.passenger_count) AS total_passengers. Group by terminal_name, apply a HAVING filter where total_passengers > 500, and order by total_passengers descending.',
     requiredOutcome:
-      'Aggregated terminal throughput table sorted by total passenger load descending.',
+      'An aggregated terminal throughput summary showing total flights and passengers for terminals exceeding 500 passengers, sorted descending.',
     checklist: [
       'JOIN terminals t -> gates g ON t.terminal_id = g.terminal_id',
       'JOIN flights f ON g.gate_id = f.gate_id',
       'SELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers',
       'GROUP BY t.terminal_name',
+      'HAVING total_passengers > 500',
       'ORDER BY total_passengers DESC',
     ],
-    sqlTopics: ['Multi-table JOIN', 'GROUP BY', 'SUM / COUNT Aggregation', 'ORDER BY DESC'],
+    sqlTopics: ['Multi-Table JOIN', 'GROUP BY', 'HAVING Clause', 'SUM / COUNT Aggregation', 'ORDER BY DESC'],
     hints: [
-      'Chain the two joins: terminals t JOIN gates g ON ... JOIN flights f ON ...',
-      'Compute COUNT(f.flight_id) AS total_flights and SUM(f.passenger_count) AS total_passengers.',
-      'SELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers FROM terminals t JOIN gates g ON t.terminal_id = g.terminal_id JOIN flights f ON g.gate_id = f.gate_id GROUP BY t.terminal_name ORDER BY total_passengers DESC;',
+      'Chain the joins: terminals t JOIN gates g ON t.terminal_id = g.terminal_id JOIN flights f ON g.gate_id = f.gate_id.',
+      'GROUP BY t.terminal_name and filter groups with HAVING total_passengers > 500 (or HAVING SUM(f.passenger_count) > 500).',
+      'SELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers\nFROM terminals t\nJOIN gates g ON t.terminal_id = g.terminal_id\nJOIN flights f ON g.gate_id = f.gate_id\nGROUP BY t.terminal_name\nHAVING total_passengers > 500\nORDER BY total_passengers DESC;',
     ],
     sampleSolution: `SELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers
 FROM terminals t
 JOIN gates g ON t.terminal_id = g.terminal_id
 JOIN flights f ON g.gate_id = f.gate_id
 GROUP BY t.terminal_name
+HAVING total_passengers > 500
 ORDER BY total_passengers DESC;`,
     solutionExplanation:
-      'Multi-table aggregations provide executive-level operational intelligence, showing how passenger volumes distribute across physical airport infrastructure.',
-    initialSqlPlaceholder: `-- Mission 6: Terminal passenger throughput summary\nSELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers\nFROM terminals t\nJOIN gates g ON ...\nJOIN flights f ON ...\nGROUP BY ...\nORDER BY ...;`,
+      'Multi-table aggregations combined with HAVING allow filtering on grouped metric calculations (unlike WHERE which filters individual rows before aggregation). This extracts exactly the high-capacity hubs required for infrastructure planning.',
+    initialSqlPlaceholder: `-- Mission 6: Multi-table terminal throughput summary with HAVING\nSELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers\nFROM terminals t\nJOIN gates g ON ...\nJOIN flights f ON ...\nGROUP BY t.terminal_name\nHAVING ...\nORDER BY ...;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify terminal throughput aggregation',
+        description: 'Verify terminal throughput aggregation with HAVING threshold',
         expectedQuery:
-          'SELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers FROM terminals t JOIN gates g ON t.terminal_id = g.terminal_id JOIN flights f ON g.gate_id = f.gate_id GROUP BY t.terminal_name ORDER BY total_passengers DESC;',
+          'SELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers FROM terminals t JOIN gates g ON t.terminal_id = g.terminal_id JOIN flights f ON g.gate_id = f.gate_id GROUP BY t.terminal_name HAVING total_passengers > 500 ORDER BY total_passengers DESC;',
         orderSensitive: true,
       },
     ],

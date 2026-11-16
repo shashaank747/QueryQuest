@@ -139,7 +139,7 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
       }
     });
 
-    it('wh_m1: verifies table creation for temperature_logs', async () => {
+    it('wh_m1: queries saturated storage bins with product names', async () => {
       const m1 = WAREHOUSE_MISSIONS[0];
       const execRes = await executeSql(m1.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -148,35 +148,6 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
       const feedback = await ValidationEngine.validate(m1.validationRules, ctx);
       expect(feedback.passed).toBe(true);
 
-      const schema = getDatabaseSchema();
-      expect(schema['temperature_logs']).toBeDefined();
-      const colNames = schema['temperature_logs'].columns.map(c => c.name);
-      expect(colNames).toEqual(expect.arrayContaining(['log_id', 'zone_id', 'recorded_temp', 'recorded_at', 'is_alert']));
-    });
-
-    it('wh_m2: verifies precision tooling product insertion', async () => {
-      const m2 = WAREHOUSE_MISSIONS[1];
-      const execRes = await executeSql(m2.sampleSolution);
-      expect(execRes.success).toBe(true);
-
-      const ctx = createValidationContext(m2.sampleSolution, execRes);
-      const feedback = await ValidationEngine.validate(m2.validationRules, ctx);
-      expect(feedback.passed).toBe(true);
-
-      const res = db.exec("SELECT sku, product_name, category, unit_weight_kg FROM products WHERE product_id = 7;");
-      expect(res[0].values[0]).toEqual(['SKU-TOOL-407', 'Laser Leveling Transit Kit', 'Tools', 3.8]);
-    });
-
-    it('wh_m3: queries overcapacity bins accurately', async () => {
-      const m3 = WAREHOUSE_MISSIONS[2];
-      const execRes = await executeSql(m3.sampleSolution);
-      expect(execRes.success).toBe(true);
-
-      const ctx = createValidationContext(m3.sampleSolution, execRes);
-      const feedback = await ValidationEngine.validate(m3.validationRules, ctx);
-      expect(feedback.passed).toBe(true);
-
-      // Verify exact 3 saturated bins: BIN-A-02 (80/80), BIN-B-02 (200/200), BIN-C-01 (60/60)
       const rows = execRes.results![0].values;
       expect(rows.length).toBe(3);
       const binCodes = rows.map(r => r[0]);
@@ -185,7 +156,37 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
       expect(binCodes).toContain('BIN-C-01');
     });
 
-    it('wh_m4: updates shipment APX-9041 to In Transit', async () => {
+    it('wh_m2: traverses 3-table chain for cold chain inventory', async () => {
+      const m2 = WAREHOUSE_MISSIONS[1];
+      const execRes = await executeSql(m2.sampleSolution);
+      expect(execRes.success).toBe(true);
+
+      const ctx = createValidationContext(m2.sampleSolution, execRes);
+      const feedback = await ValidationEngine.validate(m2.validationRules, ctx);
+      expect(feedback.passed).toBe(true);
+
+      const rows = execRes.results![0].values;
+      expect(rows.length).toBe(2);
+      expect(rows[0][2]).toBe('BIN-C-01');
+      expect(rows[0][3]).toBe(60);
+      expect(rows[1][2]).toBe('BIN-C-02');
+      expect(rows[1][3]).toBe(35);
+    });
+
+    it('wh_m3: warehouse zone distribution with LEFT JOIN', async () => {
+      const m3 = WAREHOUSE_MISSIONS[2];
+      const execRes = await executeSql(m3.sampleSolution);
+      expect(execRes.success).toBe(true);
+
+      const ctx = createValidationContext(m3.sampleSolution, execRes);
+      const feedback = await ValidationEngine.validate(m3.validationRules, ctx);
+      expect(feedback.passed).toBe(true);
+
+      const rows = execRes.results![0].values;
+      expect(rows.length).toBe(4);
+    });
+
+    it('wh_m4: categorizes storage bin fill levels with CASE WHEN', async () => {
       const m4 = WAREHOUSE_MISSIONS[3];
       const execRes = await executeSql(m4.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -194,11 +195,13 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
       const feedback = await ValidationEngine.validate(m4.validationRules, ctx);
       expect(feedback.passed).toBe(true);
 
-      const res = db.exec("SELECT status FROM shipments WHERE tracking_number = 'APX-9041';");
-      expect(res[0].values[0][0]).toBe('In Transit');
+      const rows = execRes.results![0].values;
+      expect(rows.length).toBe(7);
+      const fullBins = rows.filter(r => r[3] === 'Full');
+      expect(fullBins.length).toBe(3);
     });
 
-    it('wh_m5: executes multi-table JOIN for cold chain inventory with descending quantity', async () => {
+    it('wh_m5: aggregates carrier freight volume with HAVING filter and order', async () => {
       const m5 = WAREHOUSE_MISSIONS[4];
       const execRes = await executeSql(m5.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -208,16 +211,13 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
       expect(feedback.passed).toBe(true);
 
       const rows = execRes.results![0].values;
-      expect(rows.length).toBe(2);
-      // Row 1: BIN-C-01 with 60 qty
-      expect(rows[0][2]).toBe('BIN-C-01');
-      expect(rows[0][3]).toBe(60);
-      // Row 2: BIN-C-02 with 35 qty
-      expect(rows[1][2]).toBe('BIN-C-02');
-      expect(rows[1][3]).toBe(35);
+      expect(rows.length).toBe(3);
+      expect(rows[0]).toEqual(['TCI Freight', 2, 44]);
+      expect(rows[1]).toEqual(['Delhivery Freight', 2, 33]);
+      expect(rows[2]).toEqual(['BlueDart Express', 2, 20]);
     });
 
-    it('wh_m6: aggregates carrier freight volume with HAVING filter and order', async () => {
+    it('wh_m6: reconciles zone capacity with multi-table JOIN and HAVING', async () => {
       const m6 = WAREHOUSE_MISSIONS[5];
       const execRes = await executeSql(m6.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -228,10 +228,7 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
 
       const rows = execRes.results![0].values;
       expect(rows.length).toBe(3);
-      // High volume carrier order: TCI (44) > Delhivery (33) > BlueDart (20)
-      expect(rows[0]).toEqual(['TCI Freight', 2, 44]);
-      expect(rows[1]).toEqual(['Delhivery Freight', 2, 33]);
-      expect(rows[2]).toEqual(['BlueDart Express', 2, 20]);
+      expect(rows[0]).toEqual(['Zone B - High-Density Racks', 320]);
     });
   });
 
@@ -241,170 +238,48 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
     });
 
     describe('wh_m1 Errors & Diagnostics', () => {
-      it('should diagnose syntax error with trailing comma', () => {
-        const badSql = `CREATE TABLE temperature_logs (
-          log_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          zone_id INTEGER NOT NULL,
-        );`;
-        try {
-          db.exec(badSql);
-          expect.fail('Should have thrown syntax error');
-        } catch (err: any) {
-          const diag = generateSqlDiagnostic(err.message, badSql);
-          expect(diag).toMatch(/Syntax error near "\)"/i);
-        }
-      });
-
-      it('should fail validation when table is created without required columns', async () => {
-        const incompleteSql = `CREATE TABLE temperature_logs (
-          log_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          zone_id INTEGER NOT NULL
-        );`;
-        const execRes = await executeSql(incompleteSql);
-        expect(execRes.success).toBe(true);
-
-        const m1 = WAREHOUSE_MISSIONS[0];
-        const ctx = createValidationContext(incompleteSql, execRes);
-        const feedback = await ValidationEngine.validate(m1.validationRules, ctx);
-
-        expect(feedback.passed).toBe(false);
-        expect(feedback.message).toContain("column 'recorded_temp' is missing");
-      });
-
-      it('should fail validation if table name is misspelled', async () => {
-        const wrongTableSql = `CREATE TABLE temp_logs (
-          log_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          zone_id INTEGER NOT NULL,
-          recorded_temp REAL NOT NULL,
-          recorded_at TEXT NOT NULL,
-          is_alert INTEGER DEFAULT 0
-        );`;
-        const execRes = await executeSql(wrongTableSql);
-        const m1 = WAREHOUSE_MISSIONS[0];
-        const ctx = createValidationContext(wrongTableSql, execRes);
-        const feedback = await ValidationEngine.validate(m1.validationRules, ctx);
-
-        expect(feedback.passed).toBe(false);
-        expect(feedback.message).toContain("Table 'temperature_logs' does not exist");
-      });
-    });
-
-    describe('wh_m2 Errors & Diagnostics', () => {
-      it('should diagnose unique constraint violation when duplicate product_id or sku is inserted', () => {
-        const dupSql = `INSERT INTO products (product_id, sku, product_name, category, unit_weight_kg)
-          VALUES (1, 'SKU-TOOL-407', 'Laser Leveling Transit Kit', 'Tools', 3.8);`;
-        try {
-          db.exec(dupSql);
-          expect.fail('Should fail with UNIQUE constraint');
-        } catch (err: any) {
-          const diag = generateSqlDiagnostic(err.message, dupSql);
-          expect(diag).toMatch(/unique constraint violation/i);
-        }
-      });
-
-      it('should diagnose non-existent column in products INSERT', () => {
-        const badColSql = `INSERT INTO products (product_id, sku, item_name, category, unit_weight_kg)
-          VALUES (7, 'SKU-TOOL-407', 'Laser Leveling Kit', 'Tools', 3.8);`;
-        try {
-          db.exec(badColSql);
-          expect.fail('Should fail with no such column');
-        } catch (err: any) {
-          const diag = generateSqlDiagnostic(err.message, badColSql);
-          expect(diag).toMatch(/Column "item_name" does not exist/i);
-        }
-      });
-
-      it('should fail validation when wrong SKU is inserted', async () => {
-        const wrongSkuSql = `INSERT INTO products (product_id, sku, product_name, category, unit_weight_kg)
-          VALUES (7, 'SKU-WRONG-999', 'Laser Leveling Transit Kit', 'Tools', 3.8);`;
-        const execRes = await executeSql(wrongSkuSql);
-        const m2 = WAREHOUSE_MISSIONS[1];
-        const ctx = createValidationContext(wrongSkuSql, execRes);
-        const feedback = await ValidationEngine.validate(m2.validationRules, ctx);
-
-        expect(feedback.passed).toBe(false);
-        expect(feedback.message).toContain('Verify SKU-TOOL-407 is inserted into products');
-      });
-    });
-
-    describe('wh_m3 Errors & Diagnostics', () => {
       it('should fail validation when strict greater than is used (> max_capacity)', async () => {
-        const strictSql = `SELECT bin_code, quantity, max_capacity
-          FROM inventory_bins
-          WHERE quantity > max_capacity;`;
+        const strictSql = `SELECT b.bin_code, p.product_name, b.quantity, b.max_capacity
+          FROM inventory_bins b
+          JOIN products p ON b.product_id = p.product_id
+          WHERE b.quantity > b.max_capacity;`;
         const execRes = await executeSql(strictSql);
         expect(execRes.success).toBe(true);
         expect(execRes.results?.length ?? 0).toBe(0);
 
-        const m3 = WAREHOUSE_MISSIONS[2];
+        const m1 = WAREHOUSE_MISSIONS[0];
         const ctx = createValidationContext(strictSql, execRes);
-        const feedback = await ValidationEngine.validate(m3.validationRules, ctx);
+        const feedback = await ValidationEngine.validate(m1.validationRules, ctx);
 
         expect(feedback.passed).toBe(false);
         expect(feedback.message).toMatch(/Your query did not return any data rows|Returned 0 record\(s\)/);
       });
 
       it('should diagnose non-existent column stock_level', () => {
-        const badColSql = `SELECT bin_code, stock_level FROM inventory_bins WHERE quantity >= max_capacity;`;
+        const badColSql = `SELECT b.bin_code, b.stock_level FROM inventory_bins b JOIN products p ON b.product_id = p.product_id;`;
         try {
           db.exec(badColSql);
           expect.fail('Should fail with no such column');
         } catch (err: any) {
           const diag = generateSqlDiagnostic(err.message, badColSql);
-          expect(diag).toMatch(/Column "stock_level" does not exist/i);
+          expect(diag).toMatch(/Column "b\.stock_level" does not exist|Column "stock_level" does not exist/i);
         }
       });
 
-      it('should diagnose non-existent table bins', () => {
-        const badTableSql = `SELECT bin_code, quantity, max_capacity FROM bins WHERE quantity >= max_capacity;`;
+      it('should diagnose missing ON clause syntax error', () => {
+        const badSql = `SELECT b.bin_code, p.product_name FROM inventory_bins b JOIN products p WHERE b.quantity >= b.max_capacity;`;
         try {
-          db.exec(badTableSql);
-          expect.fail('Should fail with no such table');
+          db.exec(badSql);
+          expect.fail('Should throw syntax error');
         } catch (err: any) {
-          const diag = generateSqlDiagnostic(err.message, badTableSql);
-          expect(diag).toMatch(/Table "bins" was not found in the database/i);
+          const diag = generateSqlDiagnostic(err.message, badSql);
+          expect(diag).toMatch(/syntax error|JOIN/i);
         }
       });
     });
 
-    describe('wh_m4 Errors & Diagnostics', () => {
-      it('should diagnose syntax error in UPDATE statement', () => {
-        const badUpdateSql = `UPDATE shipments SET status == 'In Transit' WHERE tracking_number = 'APX-9041';`;
-        try {
-          db.exec(badUpdateSql);
-          expect.fail('Should fail with syntax error');
-        } catch (err: any) {
-          const diag = generateSqlDiagnostic(err.message, badUpdateSql);
-          expect(diag).toMatch(/syntax error near "=="|syntax error/i);
-        }
-      });
-
-      it('should fail validation when updating a non-existent tracking number', async () => {
-        const wrongTrackSql = `UPDATE shipments SET status = 'In Transit' WHERE tracking_number = 'APX-9999';`;
-        const execRes = await executeSql(wrongTrackSql);
-        const m4 = WAREHOUSE_MISSIONS[3];
-        const ctx = createValidationContext(wrongTrackSql, execRes);
-        const feedback = await ValidationEngine.validate(m4.validationRules, ctx);
-
-        expect(feedback.passed).toBe(false);
-        expect(feedback.message).toContain('Verify APX-9041 status is In Transit');
-      });
-
-      it('should diagnose non-existent column shipment_state', () => {
-        const badColSql = `UPDATE shipments SET shipment_state = 'In Transit' WHERE tracking_number = 'APX-9041';`;
-        try {
-          db.exec(badColSql);
-          expect.fail('Should fail with no such column');
-        } catch (err: any) {
-          const diag = generateSqlDiagnostic(err.message, badColSql);
-          expect(diag).toMatch(/Column "shipment_state" does not exist/i);
-        }
-      });
-    });
-
-    describe('wh_m5 Errors & Diagnostics', () => {
+    describe('wh_m2 Errors & Diagnostics', () => {
       it('should fail validation when JOIN condition is invalid', async () => {
-        // Wrong join: connecting inventory_bins to zones via bin_id instead of zone_id
         const badJoinSql = `SELECT p.sku, p.product_name, b.bin_code, b.quantity, z.zone_name
           FROM products p
           JOIN inventory_bins b ON p.product_id = b.product_id
@@ -414,9 +289,9 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
         const execRes = await executeSql(badJoinSql);
         expect(execRes.success).toBe(true);
 
-        const m5 = WAREHOUSE_MISSIONS[4];
+        const m2 = WAREHOUSE_MISSIONS[1];
         const ctx = createValidationContext(badJoinSql, execRes);
-        const feedback = await ValidationEngine.validate(m5.validationRules, ctx);
+        const feedback = await ValidationEngine.validate(m2.validationRules, ctx);
 
         expect(feedback.passed).toBe(false);
       });
@@ -431,9 +306,9 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
         const execRes = await executeSql(warmZoneSql);
         expect(execRes.success).toBe(true);
 
-        const m5 = WAREHOUSE_MISSIONS[4];
+        const m2 = WAREHOUSE_MISSIONS[1];
         const ctx = createValidationContext(warmZoneSql, execRes);
-        const feedback = await ValidationEngine.validate(m5.validationRules, ctx);
+        const feedback = await ValidationEngine.validate(m2.validationRules, ctx);
 
         expect(feedback.passed).toBe(false);
         expect(feedback.message).toContain('Returned 5 record(s), but 2 were expected');
@@ -449,27 +324,62 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
         const execRes = await executeSql(ascSql);
         expect(execRes.success).toBe(true);
 
-        const m5 = WAREHOUSE_MISSIONS[4];
+        const m2 = WAREHOUSE_MISSIONS[1];
         const ctx = createValidationContext(ascSql, execRes);
-        const feedback = await ValidationEngine.validate(m5.validationRules, ctx);
+        const feedback = await ValidationEngine.validate(m2.validationRules, ctx);
 
         expect(feedback.passed).toBe(false);
         expect(feedback.message).toContain('Ensure ORDER BY clause is applied');
       });
+    });
 
-      it('should diagnose non-existent column z.cold_chain', () => {
-        const badColSql = `SELECT p.sku, p.product_name FROM products p JOIN inventory_bins b ON p.product_id = b.product_id JOIN zones z ON b.zone_id = z.zone_id WHERE z.cold_chain = 1;`;
+    describe('wh_m3 Errors & Diagnostics', () => {
+      it('should diagnose non-existent column in LEFT JOIN', () => {
+        const badColSql = `SELECT w.warehouse_name, w.invalid_col, z.zone_name FROM warehouses w LEFT JOIN zones z ON w.warehouse_id = z.warehouse_id;`;
         try {
           db.exec(badColSql);
           expect.fail('Should fail with no such column');
         } catch (err: any) {
           const diag = generateSqlDiagnostic(err.message, badColSql);
-          expect(diag).toMatch(/Column "z\.cold_chain" does not exist|Column "cold_chain" does not exist/i);
+          expect(diag).toMatch(/Column "w\.invalid_col" does not exist|Column "invalid_col" does not exist/i);
         }
       });
     });
 
-    describe('wh_m6 Errors & Diagnostics', () => {
+    describe('wh_m4 Errors & Diagnostics', () => {
+      it('should diagnose syntax error in CASE WHEN without END', () => {
+        const badCaseSql = `SELECT bin_code, quantity, max_capacity,
+          CASE WHEN quantity >= max_capacity THEN 'Full' ELSE 'Underutilized'
+          FROM inventory_bins;`;
+        try {
+          db.exec(badCaseSql);
+          expect.fail('Should fail with syntax error');
+        } catch (err: any) {
+          const diag = generateSqlDiagnostic(err.message, badCaseSql);
+          expect(diag).toMatch(/syntax error/i);
+        }
+      });
+
+      it('should fail validation when CASE thresholds are inverted', async () => {
+        const invertedSql = `SELECT bin_code, quantity, max_capacity,
+          CASE
+            WHEN quantity >= max_capacity * 0.5 THEN 'Optimal'
+            WHEN quantity >= max_capacity THEN 'Full'
+            ELSE 'Underutilized'
+          END AS fill_level
+          FROM inventory_bins;`;
+        const execRes = await executeSql(invertedSql);
+        expect(execRes.success).toBe(true);
+
+        const m4 = WAREHOUSE_MISSIONS[3];
+        const ctx = createValidationContext(invertedSql, execRes);
+        const feedback = await ValidationEngine.validate(m4.validationRules, ctx);
+
+        expect(feedback.passed).toBe(false);
+      });
+    });
+
+    describe('wh_m5 Errors & Diagnostics', () => {
       it('should diagnose misuse of aggregate function in WHERE clause', () => {
         const misuseSql = `SELECT carrier, COUNT(shipment_id) AS total_shipments, SUM(pallet_count) AS total_pallets
           FROM shipments
@@ -494,9 +404,9 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
         expect(execRes.success).toBe(true);
         expect(execRes.results?.length ?? 0).toBe(0);
 
-        const m6 = WAREHOUSE_MISSIONS[5];
+        const m5 = WAREHOUSE_MISSIONS[4];
         const ctx = createValidationContext(highHavingSql, execRes);
-        const feedback = await ValidationEngine.validate(m6.validationRules, ctx);
+        const feedback = await ValidationEngine.validate(m5.validationRules, ctx);
 
         expect(feedback.passed).toBe(false);
         expect(feedback.message).toMatch(/Your query did not return any data rows|Returned 0 record\(s\)/);
@@ -510,9 +420,9 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
         expect(execRes.success).toBe(true);
         expect(execRes.results![0].values.length).toBe(1);
 
-        const m6 = WAREHOUSE_MISSIONS[5];
+        const m5 = WAREHOUSE_MISSIONS[4];
         const ctx = createValidationContext(noGroupBySql, execRes);
-        const feedback = await ValidationEngine.validate(m6.validationRules, ctx);
+        const feedback = await ValidationEngine.validate(m5.validationRules, ctx);
 
         expect(feedback.passed).toBe(false);
         expect(feedback.message).toContain('Returned 1 record(s), but 3 were expected');
@@ -527,12 +437,31 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
         const execRes = await executeSql(ascSql);
         expect(execRes.success).toBe(true);
 
-        const m6 = WAREHOUSE_MISSIONS[5];
+        const m5 = WAREHOUSE_MISSIONS[4];
         const ctx = createValidationContext(ascSql, execRes);
-        const feedback = await ValidationEngine.validate(m6.validationRules, ctx);
+        const feedback = await ValidationEngine.validate(m5.validationRules, ctx);
 
         expect(feedback.passed).toBe(false);
         expect(feedback.message).toContain('Ensure ORDER BY clause is applied');
+      });
+    });
+
+    describe('wh_m6 Errors & Diagnostics', () => {
+      it('should fail validation when HAVING threshold is omitted', async () => {
+        const noHavingSql = `SELECT z.zone_name, SUM(b.quantity) AS total_stock
+          FROM zones z
+          JOIN inventory_bins b ON z.zone_id = b.zone_id
+          GROUP BY z.zone_name
+          ORDER BY total_stock DESC;`;
+        const execRes = await executeSql(noHavingSql);
+        expect(execRes.success).toBe(true);
+
+        const m6 = WAREHOUSE_MISSIONS[5];
+        const ctx = createValidationContext(noHavingSql, execRes);
+        const feedback = await ValidationEngine.validate(m6.validationRules, ctx);
+
+        expect(feedback.passed).toBe(false);
+        expect(feedback.message).toContain('Returned 4 record(s), but 3 were expected');
       });
     });
   });
@@ -553,9 +482,9 @@ describe('World 3: Warehouse Management Playthrough & Audit', () => {
         .map(m => m.badge!.id);
 
       expect(missionBadgeIds).toEqual([
-        'table_architect',
         'cargo_supervisor',
         'join_master',
+        'aggregate_wizard',
         'warehouse_master',
       ]);
 

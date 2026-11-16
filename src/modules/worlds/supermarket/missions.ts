@@ -261,40 +261,40 @@ WHERE status = 'Discontinued';`,
   {
     id: 'sm_m7',
     order: 7,
-    title: 'Investigate Checkout Lane Error',
+    title: 'Search Catalog for Organic Products',
     role: 'Junior Database Executive',
     storyline:
-      'Cashier Tanvi at Register 2 reports a live issue: A shopper attempted to purchase a Wireless Optical Mouse (product_id = 6), but the checkout terminal threw an out-of-stock validation error!',
+      'Health-conscious shoppers are asking our customer service desk for organic food items. Floor Supervisor Imran Khan wants a quick catalog search to find all active organic products so staff can guide shoppers to the right shelves.',
     businessProblem:
-      'Manager Devendra wants you to correlate product details with actual shelf inventory to verify the quantity and aisle location.',
+      'Floor clerks are unable to quickly find organic products across departments. Management needs a query to locate all active items with "Organic" in their product name.',
     objective:
-      'Write an INNER JOIN between "products" and "inventory" on product_id. Select product_name, quantity_on_hand, and aisle_number for product_id = 6.',
+      'Write a SELECT query on the "products" table returning product_id, product_name, category_id, and unit_price for all products where product_name contains "Organic" and status is "Active".',
     requiredOutcome:
-      'A single row displaying the Wireless Optical Mouse with its quantity_on_hand (0) and aisle_number (Aisle 4).',
+      'Result set containing active products with "Organic" in their name, displaying product_id, product_name, category_id, and unit_price.',
     checklist: [
-      'SELECT product_name, quantity_on_hand, aisle_number',
-      'FROM products JOIN inventory ON products.product_id = inventory.product_id',
-      'WHERE products.product_id = 6',
+      'SELECT product_id, product_name, category_id, unit_price',
+      'FROM products',
+      "WHERE product_name LIKE '%Organic%'",
+      "AND status = 'Active'",
     ],
-    sqlTopics: ['INNER JOIN', 'ON clause', 'Multi-table correlation'],
+    sqlTopics: ['SELECT', 'WHERE', 'LIKE operator', 'Wildcard (%)', 'Logical AND'],
     hints: [
-      'Join products (p) and inventory (i) using: JOIN inventory ON products.product_id = inventory.product_id',
-      'Select the required columns: product_name, quantity_on_hand, aisle_number.',
-      'SELECT p.product_name, i.quantity_on_hand, i.aisle_number FROM products p JOIN inventory i ON p.product_id = i.product_id WHERE p.product_id = 6;',
+      "Use the LIKE operator with the '%' wildcard on product_name to search for text patterns: product_name LIKE '%Organic%'.",
+      "Add a condition checking status = 'Active' using AND so only active inventory is returned.",
+      "SELECT product_id, product_name, category_id, unit_price FROM products WHERE product_name LIKE '%Organic%' AND status = 'Active';",
     ],
-    sampleSolution: `SELECT p.product_name, i.quantity_on_hand, i.aisle_number
-FROM products p
-JOIN inventory i ON p.product_id = i.product_id
-WHERE p.product_id = 6;`,
+    sampleSolution: `SELECT product_id, product_name, category_id, unit_price
+FROM products
+WHERE product_name LIKE '%Organic%' AND status = 'Active';`,
     solutionExplanation:
-      'An INNER JOIN combines rows from two tables based on a common attribute (product_id). This allows operational analysts to bridge catalog descriptions with live warehouse stock.',
-    initialSqlPlaceholder: `-- Mission 7: Join products and inventory to investigate product 6\nSELECT p.product_name, i.quantity_on_hand, i.aisle_number\nFROM products p\nJOIN inventory i ON ...\nWHERE ...;`,
+      "The LIKE operator performs pattern matching against string data. By wrapping 'Organic' in '%' wildcards (%Organic%), SQLite matches any product name containing 'Organic' anywhere in the title, and the AND status = 'Active' filter excludes obsolete items.",
+    initialSqlPlaceholder: `-- Mission 7: Find active organic products in the catalog\nSELECT product_id, product_name, category_id, unit_price\nFROM products\nWHERE ...;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify joined product and inventory details for product_id 6',
+        description: 'Verify active organic products matching the LIKE pattern are returned',
         expectedQuery:
-          'SELECT p.product_name, i.quantity_on_hand, i.aisle_number FROM products p JOIN inventory i ON p.product_id = i.product_id WHERE p.product_id = 6;',
+          "SELECT product_id, product_name, category_id, unit_price FROM products WHERE product_name LIKE '%Organic%' AND status = 'Active';",
       },
     ],
     xpReward: 160,
@@ -307,94 +307,87 @@ WHERE p.product_id = 6;`,
   {
     id: 'sm_m8',
     order: 8,
-    title: 'Trace Customer Order Fulfillment',
+    title: 'Filter Mid-Tier Customer Orders',
     role: 'Junior Database Executive',
     storyline:
-      'Customer Loyalty Lead Diya wants an audit trail connecting registered customers to the exact items they have ordered across all store transactions.',
+      'Store Operations Manager Devendra is conducting a mid-quarter sales analysis. He wants an audit of completed orders within the mid-tier basket range (₹500 to ₹2,500) to optimize register checkout promotions.',
     businessProblem:
-      'Orders and items reside across multiple normalized tables (customers, orders, order_items). We must link them together.',
+      'Management needs to isolate completed orders whose total amount falls between ₹500 and ₹2,500, ordered from highest value to lowest value.',
     objective:
-      'Join "customers", "orders", and "order_items". Select customer_id, first_name, order_id, product_id, and quantity. Order results by order_id, then product_id.',
+      'Query the "orders" table for orders where status = "Completed" and total_amount is BETWEEN 500 AND 2500. Select order_id, customer_id, order_date, and total_amount, sorted by total_amount in descending order.',
     requiredOutcome:
-      'A multi-table joined dataset ordered by order_id, then product_id.',
+      'A list of completed orders with total_amount between 500 and 2500, sorted descending by total_amount.',
     checklist: [
-      'SELECT c.customer_id, c.first_name, o.order_id, oi.product_id, oi.quantity',
-      'FROM customers c JOIN orders o ON c.customer_id = o.customer_id',
-      'JOIN order_items oi ON o.order_id = oi.order_id',
-      'ORDER BY o.order_id, oi.product_id',
+      'SELECT order_id, customer_id, order_date, total_amount',
+      'FROM orders',
+      "WHERE status = 'Completed'",
+      'AND total_amount BETWEEN 500 AND 2500',
+      'ORDER BY total_amount DESC',
     ],
-    sqlTopics: ['Multi-table JOIN', 'ORDER BY multiple columns', 'Aliasing'],
+    sqlTopics: ['SELECT', 'WHERE', 'BETWEEN operator', 'ORDER BY DESC'],
     hints: [
-      'Chain two JOINs: customers -> orders -> order_items.',
-      'Use table aliases (c, o, oi) for clarity and brevity.',
-      'SELECT c.customer_id, c.first_name, o.order_id, oi.product_id, oi.quantity FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id ORDER BY o.order_id, oi.product_id;',
+      "Use the BETWEEN operator to specify an inclusive numeric range: total_amount BETWEEN 500 AND 2500.",
+      "Ensure you filter for status = 'Completed' and sort the results with ORDER BY total_amount DESC.",
+      "SELECT order_id, customer_id, order_date, total_amount FROM orders WHERE status = 'Completed' AND total_amount BETWEEN 500 AND 2500 ORDER BY total_amount DESC;",
     ],
-    sampleSolution: `SELECT c.customer_id, c.first_name, o.order_id, oi.product_id, oi.quantity
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-ORDER BY o.order_id, oi.product_id;`,
+    sampleSolution: `SELECT order_id, customer_id, order_date, total_amount
+FROM orders
+WHERE status = 'Completed' AND total_amount BETWEEN 500 AND 2500
+ORDER BY total_amount DESC;`,
     solutionExplanation:
-      'Relational normalization splits business transactions into logical entities. Multi-table JOINs recombine these normalized records cleanly without data redundancy.',
-    initialSqlPlaceholder: `-- Mission 8: Connect customers, orders, and order_items\nSELECT c.customer_id, c.first_name, o.order_id, oi.product_id, oi.quantity\nFROM customers c\nJOIN orders o ON ...\nJOIN order_items oi ON ...\nORDER BY ...;`,
+      'The BETWEEN operator cleanly tests whether an expression falls within an inclusive boundary (equivalent to total_amount >= 500 AND total_amount <= 2500). Sorting by total_amount DESC displays highest-value baskets first.',
+    initialSqlPlaceholder: `-- Mission 8: Filter completed orders between 500 and 2500\nSELECT order_id, customer_id, order_date, total_amount\nFROM orders\nWHERE ...\nORDER BY ...;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify 3-table join order details',
+        description: 'Verify completed orders in the 500-2500 range sorted descending',
         expectedQuery:
-          'SELECT c.customer_id, c.first_name, o.order_id, oi.product_id, oi.quantity FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id ORDER BY o.order_id, oi.product_id;',
+          "SELECT order_id, customer_id, order_date, total_amount FROM orders WHERE status = 'Completed' AND total_amount BETWEEN 500 AND 2500 ORDER BY total_amount DESC;",
         orderSensitive: true,
       },
     ],
     xpReward: 180,
-    badge: {
-      id: 'join_master',
-      title: 'Join Master',
-      icon: 'GitFork',
-    },
   },
   {
     id: 'sm_m9',
     order: 9,
-    title: 'Analyze Category-Wise Revenue Performance',
+    title: 'Summarize High-Volume Payment Methods',
     role: 'Junior Database Executive',
     storyline:
-      'Finance Director Mehta is reviewing departmental revenue for the executive board. He requests an aggregated breakdown of sales by category, focusing on top-performing departments.',
+      'Finance Director Mehta is reviewing store payment channels to negotiate merchant processing fee rates. He needs a summary of total revenue and transaction volumes for payment methods that generated over ₹2,000 in revenue.',
     businessProblem:
-      'The board needs to know total revenue per product category, filtering only for categories that generated over ₹1,000 in total sales.',
+      'The accounting team needs aggregated revenue and transaction counts grouped by payment method, filtering only for methods generating more than ₹2,000 in total sales.',
     objective:
-      'Calculate total sales revenue per category. Select category_name and SUM(oi.quantity * oi.unit_price) AS total_revenue. Group by category_name, filter for total_revenue > 1000 using HAVING, and sort by total_revenue descending.',
+      'Query the "payments" table to calculate transaction count and total revenue grouped by payment_method. Select payment_method, COUNT(payment_id) AS total_transactions, and SUM(amount) AS total_revenue. Filter groups using HAVING total_revenue > 2000, and sort by total_revenue descending.',
     requiredOutcome:
-      'Aggregated category revenue table with total_revenue > 1000, sorted highest to lowest.',
+      'Aggregated summary showing payment_method, total_transactions, and total_revenue for methods with total_revenue > 2000, ordered from highest to lowest revenue.',
     checklist: [
-      'JOIN categories, products, order_items',
-      'GROUP BY c.category_name',
-      'Calculate SUM(oi.quantity * oi.unit_price) AS total_revenue',
-      'Filter with HAVING total_revenue > 1000',
+      'SELECT payment_method, COUNT(payment_id) AS total_transactions, SUM(amount) AS total_revenue',
+      'FROM payments',
+      'GROUP BY payment_method',
+      'HAVING total_revenue > 2000',
       'ORDER BY total_revenue DESC',
     ],
-    sqlTopics: ['GROUP BY', 'SUM', 'HAVING clause', 'Arithmetic expressions'],
+    sqlTopics: ['GROUP BY', 'COUNT', 'SUM', 'HAVING clause', 'ORDER BY DESC'],
     hints: [
-      'In SQL, total revenue is computed as SUM(quantity * unit_price).',
-      'Remember: Aggregate conditions cannot go into WHERE. Use HAVING total_revenue > 1000.',
-      'SELECT c.category_name, SUM(oi.quantity * oi.unit_price) AS total_revenue FROM categories c JOIN products p ON c.category_id = p.category_id JOIN order_items oi ON p.product_id = oi.product_id GROUP BY c.category_name HAVING total_revenue > 1000 ORDER BY total_revenue DESC;',
+      'Group records by payment_method and compute COUNT(payment_id) AS total_transactions and SUM(amount) AS total_revenue.',
+      'Filter aggregated group sums using the HAVING clause: HAVING total_revenue > 2000.',
+      'SELECT payment_method, COUNT(payment_id) AS total_transactions, SUM(amount) AS total_revenue FROM payments GROUP BY payment_method HAVING total_revenue > 2000 ORDER BY total_revenue DESC;',
     ],
-    sampleSolution: `SELECT c.category_name, SUM(oi.quantity * oi.unit_price) AS total_revenue
-FROM categories c
-JOIN products p ON c.category_id = p.category_id
-JOIN order_items oi ON p.product_id = oi.product_id
-GROUP BY c.category_name
-HAVING total_revenue > 1000
+    sampleSolution: `SELECT payment_method, COUNT(payment_id) AS total_transactions, SUM(amount) AS total_revenue
+FROM payments
+GROUP BY payment_method
+HAVING total_revenue > 2000
 ORDER BY total_revenue DESC;`,
     solutionExplanation:
-      'GROUP BY groups rows sharing the same category name into summary rows. The HAVING clause applies filters after aggregate computation, unlike WHERE which filters individual rows beforehand.',
-    initialSqlPlaceholder: `-- Mission 9: Calculate category-wise sales > 1000\nSELECT c.category_name, SUM(...) AS total_revenue\nFROM categories c\nJOIN products p ON ...\nJOIN order_items oi ON ...\nGROUP BY ...\nHAVING ...\nORDER BY ...;`,
+      'GROUP BY aggregates individual payment transactions by payment_method. Aggregate functions COUNT() and SUM() calculate totals per group, and HAVING filters the aggregated sums (total_revenue > 2000), unlike WHERE which filters single rows before grouping.',
+    initialSqlPlaceholder: `-- Mission 9: Summarize payment methods with revenue > 2000\nSELECT payment_method, COUNT(payment_id) AS total_transactions, SUM(amount) AS total_revenue\nFROM payments\nGROUP BY ...\nHAVING ...\nORDER BY ...;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify category revenue aggregate calculation',
+        description: 'Verify grouped payment revenue and transaction counts with HAVING filter',
         expectedQuery:
-          'SELECT c.category_name, SUM(oi.quantity * oi.unit_price) AS total_revenue FROM categories c JOIN products p ON c.category_id = p.category_id JOIN order_items oi ON p.product_id = oi.product_id GROUP BY c.category_name HAVING total_revenue > 1000 ORDER BY total_revenue DESC;',
+          'SELECT payment_method, COUNT(payment_id) AS total_transactions, SUM(amount) AS total_revenue FROM payments GROUP BY payment_method HAVING total_revenue > 2000 ORDER BY total_revenue DESC;',
         orderSensitive: true,
       },
     ],
@@ -411,41 +404,40 @@ ORDER BY total_revenue DESC;`,
     title: 'Generate Final Supermarket Operations Deliverable',
     role: 'Junior Database Executive',
     storyline:
-      'Congratulations! You have resolved data issues, audited inventory, and structured the store database. As your capstone assignment, generate the definitive Best-Selling Products metric for the quarterly executive report.',
+      'Congratulations on structuring the store database and auditing transactions! As your capstone assignment, Head of Customer Loyalty Diya requests the definitive Top 3 Customers report by total spending across all store orders for the quarterly executive meeting.',
     businessProblem:
-      'The executive operations summary requires the top 3 best-selling products by total units sold across all order items to prioritize warehouse space.',
+      'The executive operations summary requires the top 3 customers by total spending, along with their order counts, to invite them to the VIP loyalty program.',
     objective:
-      'Join "products" and "order_items". Select product_name and SUM(oi.quantity) AS units_sold. Group by product_name, order by units_sold descending, and limit to 3.',
+      'Query the "orders" table. Select customer_id, COUNT(order_id) AS total_orders, and SUM(total_amount) AS total_spent. Group by customer_id, order by total_spent descending, and limit the results to 3.',
     requiredOutcome:
-      'Top 3 products with their total units sold, ordered from highest to lowest.',
+      'Top 3 customers with their total order count and total spent, ordered from highest to lowest spending.',
     checklist: [
-      'SELECT p.product_name, SUM(oi.quantity) AS units_sold',
-      'FROM products p JOIN order_items oi ON p.product_id = oi.product_id',
-      'GROUP BY p.product_name',
-      'ORDER BY units_sold DESC',
+      'SELECT customer_id, COUNT(order_id) AS total_orders, SUM(total_amount) AS total_spent',
+      'FROM orders',
+      'GROUP BY customer_id',
+      'ORDER BY total_spent DESC',
       'LIMIT 3',
     ],
-    sqlTopics: ['GROUP BY', 'SUM', 'ORDER BY DESC', 'LIMIT', 'Final Report Metric'],
+    sqlTopics: ['GROUP BY', 'COUNT', 'SUM', 'ORDER BY DESC', 'LIMIT', 'Final Report Metric'],
     hints: [
-      'Aggregate order items grouped by product_name.',
-      'Order by units_sold descending and cap the result with LIMIT 3.',
-      'SELECT p.product_name, SUM(oi.quantity) AS units_sold FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_name ORDER BY units_sold DESC LIMIT 3;',
+      'Aggregate the orders table grouped by customer_id using COUNT(order_id) and SUM(total_amount).',
+      'Order the results by total_spent descending and cap with LIMIT 3.',
+      'SELECT customer_id, COUNT(order_id) AS total_orders, SUM(total_amount) AS total_spent FROM orders GROUP BY customer_id ORDER BY total_spent DESC LIMIT 3;',
     ],
-    sampleSolution: `SELECT p.product_name, SUM(oi.quantity) AS units_sold
-FROM products p
-JOIN order_items oi ON p.product_id = oi.product_id
-GROUP BY p.product_name
-ORDER BY units_sold DESC
+    sampleSolution: `SELECT customer_id, COUNT(order_id) AS total_orders, SUM(total_amount) AS total_spent
+FROM orders
+GROUP BY customer_id
+ORDER BY total_spent DESC
 LIMIT 3;`,
     solutionExplanation:
-      'By grouping orders by product and sorting by total units sold with LIMIT 3, SQL delivers executive-ready business intelligence directly from raw transaction logs.',
-    initialSqlPlaceholder: `-- Mission 10: Top 3 best-selling products\nSELECT p.product_name, SUM(oi.quantity) AS units_sold\nFROM products p\nJOIN order_items oi ON ...\nGROUP BY ...\nORDER BY ...\nLIMIT 3;`,
+      'By grouping orders by customer_id and computing aggregate metrics (order count and total expenditure), SQL provides concise customer-level insights. Sorting by total_spent descending with LIMIT 3 isolates the highest-value patrons directly from raw transaction records.',
+    initialSqlPlaceholder: `-- Mission 10: Top 3 spending customers\nSELECT customer_id, COUNT(order_id) AS total_orders, SUM(total_amount) AS total_spent\nFROM orders\nGROUP BY ...\nORDER BY ...\nLIMIT 3;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify top 3 best-selling products',
+        description: 'Verify top 3 spending customers from orders',
         expectedQuery:
-          'SELECT p.product_name, SUM(oi.quantity) AS units_sold FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_name ORDER BY units_sold DESC LIMIT 3;',
+          'SELECT customer_id, COUNT(order_id) AS total_orders, SUM(total_amount) AS total_spent FROM orders GROUP BY customer_id ORDER BY total_spent DESC LIMIT 3;',
         orderSensitive: true,
       },
     ],

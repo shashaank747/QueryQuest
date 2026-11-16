@@ -117,13 +117,13 @@ Quest Query features **7 distinct industry worlds** with **52 hands-on scenario 
 
 | World | Tier | Industry | Operational Reference | Missions | SQL Focus | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1. Supermarket Operations** | Beginner | Retail & Consumer Goods | Checkout POS, inventory aisles, supplier manifests | 10 | `CREATE TABLE`, `PRIMARY KEY`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `DELETE`, `GROUP BY`, `HAVING` | **Unlocked (Playable)** |
+| **1. Supermarket Operations** | Beginner | Retail & Consumer Goods | Checkout POS, inventory aisles, supplier manifests | 10 | `CREATE TABLE`, `PRIMARY KEY`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `DELETE`, `LIKE`, `BETWEEN`, `GROUP BY`, `HAVING` (No JOINs!) | **Unlocked (Playable)** |
 | **2. Namma Metro — Transit Command** | Beginner | Public Transit & Mobility | BMRCL OCC room, station lines, smart-cards, footfall | 9 | `CREATE TABLE`, `AUTOINCREMENT`, `UNIQUE`, `CHECK`, `INSERT`, `WHERE`, `BETWEEN`, `IN`, `LIKE`, `IS NULL`, `UPDATE`, `DELETE`, Aggregations | **Unlocked (Playable)** |
 | **3. Query & Kaapi — Tiffin & Filter Coffee** | Beginner | Food & Beverage / Hospitality | Heritage tiffin counter, Chikmagalur coffee, loyalty passes | 9 | `CREATE TABLE`, `AUTOINCREMENT`, `UNIQUE`, `CHECK`, `INSERT`, `WHERE`, `BETWEEN`, `IN`, `LIKE`, `IS NULL`, `UPDATE`, `DELETE`, Aggregations | **Unlocked (Playable)** |
-| **4. Airport Operations** | Intermediate | Aviation & Transportation | Radar tracking, flight schedules (FIDS), passenger gates | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires Any 2 T1)** |
-| **5. Warehouse Management** | Intermediate | Logistics & Supply Chain | Automated conveyors, pallet racks, temperature vaults | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, `HAVING` | **Playable (Requires Any 2 T1)** |
-| **6. Hospital Administration** | Advanced | Healthcare & Clinical | Emergency admissions, doctor clinic rosters, bed wards | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires Any 2 T2)** |
-| **7. Bank Operations** | Advanced | Banking & Financial Services | Ledger balances, wire transfers, fraud anomaly audits | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires Any 2 T2)** |
+| **4. Airport Operations** | Intermediate | Aviation & Transportation | Radar tracking, flight schedules (FIDS), passenger gates | 6 | `INNER JOIN`, Multi-Table Chains, `LEFT JOIN`, `CASE WHEN`, `GROUP BY`, `HAVING`, Aggregations | **Playable (Requires Any 2 T1)** |
+| **5. Warehouse Management** | Intermediate | Logistics & Supply Chain | Automated conveyors, pallet racks, temperature vaults | 6 | `INNER JOIN`, Multi-Table Chains, `LEFT JOIN`, `CASE WHEN`, `GROUP BY`, `HAVING`, Aggregations | **Playable (Requires Any 2 T1)** |
+| **6. Hospital Administration** | Advanced | Healthcare & Clinical | Emergency admissions, doctor clinic rosters, bed wards | 6 | Scalar & Correlated Subqueries (`EXISTS`), CTEs (`WITH`), Window Functions (`DENSE_RANK`, `LAG`), ACID Transactions | **Playable (Requires Any 2 T2)** |
+| **7. Bank Operations** | Advanced | Banking & Financial Services | Ledger balances, wire transfers, fraud anomaly audits | 6 | Correlated Subqueries, CTEs (`WITH`), Window Functions (`SUM OVER`, `LAG`, `DENSE_RANK`), ACID Transactions | **Playable (Requires Any 2 T2)** |
 
 ---
 
@@ -144,15 +144,15 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 
 ### World 1: Supermarket Operations &bull; FreshMart Hypermarkets (Beginner &bull; 10 Missions)
 1. **Initialize Supermarket Store Workspace**: `CREATE TABLE store_branches` with `INTEGER PRIMARY KEY` and `NOT NULL`.
-2. **Create Product Categories Catalog**: `CREATE TABLE categories` with `AUTOINCREMENT` and `UNIQUE` constraints.
+2. **Create Store Departments Registry**: `CREATE TABLE departments` with `AUTOINCREMENT` and `UNIQUE` constraints.
 3. **Register New Vendor Partnership**: `INSERT INTO suppliers` with vendor contact information.
 4. **Identify Low Stock & Depleted Shelves**: Filter `inventory` where `quantity_on_hand < reorder_level`.
 5. **Correct Product Pricing Discrepancy**: Update pricing data with `UPDATE products SET unit_price = ...`.
 6. **Purge Discontinued Inventory Records**: Execute referentially safe `DELETE` queries.
-7. **Investigate Checkout Lane Error**: Join `products` and `inventory` to diagnose out-of-stock POS scanner exceptions.
-8. **Trace Customer Order Fulfillment**: Multi-table `JOIN` linking `customers`, `orders`, and `order_items`.
-9. **Analyze Category-Wise Revenue Performance**: Group department sales with `GROUP BY`, `SUM()`, and `HAVING`.
-10. **Generate Final Supermarket Operations Deliverable**: Compute product velocity rankings and compile the live Executive Audit Report.
+7. **Scan Organic Product Catalog**: Single-table text search with `SELECT ... FROM products WHERE product_name LIKE '%Organic%' AND status = 'Active'`.
+8. **Audit Completed Medium-Range Orders**: Single-table range filter with `SELECT ... FROM orders WHERE status = 'Completed' AND total_amount BETWEEN 500 AND 2500`.
+9. **Analyze Payment Method Revenue Performance**: Single-table aggregation with `GROUP BY payment_method HAVING total_revenue > 2000`.
+10. **Deliver Final Top-Spender Operations Summary**: Single-table capstone deliverable on `orders` ranking top customer spenders.
 
 ### World 2: Namma Metro — Transit Command &bull; BMRCL Control Room (Beginner &bull; 9 Missions)
 1. **Booting the Grid**: `CREATE TABLE stations` with `INTEGER PRIMARY KEY`, `NOT NULL`, and `DEFAULT 'Operational'`.
@@ -177,36 +177,36 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 9. **Closing Shift Executive Tally**: Single aggregate query computing `COUNT(*)`, `SUM()`, `ROUND(AVG(), 2)`, `MIN()`, and `MAX()`.
 
 ### World 4: Airport Operations &bull; SkyHarbor International (Intermediate &bull; 6 Missions)
-1. **Initialize Flights Tracking Table**: `CREATE TABLE flights` with aircraft codes, routes, and departure times.
-2. **Log Passenger Manifest Registrations**: `INSERT INTO passengers` with booking references.
-3. **Identify Delayed Flights**: Filter radar logs where `status = 'DELAYED'` or `departure_time` exceeds schedule.
-4. **Update Flight Gate Assignments**: Reassign terminal gates via `UPDATE flights SET gate = ...`.
-5. **Join Flights with Airline Carriers**: Link flight records with carrier partner manifests using `INNER JOIN`.
-6. **Analyze Terminal Passenger Traffic**: Aggregate departures and passenger volume per terminal with `GROUP BY` and `COUNT()`.
+1. **First Discovery: Relational INNER JOIN**: Correlate `flights` and `airlines` on `airline_id` where `status = 'Delayed'`.
+2. **Multi-Table Concourse Navigation Chain**: 3-table join connecting `flights`, `gates`, and `terminals`.
+3. **Unmatched Gate Audit with LEFT JOIN**: Outer join querying `gates` with `LEFT JOIN flights` where `f.flight_id IS NULL`.
+4. **Flight Capacity Classification with CASE WHEN**: Categorize flights into 'Heavy', 'Medium', and 'Light' capacity tiers.
+5. **Correlate Heavy Baggage with Flights**: Join `flights` and `baggage` where `weight_kg > 25.0` ordered by weight descending.
+6. **Multi-Table Terminal Passenger Throughput Summary**: Join `terminals`, `gates`, and `flights` with `GROUP BY` and `HAVING total_passengers > 500`.
 
 ### World 5: Warehouse Management &bull; Apex Global Logistics (Intermediate &bull; 6 Missions)
-1. **Deploy Pallet Storage Schema**: `CREATE TABLE storage_bins` with zone codes and weight capacities.
-2. **Receive Inbound Stock Manifest**: Record inbound pallet quantities into `inventory_stock`.
-3. **Audit Low-Stock Pallet Bins**: Query storage bins with stock levels falling below emergency reorder thresholds.
-4. **Relocate Pallet to High-Bay Storage**: Update bin location coordinates for fragile freight.
-5. **Reconcile Inbound Shipments with Vendors**: Join shipment tables with supplier directories to audit lead times.
-6. **Evaluate Departmental Space Utilization**: Calculate total cubic volume and utilized bins using `GROUP BY` and `HAVING`.
+1. **First Discovery: Relational INNER JOIN**: Correlate saturated `inventory_bins` with `products` on `product_id`.
+2. **Multi-Table Supply Chain Relational Chain**: 3-table join connecting `products`, `inventory_bins`, and cold chain `zones`.
+3. **Warehouse Zone Distribution with LEFT JOIN**: Join `warehouses` with `zones` to audit regional facility floor allocations.
+4. **Storage Bin Saturation Analysis with CASE WHEN**: Classify bin fill levels into 'Full', 'Optimal', and 'Underutilized'.
+5. **Audit High-Volume Freight Carriers with HAVING**: Group `shipments` by carrier and filter for `total_pallets > 15`.
+6. **Multi-Table Zone Capacity Reconciliation with HAVING**: Join `zones` and `inventory_bins` with `GROUP BY` and `HAVING total_stock > 50`.
 
 ### World 6: Hospital Administration &bull; Metro General Hospital (Advanced &bull; 6 Missions)
-1. **Initialize Ward & Bed Allocation Registry**: `CREATE TABLE beds` with ward identifiers and availability flags.
-2. **Admit Inpatient Case Records**: Insert patient intake manifests with attending physician associations.
-3. **Filter Active Emergency Admissions**: Query patient admissions filtered by triage urgency status.
-4. **Discharge Patient & Release Ward Bed**: Update patient record status to `DISCHARGED` and bed status to `AVAILABLE`.
-5. **Correlate Patients with Attending Doctors**: Multi-table relational query connecting `patients`, `admissions`, and `physicians`.
-6. **Analyze Average Departmental Length of Stay**: Compute patient occupancy times across medical departments using aggregations.
+1. **Identify High-Occupancy Wards via Scalar Subquery**: Query `wards` where `occupied_beds > (SELECT AVG(occupied_beds) FROM wards)`.
+2. **Correlate Active Trauma Attendings via EXISTS**: Correlated subquery finding doctors with active ICU admissions.
+3. **Calculate Ward Bed Saturation via CTE**: Common Table Expression (`WITH WardStats AS ...`) calculating occupancy rates >= 80%.
+4. **Rank Hospital Ward Occupancy via DENSE_RANK()**: Window function ranking wards by occupied beds.
+5. **Analyze Inpatient Intake Intervals via LAG()**: Window function offset analysis calculating time gaps between admissions.
+6. **Execute Atomic Patient Discharge & Bed Reclaim (ACID)**: Multi-statement transactional block (`BEGIN TRANSACTION ... COMMIT`).
 
 ### World 7: Bank Operations &bull; Apex National Trust (Advanced &bull; 6 Missions)
-1. **Create Customer Accounts Ledger**: `CREATE TABLE accounts` with balance constraints and account tiers.
-2. **Open High-Yield Savings Accounts**: Record new client account profiles with initial balances.
-3. **Audit High-Value Transactions**: Detect anomalous wire transfers exceeding compliance monitoring thresholds.
-4. **Execute Balance Ledger Update**: Safely adjust account balances following an audited deposit.
-5. **Join Transactions with Customer Profiles**: Link suspicious transfers with account holder details for AML compliance.
-6. **Calculate Branch Daily Liquidity**: Aggregate total transaction volume and end-of-day balances per branch.
+1. **Detect Deposit Outliers via Correlated Subquery**: Find accounts with balance above average for their account type.
+2. **Audit High-Net-Worth Accounts via CTE**: Common Table Expression (`WITH HighValueAccounts AS ...`) linking institutional deposits to transactions.
+3. **Compute Cumulative Balance Stream via SUM() OVER**: Window function running totals partitioned by account.
+4. **Audit Successive Transaction Velocity via LAG()**: Window function offset analysis tracking transaction interval shifts.
+5. **Rank Branch Depositors via DENSE_RANK() OVER**: Window function partitioned ranking of top balances per branch.
+6. **Execute Atomic Ledger Funds Transfer (ACID)**: Multi-statement transactional block (`BEGIN TRANSACTION ... COMMIT`) transferring funds between accounts.
 
 ---
 

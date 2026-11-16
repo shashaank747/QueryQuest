@@ -111,7 +111,7 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       });
     });
 
-    it('Mission 1: Deploy Emergency Medical On-Call Roster (CREATE TABLE)', async () => {
+    it('Mission 1: Filter Wards Exceeding Average Occupancy via Scalar Subquery', async () => {
       const m1 = HOSPITAL_MISSIONS[0];
       const execRes = await executeSql(db, m1.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -119,13 +119,10 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       const ctx = buildContext(db, m1.sampleSolution, execRes);
       const feedback = await ValidationEngine.validate(m1.validationRules, ctx);
       expect(feedback.passed).toBe(true);
-
-      // Verify table columns in sqlite_master
-      const cols = db.exec("PRAGMA table_info(emergency_roster);")[0].values.map((c: any[]) => c[1]);
-      expect(cols).toEqual(['roster_id', 'doctor_id', 'shift_date', 'shift_type', 'pager_number']);
+      expect(execRes.results[0].values.length).toBeGreaterThan(0);
     });
 
-    it('Mission 2: Register Pediatric Cardiology Attending (INSERT INTO)', async () => {
+    it('Mission 2: Identify Active Intensive Care Physicians with EXISTS Subquery', async () => {
       const m2 = HOSPITAL_MISSIONS[1];
       const execRes = await executeSql(db, m2.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -133,12 +130,10 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       const ctx = buildContext(db, m2.sampleSolution, execRes);
       const feedback = await ValidationEngine.validate(m2.validationRules, ctx);
       expect(feedback.passed).toBe(true);
-
-      const res = db.exec("SELECT first_name, last_name, specialty, department_id, is_on_call FROM doctors WHERE doctor_id = 7;");
-      expect(res[0].values[0]).toEqual(['Neil', 'Armstrong', 'Pediatric Cardiology', 4, 1]);
+      expect(execRes.results[0].values.length).toBeGreaterThan(0);
     });
 
-    it('Mission 3: Audit Saturated Hospital Wards (SELECT WHERE)', async () => {
+    it('Mission 3: Analyze High Bed Saturation with CTE', async () => {
       const m3 = HOSPITAL_MISSIONS[2];
       const execRes = await executeSql(db, m3.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -146,15 +141,10 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       const ctx = buildContext(db, m3.sampleSolution, execRes);
       const feedback = await ValidationEngine.validate(m3.validationRules, ctx);
       expect(feedback.passed).toBe(true);
-
-      // Verify exactly 2 saturated wards: ICU (12/12) and Post-Op Recovery Wing (16/16)
-      expect(execRes.results[0].values).toHaveLength(2);
-      const wardNames = execRes.results[0].values.map((v: any[]) => v[0]);
-      expect(wardNames).toContain('Intensive Care Unit (ICU)');
-      expect(wardNames).toContain('Post-Op Recovery Wing');
+      expect(execRes.results[0].values.length).toBeGreaterThan(0);
     });
 
-    it('Mission 4: Discharge Inpatient & Reclaim Hospital Bed (UPDATE)', async () => {
+    it('Mission 4: Rank Inpatient Care Units with DENSE_RANK()', async () => {
       const m4 = HOSPITAL_MISSIONS[3];
       const execRes = await executeSql(db, m4.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -162,15 +152,10 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       const ctx = buildContext(db, m4.sampleSolution, execRes);
       const feedback = await ValidationEngine.validate(m4.validationRules, ctx);
       expect(feedback.passed).toBe(true);
-
-      const check = db.exec("SELECT status, discharge_date FROM admissions WHERE admission_id = 104;");
-      expect(check[0].values[0]).toEqual(['Discharged', '2026-11-16']);
+      expect(execRes.results[0].values.length).toBe(5);
     });
 
-    it('Mission 5: Correlate Active Inpatients with Attending Physicians (Multi-table JOIN)', async () => {
-      // Must run Mission 4 first so admission 104 is discharged
-      await executeSql(db, HOSPITAL_MISSIONS[3].sampleSolution);
-
+    it('Mission 5: Analyze Admission Intervals with LAG()', async () => {
       const m5 = HOSPITAL_MISSIONS[4];
       const execRes = await executeSql(db, m5.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -178,14 +163,10 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       const ctx = buildContext(db, m5.sampleSolution, execRes);
       const feedback = await ValidationEngine.validate(m5.validationRules, ctx);
       expect(feedback.passed).toBe(true);
-
-      // 4 active admissions: 101 (Nov 12), 102 (Nov 13), 103 (Nov 14), 106 (Nov 15)
-      expect(execRes.results[0].values).toHaveLength(4);
-      const dates = execRes.results[0].values.map((r: any[]) => r[6]);
-      expect(dates).toEqual(['2026-11-12', '2026-11-13', '2026-11-14', '2026-11-15']);
+      expect(execRes.results[0].values.length).toBe(6);
     });
 
-    it('Mission 6: Analyze Hospital Bed Capacity by Care Specialty (GROUP BY & Aggregation)', async () => {
+    it('Mission 6: Atomic Patient Discharge & Bed Reclaim (ACID Transaction)', async () => {
       const m6 = HOSPITAL_MISSIONS[5];
       const execRes = await executeSql(db, m6.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -194,18 +175,10 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       const feedback = await ValidationEngine.validate(m6.validationRules, ctx);
       expect(feedback.passed).toBe(true);
 
-      // Verify descending order of total_occupied
-      const rows = execRes.results[0].values;
-      expect(rows).toHaveLength(4);
-      // General Inpatient: 26, Critical Care: 20, Step-Down Care: 16, Specialized Care: 14
-      expect(rows[0][0]).toBe('General Inpatient');
-      expect(rows[0][3]).toBe(26);
-      expect(rows[1][0]).toBe('Critical Care');
-      expect(rows[1][3]).toBe(20);
-      expect(rows[2][0]).toBe('Step-Down Care');
-      expect(rows[2][3]).toBe(16);
-      expect(rows[3][0]).toBe('Specialized Care');
-      expect(rows[3][3]).toBe(14);
+      const checkAdm = db.exec("SELECT status, discharge_date FROM admissions WHERE admission_id = 101;");
+      expect(checkAdm[0].values[0]).toEqual(['Discharged', '2026-11-16']);
+      const checkWard = db.exec("SELECT occupied_beds FROM wards WHERE ward_id = 1;");
+      expect(checkWard[0].values[0][0]).toBe(11);
     });
 
     it('Sequential full chain playthrough of all 6 missions end-to-end', async () => {
@@ -224,200 +197,70 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       db = await createFreshDb();
     });
 
-    it('hp_m1: Intentional Error - Syntax mistake (unclosed parenthesis)', async () => {
-      const invalidSql = `CREATE TABLE emergency_roster (roster_id INTEGER PRIMARY KEY;`;
+    it('hp_m1: Intentional Error - Syntax mistake in scalar subquery', async () => {
+      const invalidSql = `SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards WHERE occupied_beds > (SELECT AVG(occupied_beds FROM wards);`;
       const execRes = await executeSql(db, invalidSql);
       expect(execRes.success).toBe(false);
       expect(execRes.error).toContain('syntax error');
-
-      const ctx = buildContext(db, invalidSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[0].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('SQL error');
     });
 
-    it('hp_m1: Intentional Error - Missing required column (omits pager_number)', async () => {
-      const incompleteSql = `CREATE TABLE emergency_roster (
-        roster_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        doctor_id INTEGER NOT NULL,
-        shift_date TEXT NOT NULL,
-        shift_type TEXT NOT NULL
-      );`;
-      const execRes = await executeSql(db, incompleteSql);
+    it('hp_m1: Intentional Error - Inverted operator returns non-matching rows', async () => {
+      const invertedSql = `SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards WHERE occupied_beds < (SELECT AVG(occupied_beds) FROM wards);`;
+      const execRes = await executeSql(db, invertedSql);
       expect(execRes.success).toBe(true);
 
-      const ctx = buildContext(db, incompleteSql, execRes);
+      const ctx = buildContext(db, invertedSql, execRes);
       const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[0].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('pager_number');
-      expect(feedback.details?.expected).toContain('pager_number');
     });
 
-    it('hp_m1: Intentional Error - Wrong table name (creates on_call_roster instead of emergency_roster)', async () => {
-      const wrongTableSql = `CREATE TABLE on_call_roster (
-        roster_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        doctor_id INTEGER NOT NULL,
-        shift_date TEXT NOT NULL,
-        shift_type TEXT NOT NULL,
-        pager_number TEXT NOT NULL
-      );`;
-      const execRes = await executeSql(db, wrongTableSql);
+    it('hp_m2: Intentional Error - Uncorrelated subquery returns all doctors', async () => {
+      const badExistsSql = `SELECT d.doctor_id, d.first_name, d.last_name, d.specialty FROM doctors d WHERE EXISTS (SELECT 1 FROM admissions a WHERE a.ward_id = 1 AND a.status = 'Admitted');`;
+      const execRes = await executeSql(db, badExistsSql);
       expect(execRes.success).toBe(true);
 
-      const ctx = buildContext(db, wrongTableSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[0].validationRules, ctx);
+      const ctx = buildContext(db, badExistsSql, execRes);
+      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[1].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain("Table 'emergency_roster' does not exist");
-      expect(feedback.details?.hint).toContain('CREATE TABLE emergency_roster');
     });
 
-    it('hp_m2: Intentional Error - Missing doctor/department relationship / Foreign Key violation', async () => {
-      // department_id = 999 does not exist in departments
-      const fkViolationSql = `INSERT INTO doctors (doctor_id, first_name, last_name, specialty, department_id, is_on_call)
-        VALUES (7, 'Neil', 'Armstrong', 'Pediatric Cardiology', 999, 1);`;
-      const execRes = await executeSql(db, fkViolationSql);
+    it('hp_m3: Intentional Error - Inverted threshold in CTE', async () => {
+      const badCteSql = `WITH WardStats AS (SELECT ward_name, total_beds, occupied_beds, ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) AS occupancy_rate FROM wards) SELECT ward_name, total_beds, occupied_beds, occupancy_rate FROM WardStats WHERE occupancy_rate < 80.0 ORDER BY occupancy_rate DESC;`;
+      const execRes = await executeSql(db, badCteSql);
+      expect(execRes.success).toBe(true);
+
+      const ctx = buildContext(db, badCteSql, execRes);
+      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[2].validationRules, ctx);
+      expect(feedback.passed).toBe(false);
+    });
+
+    it('hp_m4: Intentional Error - Missing OVER clause in DENSE_RANK() causes error', async () => {
+      const badRankSql = `SELECT ward_name, ward_type, occupied_beds, DENSE_RANK() AS occupancy_rank FROM wards;`;
+      const execRes = await executeSql(db, badRankSql);
       expect(execRes.success).toBe(false);
-      expect(execRes.error?.toLowerCase()).toContain('foreign key');
-
-      const ctx = buildContext(db, fkViolationSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[1].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('SQL error');
+      expect(execRes.error).toMatch(/misuse of window function|syntax error|OVER/i);
     });
 
-    it('hp_m2: Intentional Error - Wrong doctor attributes / incomplete WHERE clause satisfaction', async () => {
-      // Insert with wrong specialty
-      const wrongSpecialtySql = `INSERT INTO doctors (doctor_id, first_name, last_name, specialty, department_id, is_on_call)
-        VALUES (7, 'Neil', 'Armstrong', 'General Surgery', 4, 1);`;
-      const execRes = await executeSql(db, wrongSpecialtySql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = buildContext(db, wrongSpecialtySql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[1].validationRules, ctx);
+    it('hp_m5: Intentional Error - Omitted ORDER BY in LAG() window function', async () => {
+      const badLagSql = `SELECT admission_id, patient_id, admission_date, LAG(admission_date) OVER () AS prev_admission_date FROM admissions;`;
+      const execRes = await executeSql(db, badLagSql);
+      // SQLite requires ORDER BY for LAG without default
+      const ctx = buildContext(db, badLagSql, execRes);
+      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[4].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('Verify Dr. Armstrong is registered in doctors');
-      expect(feedback.details?.expected).toContain("specialty = 'Pediatric Cardiology'");
     });
 
-    it('hp_m3: Intentional Error - Filter omission (omitting WHERE clause returns all 5 wards)', async () => {
-      const omittedFilterSql = `SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards;`;
-      const execRes = await executeSql(db, omittedFilterSql);
-      expect(execRes.success).toBe(true);
-      expect(execRes.results[0].values).toHaveLength(5);
-
-      const ctx = buildContext(db, omittedFilterSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[2].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('Returned 5 record(s), but 2 were expected');
-      expect(feedback.details?.hint).toContain('WHERE filter');
-    });
-
-    it('hp_m3: Intentional Error - Inverted comparison filter (occupied_beds < total_beds)', async () => {
-      const invertedFilterSql = `SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards WHERE occupied_beds < total_beds;`;
-      const execRes = await executeSql(db, invertedFilterSql);
-      expect(execRes.success).toBe(true);
-      expect(execRes.results[0].values).toHaveLength(3); // 3 non-saturated wards
-
-      const ctx = buildContext(db, invertedFilterSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[2].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('Returned 3 record(s), but 2 were expected');
-    });
-
-    it('hp_m4: Intentional Error - Filter omission / wrong admission target in UPDATE', async () => {
-      // Student accidentally targets admission_id = 101 instead of 104
-      const wrongTargetSql = `UPDATE admissions SET discharge_date = '2026-11-16', status = 'Discharged' WHERE admission_id = 101;`;
+    it('hp_m6: Intentional Error - Wrong admission target in transaction update', async () => {
+      const wrongTargetSql = `BEGIN TRANSACTION;
+UPDATE admissions SET status = 'Discharged', discharge_date = '2026-11-16' WHERE admission_id = 999;
+UPDATE wards SET occupied_beds = occupied_beds - 1 WHERE ward_id = 1;
+COMMIT;`;
       const execRes = await executeSql(db, wrongTargetSql);
       expect(execRes.success).toBe(true);
 
       const ctx = buildContext(db, wrongTargetSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[3].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('admission 104 is discharged');
-      expect(feedback.details?.expected).toContain('admission_id = 104');
-    });
-
-    it('hp_m5: Intentional Error - Missing doctor/patient relationship / Wrong JOIN ON keys', async () => {
-      // Connects admissions to doctors using patient_id instead of doctor_id
-      const wrongJoinSql = `SELECT p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date
-        FROM patients p
-        JOIN admissions a ON p.patient_id = a.patient_id
-        JOIN doctors d ON a.patient_id = d.doctor_id
-        WHERE a.status = 'Admitted'
-        ORDER BY a.admission_date ASC;`;
-      const execRes = await executeSql(db, wrongJoinSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = buildContext(db, wrongJoinSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[4].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toMatch(/records returned do not match|data values returned do not match|Returned \d+ record\(s\)/);
-    });
-
-    it('hp_m5: Intentional Error - Status filter omission (includes Discharged patient 105)', async () => {
-      const omittedFilterSql = `SELECT p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date
-        FROM patients p
-        JOIN admissions a ON p.patient_id = a.patient_id
-        JOIN doctors d ON a.doctor_id = d.doctor_id
-        ORDER BY a.admission_date ASC;`;
-      const execRes = await executeSql(db, omittedFilterSql);
-      expect(execRes.success).toBe(true);
-      // Returns 6 rows instead of 5 (or 4 if m4 ran)
-      expect(execRes.results[0].values.length).toBeGreaterThan(4);
-
-      const ctx = buildContext(db, omittedFilterSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[4].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.details?.hint).toContain('WHERE filter');
-    });
-
-    it('hp_m5: Intentional Error - Order violation (ORDER BY admission_date DESC instead of ASC)', async () => {
-      // First discharge 104 so row counts match
-      await executeSql(db, HOSPITAL_MISSIONS[3].sampleSolution);
-
-      const wrongOrderSql = `SELECT p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date
-        FROM patients p
-        JOIN admissions a ON p.patient_id = a.patient_id
-        JOIN doctors d ON a.doctor_id = d.doctor_id
-        WHERE a.status = 'Admitted'
-        ORDER BY a.admission_date DESC;`;
-      const execRes = await executeSql(db, wrongOrderSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = buildContext(db, wrongOrderSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[4].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('ordering');
-    });
-
-    it('hp_m6: Intentional Error - Wrong grouping column (GROUP BY total_beds instead of ward_type)', async () => {
-      const wrongGroupingSql = `SELECT ward_type, COUNT(ward_id) AS total_wards, SUM(total_beds) AS total_capacity, SUM(occupied_beds) AS total_occupied
-        FROM wards
-        GROUP BY total_beds
-        ORDER BY total_occupied DESC;`;
-      const execRes = await executeSql(db, wrongGroupingSql);
-      expect(execRes.success).toBe(true);
-      // Grouping by total_beds produces 5 groups instead of 4 ward_type groups
-      expect(execRes.results[0].values).toHaveLength(5);
-
-      const ctx = buildContext(db, wrongGroupingSql, execRes);
       const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[5].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('Returned 5 record(s), but 4 were expected');
-    });
-
-    it('hp_m6: Intentional Error - Reversed ordering (ORDER BY total_occupied ASC instead of DESC)', async () => {
-      const wrongOrderSql = `SELECT ward_type, COUNT(ward_id) AS total_wards, SUM(total_beds) AS total_capacity, SUM(occupied_beds) AS total_occupied
-        FROM wards
-        GROUP BY ward_type
-        ORDER BY total_occupied ASC;`;
-      const execRes = await executeSql(db, wrongOrderSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = buildContext(db, wrongOrderSql, execRes);
-      const feedback = await ValidationEngine.validate(HOSPITAL_MISSIONS[5].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('ordering');
     });
   });
 
@@ -536,9 +379,9 @@ describe('World 4: Hospital Administration Comprehensive Playthrough & Diagnosti
       const resBeds = await executeSql(db, metrics[1].query);
       expect(resBeds.results[0].values[0][0]).toBe(88);
 
-      // Check Critical Ward Occupancy Rate: 90.9% (20 / 22 beds)
+      // Check Critical Ward Occupancy Rate: 86.4% (19 / 22 beds after mission 6 discharge)
       const resRate = await executeSql(db, metrics[2].query);
-      expect(resRate.results[0].values[0][0]).toBe('90.9%');
+      expect(resRate.results[0].values[0][0]).toBe('86.4%');
     });
   });
 });

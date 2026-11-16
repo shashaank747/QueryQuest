@@ -4,97 +4,85 @@ export const HOSPITAL_MISSIONS: Mission[] = [
   {
     id: 'hp_m1',
     order: 1,
-    title: 'Deploy Emergency Medical On-Call Roster',
+    title: 'Filter Wards Exceeding Average Occupancy via Scalar Subquery',
     role: 'Healthcare Information Analyst',
     storyline:
-      'Welcome to Metro General Hospital System! Joint Commission clinical accreditation requires real-time digital tracking of physician emergency coverage. Chief of Staff Dr. Elena asks you to build the emergency call roster table.',
+      'Welcome to Metro General Hospital System! Joint Commission clinical oversight requires real-time monitoring of inpatient bed saturation. Hospital Director Dr. Elena requests an automated audit to identify care units currently carrying above-average patient loads.',
     businessProblem:
-      'Paper call sheets pinned to bulletin boards lead to unverified coverage during sudden trauma spikes and code blue incidents.',
+      'Hardcoding fixed bed occupancy thresholds produces inaccurate alerts as hospital census dynamically fluctuates. A scalar subquery is needed to calculate the campus-wide average occupied beds dynamically and filter units exceeding that threshold.',
     objective:
-      'Create a table named "emergency_roster" with roster_id (INTEGER PRIMARY KEY AUTOINCREMENT), doctor_id (INTEGER NOT NULL), shift_date (TEXT NOT NULL), shift_type (TEXT NOT NULL), and pager_number (TEXT NOT NULL).',
+      'Write a query using a scalar subquery in the WHERE clause to select ward_name, ward_type, total_beds, and occupied_beds from "wards" where occupied_beds > (SELECT AVG(occupied_beds) FROM wards).',
     requiredOutcome:
-      'A new emergency_roster table ready to log hospital coverage rotations and physician pager numbers.',
+      'A report listing hospital wards with occupied beds higher than the campus-wide average.',
     checklist: [
-      'Use CREATE TABLE emergency_roster',
-      'Define roster_id INTEGER PRIMARY KEY AUTOINCREMENT',
-      'Include doctor_id INTEGER NOT NULL',
-      'Include shift_date TEXT NOT NULL',
-      'Include shift_type TEXT NOT NULL',
-      'Include pager_number TEXT NOT NULL',
+      'SELECT ward_name, ward_type, total_beds, occupied_beds',
+      'FROM wards',
+      'WHERE occupied_beds > (SELECT AVG(occupied_beds) FROM wards)',
     ],
-    sqlTopics: ['CREATE TABLE', 'PRIMARY KEY', 'NOT NULL constraints', 'Healthcare DDL'],
+    sqlTopics: ['Scalar Subquery', 'WHERE Clause Subquery', 'AVG() Aggregation', 'Bed Utilization'],
     hints: [
-      'Use CREATE TABLE emergency_roster (...) with the required column specifications.',
-      'Set roster_id as INTEGER PRIMARY KEY AUTOINCREMENT.',
-      'CREATE TABLE emergency_roster (\n  roster_id INTEGER PRIMARY KEY AUTOINCREMENT,\n  doctor_id INTEGER NOT NULL,\n  shift_date TEXT NOT NULL,\n  shift_type TEXT NOT NULL,\n  pager_number TEXT NOT NULL\n);',
+      'Use a subquery inside the WHERE clause to dynamically compute the average occupied beds: (SELECT AVG(occupied_beds) FROM wards).',
+      'Compare occupied_beds against the result of that scalar subquery using the greater-than (>) operator.',
+      'SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards WHERE occupied_beds > (SELECT AVG(occupied_beds) FROM wards);',
     ],
-    sampleSolution: `CREATE TABLE emergency_roster (
-  roster_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  doctor_id INTEGER NOT NULL,
-  shift_date TEXT NOT NULL,
-  shift_type TEXT NOT NULL,
-  pager_number TEXT NOT NULL
-);`,
+    sampleSolution: `SELECT ward_name, ward_type, total_beds, occupied_beds
+FROM wards
+WHERE occupied_beds > (SELECT AVG(occupied_beds) FROM wards);`,
     solutionExplanation:
-      'Standardized schema definitions eliminate physician shift ambiguities and provide reliable operational audit trails for healthcare regulatory compliance.',
-    initialSqlPlaceholder: `-- Mission 1: Create emergency roster table\nCREATE TABLE emergency_roster (\n  \n);`,
+      'Scalar subqueries evaluate to a single atomic value, enabling dynamic comparisons against dataset-wide aggregates without hardcoding changing numbers.',
+    initialSqlPlaceholder: `-- Mission 1: Scalar subquery for wards with above-average occupied beds\nSELECT ward_name, ward_type, total_beds, occupied_beds\nFROM wards\nWHERE occupied_beds > (\n  \n);`,
     validationRules: [
       {
-        type: 'TABLE_EXISTS',
-        description: 'Verify emergency_roster table exists with required columns',
-        expectedTable: 'emergency_roster',
-        expectedColumns: [
-          'roster_id',
-          'doctor_id',
-          'shift_date',
-          'shift_type',
-          'pager_number',
-        ],
+        type: 'SELECT_EXACT',
+        description: 'Verify wards exceeding average occupied beds via scalar subquery',
+        expectedQuery:
+          'SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards WHERE occupied_beds > (SELECT AVG(occupied_beds) FROM wards);',
       },
     ],
     xpReward: 100,
-    badge: {
-      id: 'table_architect',
-      title: 'Table Architect',
-      icon: 'Database',
-    },
   },
   {
     id: 'hp_m2',
     order: 2,
-    title: 'Register Pediatric Cardiology Attending',
+    title: 'Identify Active Intensive Care Physicians with EXISTS Subquery',
     role: 'Healthcare Information Analyst',
     storyline:
-      'Metro General has recruited Dr. Neil Armstrong to lead pediatric interventional cardiology. Clinical Credentialing requests his formal entry into the physician registry.',
+      'Trauma triage dispatch must know which attending physicians currently oversee active admissions inside the Intensive Care Unit (ward_id = 1). Nurse Supervisor Tara asks for a correlated EXISTS subquery.',
     businessProblem:
-      'New clinical attendings cannot be designated as primary physicians on patient intake charts until registered in the active doctors directory.',
+      'Using outer joins can duplicate physician rows if a doctor has multiple admissions. A correlated subquery with EXISTS efficiently tests for row existence without altering the cardinality of the doctors table.',
     objective:
-      'Insert a new row into "doctors" with: doctor_id = 7, first_name = "Neil", last_name = "Armstrong", specialty = "Pediatric Cardiology", department_id = 4, and is_on_call = 1.',
+      'Select doctor_id, first_name, last_name, and specialty from "doctors" d where an active admission (status = "Admitted") exists in ward_id = 1 using EXISTS (SELECT 1 FROM admissions a WHERE a.doctor_id = d.doctor_id AND a.ward_id = 1 AND a.status = \'Admitted\').',
     requiredOutcome:
-      'Dr. Neil Armstrong registered in the doctors table under Pediatrics (department 4).',
+      'A list of doctors who currently have at least one active patient admitted in ward 1 (ICU).',
     checklist: [
-      'Use INSERT INTO doctors (...)',
-      'Specify doctor_id, first_name, last_name, specialty, department_id, is_on_call',
-      'Enclose names and specialty in single quotes',
+      'SELECT d.doctor_id, d.first_name, d.last_name, d.specialty FROM doctors d',
+      'Use WHERE EXISTS (SELECT 1 FROM admissions a ...)',
+      'Correlate a.doctor_id = d.doctor_id',
+      'Filter with a.ward_id = 1 AND a.status = \'Admitted\'',
     ],
-    sqlTopics: ['INSERT INTO', 'Physician Registration', 'Foreign Key Mapping'],
+    sqlTopics: ['Correlated Subquery', 'EXISTS Operator', 'Physician Roster', 'Clinical Triage'],
     hints: [
-      'Use INSERT INTO doctors (doctor_id, first_name, last_name, specialty, department_id, is_on_call) VALUES (...);',
-      'Set department_id = 4 and is_on_call = 1.',
-      "INSERT INTO doctors (doctor_id, first_name, last_name, specialty, department_id, is_on_call) VALUES (7, 'Neil', 'Armstrong', 'Pediatric Cardiology', 4, 1);",
+      'Use WHERE EXISTS (...) referencing outer table d with a.doctor_id = d.doctor_id.',
+      'Filter the inner query by a.ward_id = 1 and a.status = \'Admitted\'.',
+      "SELECT d.doctor_id, d.first_name, d.last_name, d.specialty FROM doctors d WHERE EXISTS (SELECT 1 FROM admissions a WHERE a.doctor_id = d.doctor_id AND a.ward_id = 1 AND a.status = 'Admitted');",
     ],
-    sampleSolution: `INSERT INTO doctors (doctor_id, first_name, last_name, specialty, department_id, is_on_call)
-VALUES (7, 'Neil', 'Armstrong', 'Pediatric Cardiology', 4, 1);`,
+    sampleSolution: `SELECT d.doctor_id, d.first_name, d.last_name, d.specialty
+FROM doctors d
+WHERE EXISTS (
+  SELECT 1 FROM admissions a
+  WHERE a.doctor_id = d.doctor_id
+    AND a.ward_id = 1
+    AND a.status = 'Admitted'
+);`,
     solutionExplanation:
-      'Populating clinical directories accurately guarantees proper foreign key attribution when scheduling surgeries and admitting pediatric patients.',
-    initialSqlPlaceholder: `-- Mission 2: Register Dr. Neil Armstrong into doctors\nINSERT INTO doctors (\n  doctor_id, first_name, last_name, specialty, department_id, is_on_call\n) VALUES (\n  \n);`,
+      'Correlated subqueries with EXISTS evaluate per-row conditions in the outer query, returning TRUE immediately upon encountering the first matching record for optimal query performance.',
+    initialSqlPlaceholder: `-- Mission 2: Correlated subquery with EXISTS for ICU attending doctors\nSELECT d.doctor_id, d.first_name, d.last_name, d.specialty\nFROM doctors d\nWHERE EXISTS (\n  SELECT 1 FROM admissions a\n  WHERE ...\n);`,
     validationRules: [
       {
-        type: 'ROW_EXISTS',
-        description: 'Verify Dr. Armstrong is registered in doctors',
-        expectedTable: 'doctors',
-        expectedWhereClause: "doctor_id = 7 AND specialty = 'Pediatric Cardiology'",
-        expectedRowCount: 1,
+        type: 'SELECT_EXACT',
+        description: 'Verify active ICU attending physicians using correlated EXISTS subquery',
+        expectedQuery:
+          "SELECT d.doctor_id, d.first_name, d.last_name, d.specialty FROM doctors d WHERE EXISTS (SELECT 1 FROM admissions a WHERE a.doctor_id = d.doctor_id AND a.ward_id = 1 AND a.status = 'Admitted');",
       },
     ],
     xpReward: 120,
@@ -107,39 +95,51 @@ VALUES (7, 'Neil', 'Armstrong', 'Pediatric Cardiology', 4, 1);`,
   {
     id: 'hp_m3',
     order: 3,
-    title: 'Audit Saturated Hospital Wards',
+    title: 'Analyze High Bed Saturation with Common Table Expression (CTE)',
     role: 'Healthcare Information Analyst',
     storyline:
-      'Bed management alerts dispatch that incoming emergency admissions are backing up in triage. Nurse Supervisor Tara requests an immediate audit of wards at 100% capacity.',
+      'Hospital operations leadership requires an executive audit of care wings operating at near-full capacity. Chief Medical Officer Dr. Vasquez asks you to compute unit occupancy rates and isolate wards operating at or above 80% capacity using a Common Table Expression.',
     businessProblem:
-      'Diverting emergency ambulances requires identifying exactly which hospital wards are fully saturated (occupied_beds >= total_beds) to activate overflow surge units.',
+      'Calculating derived occupancy percentages repeatedly in multiple clauses makes SQL queries cumbersome and error-prone. A CTE isolates the occupancy percentage calculation into an elegant, reusable temporary result set.',
     objective:
-      'Select ward_name, ward_type, total_beds, and occupied_beds from "wards" where occupied_beds >= total_beds.',
+      'Define a CTE named "WardStats" that selects ward_name, total_beds, occupied_beds, and calculates occupancy_rate as ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) from "wards". In the primary query, select ward_name, total_beds, occupied_beds, and occupancy_rate from WardStats where occupancy_rate >= 80.0 ordered by occupancy_rate descending.',
     requiredOutcome:
-      'A report of wards operating at or over maximum bed capacity.',
+      'A CTE query outputting wards with an occupancy rate of 80% or greater, sorted from highest to lowest occupancy.',
     checklist: [
-      'SELECT ward_name, ward_type, total_beds, occupied_beds',
-      'FROM wards',
-      'WHERE occupied_beds >= total_beds',
+      'Define WITH WardStats AS (...)',
+      'Compute ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) AS occupancy_rate',
+      'SELECT ward_name, total_beds, occupied_beds, occupancy_rate FROM WardStats',
+      'Filter with WHERE occupancy_rate >= 80.0',
+      'ORDER BY occupancy_rate DESC',
     ],
-    sqlTopics: ['SELECT', 'WHERE clause', 'Bed Capacity Triaging'],
+    sqlTopics: ['Common Table Expressions (CTE)', 'WITH Clause', 'Derived Metrics', 'ORDER BY DESC'],
     hints: [
-      'Use SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards WHERE ...;',
-      'Filter with occupied_beds >= total_beds.',
-      'SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards WHERE occupied_beds >= total_beds;',
+      'Begin with WITH WardStats AS (SELECT ward_name, total_beds, occupied_beds, ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) AS occupancy_rate FROM wards).',
+      'In the outer query, query WardStats filtering WHERE occupancy_rate >= 80.0 and ordering by occupancy_rate DESC.',
+      'WITH WardStats AS (\n  SELECT ward_name, total_beds, occupied_beds, ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) AS occupancy_rate FROM wards\n) SELECT ward_name, total_beds, occupied_beds, occupancy_rate FROM WardStats WHERE occupancy_rate >= 80.0 ORDER BY occupancy_rate DESC;',
     ],
-    sampleSolution: `SELECT ward_name, ward_type, total_beds, occupied_beds
-FROM wards
-WHERE occupied_beds >= total_beds;`,
+    sampleSolution: `WITH WardStats AS (
+  SELECT
+    ward_name,
+    total_beds,
+    occupied_beds,
+    ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) AS occupancy_rate
+  FROM wards
+)
+SELECT ward_name, total_beds, occupied_beds, occupancy_rate
+FROM WardStats
+WHERE occupancy_rate >= 80.0
+ORDER BY occupancy_rate DESC;`,
     solutionExplanation:
-      'Real-time bed queries prevent emergency room bottlenecks and inform hospital administrators when surge bed expansion is required.',
-    initialSqlPlaceholder: `-- Mission 3: Query wards with 100% bed occupancy\nSELECT ward_name, ward_type, total_beds, occupied_beds\nFROM wards\nWHERE ...;`,
+      'Common Table Expressions (WITH clauses) improve query modularity and readability by structuring intermediate calculations into named logical blocks before final filtering and ordering.',
+    initialSqlPlaceholder: `-- Mission 3: CTE for wards with occupancy rate >= 80%\nWITH WardStats AS (\n  SELECT \n    ward_name, total_beds, occupied_beds, ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) AS occupancy_rate\n  FROM wards\n)\nSELECT ward_name, total_beds, occupied_beds, occupancy_rate\nFROM WardStats\nWHERE ...\nORDER BY ...;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify saturated hospital ward query',
+        description: 'Verify ward occupancy CTE analysis for rates >= 80%',
         expectedQuery:
-          'SELECT ward_name, ward_type, total_beds, occupied_beds FROM wards WHERE occupied_beds >= total_beds;',
+          'WITH WardStats AS (SELECT ward_name, total_beds, occupied_beds, ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) AS occupancy_rate FROM wards) SELECT ward_name, total_beds, occupied_beds, occupancy_rate FROM WardStats WHERE occupancy_rate >= 80.0 ORDER BY occupancy_rate DESC;',
+        orderSensitive: true,
       },
     ],
     xpReward: 130,
@@ -147,40 +147,42 @@ WHERE occupied_beds >= total_beds;`,
   {
     id: 'hp_m4',
     order: 4,
-    title: 'Discharge Inpatient & Reclaim Hospital Bed',
+    title: 'Rank Inpatient Care Units with Window Function DENSE_RANK()',
     role: 'Healthcare Information Analyst',
     storyline:
-      'Pediatric patient Kavya Krishnan (admission_id = 104) has made a complete recovery and Dr. Oswald has signed the discharge clearance for today (2026-11-16).',
+      'The Facilities Planning Committee is evaluating patient density to allocate emergency relief funding and auxiliary beds. Department Head Dr. Menon requests a strict ranking of all hospital wards by occupied bed count using modern SQL window functions.',
     businessProblem:
-      'Pending emergency patients cannot be assigned a pediatric bed until the active admission is formally transitioned to Discharged in the central electronic health records system.',
+      'Traditional aggregation with GROUP BY collapses individual ward attributes. Window functions compute ranks across the entire result set while retaining granular ward details.',
     objective:
-      'Update "admissions" to set discharge_date = "2026-11-16" and status = "Discharged" for admission_id = 104.',
+      'Select ward_name, ward_type, occupied_beds, and DENSE_RANK() OVER (ORDER BY occupied_beds DESC) AS occupancy_rank from "wards" ordered by occupancy_rank ascending.',
     requiredOutcome:
-      'Admission 104 updated with discharge date and Discharged status.',
+      'A ranked report of all hospital wards ordered by their occupancy ranking from highest occupied beds (rank 1) to lowest.',
     checklist: [
-      'Use UPDATE admissions',
-      'SET discharge_date = \'2026-11-16\', status = \'Discharged\'',
-      'WHERE admission_id = 104',
+      'SELECT ward_name, ward_type, occupied_beds',
+      'Compute DENSE_RANK() OVER (ORDER BY occupied_beds DESC) AS occupancy_rank',
+      'FROM wards',
+      'ORDER BY occupancy_rank ASC',
     ],
-    sqlTopics: ['UPDATE', 'WHERE clause', 'Clinical Status Transition'],
+    sqlTopics: ['Window Functions', 'DENSE_RANK()', 'OVER Clause', 'Analytical Ranking'],
     hints: [
-      'Syntax: UPDATE admissions SET discharge_date = \'2026-11-16\', status = \'Discharged\' WHERE condition;',
-      'Specify WHERE admission_id = 104.',
-      "UPDATE admissions SET discharge_date = '2026-11-16', status = 'Discharged' WHERE admission_id = 104;",
+      'Use the window function syntax: DENSE_RANK() OVER (ORDER BY occupied_beds DESC) AS occupancy_rank.',
+      'Select ward_name, ward_type, occupied_beds, and the ranked column.',
+      'SELECT ward_name, ward_type, occupied_beds, DENSE_RANK() OVER (ORDER BY occupied_beds DESC) AS occupancy_rank FROM wards ORDER BY occupancy_rank ASC;',
     ],
-    sampleSolution: `UPDATE admissions
-SET discharge_date = '2026-11-16', status = 'Discharged'
-WHERE admission_id = 104;`,
+    sampleSolution: `SELECT ward_name, ward_type, occupied_beds,
+       DENSE_RANK() OVER (ORDER BY occupied_beds DESC) AS occupancy_rank
+FROM wards
+ORDER BY occupancy_rank ASC;`,
     solutionExplanation:
-      'Disciplined status updates in electronic medical records free up hospital beds in real-time, reducing waiting times for incoming emergency cases.',
-    initialSqlPlaceholder: `-- Mission 4: Discharge admission 104\nUPDATE admissions\nSET discharge_date = '2026-11-16', status = 'Discharged'\nWHERE admission_id = 104;`,
+      'The DENSE_RANK() window function assigns consecutive ranks without gaps, providing clean and standardized operational tiering across hospital infrastructure.',
+    initialSqlPlaceholder: `-- Mission 4: Window function ranking of wards by occupied beds\nSELECT ward_name, ward_type, occupied_beds,\n       DENSE_RANK() OVER (ORDER BY occupied_beds DESC) AS occupancy_rank\nFROM wards\nORDER BY ...;`,
     validationRules: [
       {
-        type: 'ROW_EXISTS',
-        description: 'Verify admission 104 is discharged',
-        expectedTable: 'admissions',
-        expectedWhereClause: "admission_id = 104 AND status = 'Discharged' AND discharge_date = '2026-11-16'",
-        expectedRowCount: 1,
+        type: 'SELECT_EXACT',
+        description: 'Verify ward ranking via DENSE_RANK() window function',
+        expectedQuery:
+          'SELECT ward_name, ward_type, occupied_beds, DENSE_RANK() OVER (ORDER BY occupied_beds DESC) AS occupancy_rank FROM wards ORDER BY occupancy_rank ASC;',
+        orderSensitive: true,
       },
     ],
     xpReward: 140,
@@ -188,93 +190,97 @@ WHERE admission_id = 104;`,
   {
     id: 'hp_m5',
     order: 5,
-    title: 'Correlate Active Inpatients with Attending Physicians',
+    title: 'Analyze Admission Intervals with Window Function LAG()',
     role: 'Healthcare Information Analyst',
     storyline:
-      'Hospital Chief Medical Officer requires a unified morning rounds roster. She needs a list of all currently admitted patients, their blood type, and their attending doctor specialty.',
+      'Clinical Epidemiology is studying inpatient intake cadence to spot sudden surges and calculate intervals between patient arrivals. The chief statistician asks you to track admission chronological progression using the LAG window function.',
     businessProblem:
-      'Doctors, patients, and admissions are stored in normalized relations. A relational query is needed to reconstruct complete clinical care profiles.',
+      'Comparing a current row with a prior row in SQL traditionally required self-joins on generated sequence IDs. Modern SQL offset window functions like LAG() access previous row data directly and efficiently.',
     objective:
-      'Join "patients", "admissions", and "doctors". Select p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date where a.status = "Admitted". Order by a.admission_date ascending.',
+      'Select admission_id, patient_id, admission_date, and LAG(admission_date) OVER (ORDER BY admission_date) AS prev_admission_date from "admissions" ordered by admission_date ascending.',
     requiredOutcome:
-      'A joined table connecting active inpatients to their assigned attending physicians, ordered chronologically by admission date.',
+      'A chronological log of patient admissions with each record displaying the admission date of the immediately preceding intake.',
     checklist: [
-      'JOIN patients p -> admissions a ON p.patient_id = a.patient_id',
-      'JOIN doctors d ON a.doctor_id = d.doctor_id',
-      'SELECT p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date',
-      'WHERE a.status = \'Admitted\'',
-      'ORDER BY a.admission_date ASC',
+      'SELECT admission_id, patient_id, admission_date',
+      'Use LAG(admission_date) OVER (ORDER BY admission_date) AS prev_admission_date',
+      'FROM admissions',
+      'ORDER BY admission_date ASC',
     ],
-    sqlTopics: ['Multi-table JOIN', 'Aliasing', 'Date Ordering', 'Status Filtering'],
+    sqlTopics: ['Window Functions', 'LAG() Offset', 'Time-Series Analysis', 'Chronological Tracking'],
     hints: [
-      'Chain the joins: patients p JOIN admissions a ON p.patient_id = a.patient_id JOIN doctors d ON a.doctor_id = d.doctor_id.',
-      'Filter with a.status = \'Admitted\' and order by a.admission_date ASC.',
-      'SELECT p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date FROM patients p JOIN admissions a ON p.patient_id = a.patient_id JOIN doctors d ON a.doctor_id = d.doctor_id WHERE a.status = \'Admitted\' ORDER BY a.admission_date ASC;',
+      'Syntax: LAG(column_name) OVER (ORDER BY order_column) AS alias.',
+      'Select admission_id, patient_id, admission_date, and LAG(admission_date) OVER (ORDER BY admission_date) AS prev_admission_date.',
+      'SELECT admission_id, patient_id, admission_date, LAG(admission_date) OVER (ORDER BY admission_date) AS prev_admission_date FROM admissions ORDER BY admission_date ASC;',
     ],
-    sampleSolution: `SELECT p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date
-FROM patients p
-JOIN admissions a ON p.patient_id = a.patient_id
-JOIN doctors d ON a.doctor_id = d.doctor_id
-WHERE a.status = 'Admitted'
-ORDER BY a.admission_date ASC;`,
+    sampleSolution: `SELECT admission_id, patient_id, admission_date,
+       LAG(admission_date) OVER (ORDER BY admission_date) AS prev_admission_date
+FROM admissions
+ORDER BY admission_date ASC;`,
     solutionExplanation:
-      'Multi-table joins link clinical demographic information with hospital admissions to provide attending physicians with immediate patient context during morning clinical rounds.',
-    initialSqlPlaceholder: `-- Mission 5: Join patients, admissions, and doctors for active inpatients\nSELECT p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date\nFROM patients p\nJOIN admissions a ON ...\nJOIN doctors d ON ...\nWHERE a.status = 'Admitted'\nORDER BY ...;`,
+      'LAG() provides seamless access to the previous row within a partitioned or ordered window, allowing healthcare analysts to calculate admission velocity and triage spacing.',
+    initialSqlPlaceholder: `-- Mission 5: Window function LAG for admission date progression\nSELECT admission_id, patient_id, admission_date,\n       LAG(admission_date) OVER (ORDER BY admission_date) AS prev_admission_date\nFROM admissions\nORDER BY ...;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify active inpatient rounds manifest',
+        description: 'Verify previous admission date calculation using LAG() window function',
         expectedQuery:
-          "SELECT p.first_name, p.last_name, p.blood_group, d.first_name AS doc_first_name, d.last_name AS doc_last_name, d.specialty, a.admission_date FROM patients p JOIN admissions a ON p.patient_id = a.patient_id JOIN doctors d ON a.doctor_id = d.doctor_id WHERE a.status = 'Admitted' ORDER BY a.admission_date ASC;",
+          'SELECT admission_id, patient_id, admission_date, LAG(admission_date) OVER (ORDER BY admission_date) AS prev_admission_date FROM admissions ORDER BY admission_date ASC;',
         orderSensitive: true,
       },
     ],
     xpReward: 160,
-    badge: {
-      id: 'join_master',
-      title: 'Join Master',
-      icon: 'GitFork',
-    },
   },
   {
     id: 'hp_m6',
     order: 6,
-    title: 'Analyze Hospital Bed Capacity by Care Specialty',
+    title: 'Execute Atomic Patient Discharge & Bed Reclaim (ACID Transaction)',
     role: 'Healthcare Information Analyst',
     storyline:
-      'The Board of Trustees is reviewing Metro General annual capital allocation. They request an aggregated breakdown of total bed capacity and occupied beds grouped by clinical ward type.',
+      'ICU patient Siddharth Varma (admission_id = 101) has completed critical recovery and is cleared for discharge today (2026-11-16). To ensure strict data consistency, the Electronic Health Record system requires patient status update and ward bed count decrement to occur within a single atomic ACID transaction.',
     businessProblem:
-      'Determining whether to fund a new surgical tower or expand pediatric ICU beds requires aggregated bed utilization metrics.',
+      'If a server crashes after updating the admission record but before decrementing the ward occupied bed count, the hospital registry becomes inconsistent (phantom occupied bed). An ACID transaction guarantees that either both updates succeed together or neither takes effect.',
     objective:
-      'Group "wards" by ward_type. Select ward_type, COUNT(ward_id) AS total_wards, SUM(total_beds) AS total_capacity, and SUM(occupied_beds) AS total_occupied. Order by total_occupied descending.',
+      'Execute an atomic transaction using BEGIN TRANSACTION and COMMIT that updates "admissions" to set status = "Discharged" and discharge_date = "2026-11-16" WHERE admission_id = 101, and updates "wards" to decrement occupied_beds = occupied_beds - 1 WHERE ward_id = 1.',
     requiredOutcome:
-      'An aggregated hospital ward capacity breakdown sorted by total occupied beds descending.',
+      'Admission 101 marked as Discharged with discharge_date = 2026-11-16 and ICU (ward_id = 1) occupied_beds decremented from 12 to 11, committed atomically.',
     checklist: [
-      'SELECT ward_type, COUNT(ward_id) AS total_wards, SUM(total_beds) AS total_capacity, SUM(occupied_beds) AS total_occupied',
-      'FROM wards',
-      'GROUP BY ward_type',
-      'ORDER BY total_occupied DESC',
+      'Start with BEGIN TRANSACTION;',
+      'UPDATE admissions SET status = \'Discharged\', discharge_date = \'2026-11-16\' WHERE admission_id = 101;',
+      'UPDATE wards SET occupied_beds = occupied_beds - 1 WHERE ward_id = 1;',
+      'Finalize with COMMIT;',
     ],
-    sqlTopics: ['GROUP BY', 'SUM / COUNT', 'Ward Capacity Analytics', 'ORDER BY DESC'],
+    sqlTopics: ['ACID Transactions', 'BEGIN TRANSACTION', 'COMMIT', 'Data Integrity', 'Atomic Operations'],
     hints: [
-      'Group by ward_type and compute COUNT(ward_id), SUM(total_beds), and SUM(occupied_beds).',
-      'Order by total_occupied DESC.',
-      'SELECT ward_type, COUNT(ward_id) AS total_wards, SUM(total_beds) AS total_capacity, SUM(occupied_beds) AS total_occupied FROM wards GROUP BY ward_type ORDER BY total_occupied DESC;',
+      'Wrap both UPDATE statements between BEGIN TRANSACTION; and COMMIT;.',
+      'First update admissions for admission_id = 101, then update wards for ward_id = 1.',
+      "BEGIN TRANSACTION;\nUPDATE admissions SET status = 'Discharged', discharge_date = '2026-11-16' WHERE admission_id = 101;\nUPDATE wards SET occupied_beds = occupied_beds - 1 WHERE ward_id = 1;\nCOMMIT;",
     ],
-    sampleSolution: `SELECT ward_type, COUNT(ward_id) AS total_wards, SUM(total_beds) AS total_capacity, SUM(occupied_beds) AS total_occupied
-FROM wards
-GROUP BY ward_type
-ORDER BY total_occupied DESC;`,
+    sampleSolution: `BEGIN TRANSACTION;
+UPDATE admissions
+SET status = 'Discharged', discharge_date = '2026-11-16'
+WHERE admission_id = 101;
+UPDATE wards
+SET occupied_beds = occupied_beds - 1
+WHERE ward_id = 1;
+COMMIT;`,
     solutionExplanation:
-      'Aggregating hospital bed inventory by ward specialty delivers actionable insights to healthcare executives for critical facility planning and staffing budgets.',
-    initialSqlPlaceholder: `-- Mission 6: Ward capacity summary by care specialty\nSELECT ward_type, COUNT(ward_id) AS total_wards, SUM(total_beds) AS total_capacity, SUM(occupied_beds) AS total_occupied\nFROM wards\nGROUP BY ...\nORDER BY ...;`,
+      'ACID transactions preserve relational invariants across multiple related tables. Wrapping dual updates in a transaction guarantees that hospital census and admission ledgers remain perfectly synchronized without risk of partial writes.',
+    initialSqlPlaceholder: `-- Mission 6: ACID transaction for atomic discharge and bed reclaim\nBEGIN TRANSACTION;\nUPDATE admissions\nSET status = 'Discharged', discharge_date = '2026-11-16'\nWHERE admission_id = 101;\nUPDATE wards\nSET occupied_beds = occupied_beds - 1\nWHERE ward_id = 1;\nCOMMIT;`,
     validationRules: [
       {
-        type: 'SELECT_EXACT',
-        description: 'Verify ward capacity aggregation',
-        expectedQuery:
-          'SELECT ward_type, COUNT(ward_id) AS total_wards, SUM(total_beds) AS total_capacity, SUM(occupied_beds) AS total_occupied FROM wards GROUP BY ward_type ORDER BY total_occupied DESC;',
-        orderSensitive: true,
+        type: 'ROW_EXISTS',
+        description: 'Verify admission 101 is marked Discharged with discharge date 2026-11-16',
+        expectedTable: 'admissions',
+        expectedWhereClause:
+          "admission_id = 101 AND status = 'Discharged' AND discharge_date = '2026-11-16'",
+        expectedRowCount: 1,
+      },
+      {
+        type: 'ROW_EXISTS',
+        description: 'Verify ICU (ward_id = 1) occupied_beds is decremented to 11',
+        expectedTable: 'wards',
+        expectedWhereClause: 'ward_id = 1 AND occupied_beds = 11',
+        expectedRowCount: 1,
       },
     ],
     xpReward: 250,

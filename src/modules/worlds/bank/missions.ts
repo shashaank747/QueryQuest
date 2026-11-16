@@ -4,283 +4,357 @@ export const BANK_MISSIONS: Mission[] = [
   {
     id: 'bk_m1',
     order: 1,
-    title: 'Deploy Suspicious Activity Reporting Schema',
+    title: 'Audit Peer-Group Outliers with Correlated Subqueries',
     role: 'Core Banking Database Analyst',
     storyline:
-      'Welcome to Apex National Trust! Federal financial regulators mandate automated relational tracking for high-risk Anti-Money Laundering (AML) triggers. Chief Compliance Officer Devendra asks you to deploy the suspicious activity table.',
+      'Chief Risk Officer Devendra is preparing the quarterly financial solvency audit. A flat balance threshold fails to identify high-risk anomalies because commercial accounts naturally hold vastly greater balances than personal savings or checking accounts. He asks you to isolate every account whose current balance exceeds the average balance of its specific account type.',
     businessProblem:
-      'Compliance officers currently log transaction audit alerts in unencrypted documents, exposing the bank to regulatory penalties under banking audit standards.',
+      'Evaluating balances against a single global average generates false alerts for modest commercial deposits while missing extreme outlier concentrations in retail checking and savings portfolios. Accurate risk monitoring requires evaluating balances relative to the peer average of each account type.',
     objective:
-      'Create a table named "suspicious_activity_flags" with flag_id (INTEGER PRIMARY KEY AUTOINCREMENT), account_id (INTEGER NOT NULL), reason TEXT NOT NULL, risk_score (INTEGER NOT NULL), and flagged_at (TEXT NOT NULL).',
+      'Write a correlated subquery that selects a.account_number, a.customer_name, a.account_type, and a.balance from "accounts a" where a.balance > (SELECT AVG(balance) FROM accounts WHERE account_type = a.account_type) ordered by a.balance DESC.',
     requiredOutcome:
-      'A new suspicious_activity_flags table ready to log automated AML alerts and financial compliance risk scores.',
+      'A prioritized list of accounts whose balances exceed their account type cohort averages, sorted highest balance first.',
     checklist: [
-      'Use CREATE TABLE suspicious_activity_flags',
-      'Define flag_id INTEGER PRIMARY KEY AUTOINCREMENT',
-      'Include account_id INTEGER NOT NULL',
-      'Include reason TEXT NOT NULL',
-      'Include risk_score INTEGER NOT NULL',
-      'Include flagged_at TEXT NOT NULL',
+      'Query from accounts with alias a',
+      'SELECT a.account_number, a.customer_name, a.account_type, a.balance',
+      'Filter with correlated subquery: WHERE a.balance > (SELECT AVG(balance) FROM accounts WHERE account_type = a.account_type)',
+      'ORDER BY a.balance DESC',
     ],
-    sqlTopics: ['CREATE TABLE', 'PRIMARY KEY', 'Column Constraints', 'Financial Auditing DDL'],
+    sqlTopics: ['Correlated Subqueries', 'Subqueries in WHERE', 'AVG() Aggregate', 'ORDER BY DESC'],
     hints: [
-      'Use CREATE TABLE suspicious_activity_flags (...) with the specified columns.',
-      'Specify flag_id INTEGER PRIMARY KEY AUTOINCREMENT.',
-      'CREATE TABLE suspicious_activity_flags (\n  flag_id INTEGER PRIMARY KEY AUTOINCREMENT,\n  account_id INTEGER NOT NULL,\n  reason TEXT NOT NULL,\n  risk_score INTEGER NOT NULL,\n  flagged_at TEXT NOT NULL\n);',
+      'A correlated subquery executes once for each candidate row in the outer query, referencing outer column values like a.account_type.',
+      'Compute the subquery: (SELECT AVG(balance) FROM accounts WHERE account_type = a.account_type) and filter with WHERE a.balance > (...).',
+      'SELECT a.account_number, a.customer_name, a.account_type, a.balance FROM accounts a WHERE a.balance > (SELECT AVG(balance) FROM accounts WHERE account_type = a.account_type) ORDER BY a.balance DESC;',
     ],
-    sampleSolution: `CREATE TABLE suspicious_activity_flags (
-  flag_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  account_id INTEGER NOT NULL,
-  reason TEXT NOT NULL,
-  risk_score INTEGER NOT NULL,
-  flagged_at TEXT NOT NULL
-);`,
+    sampleSolution: `SELECT a.account_number, a.customer_name, a.account_type, a.balance
+FROM accounts a
+WHERE a.balance > (SELECT AVG(balance) FROM accounts WHERE account_type = a.account_type)
+ORDER BY a.balance DESC;`,
     solutionExplanation:
-      'Centralized compliance tables allow automated banking risk engines to flag structuring, sudden deposit surges, and illicit transaction sequences.',
-    initialSqlPlaceholder: `-- Mission 1: Create suspicious activity flags table\nCREATE TABLE suspicious_activity_flags (\n  \n);`,
+      'A correlated subquery depends on the outer query for its values—here, account_type = a.account_type. For every account evaluated by SQLite, the subquery calculates the dynamic average balance for that specific account tier (Savings, Checking, or Commercial) and returns only those accounts outperforming their peer group average.',
+    initialSqlPlaceholder: `-- Mission 1: Correlated subquery for peer-group balance outliers
+SELECT a.account_number, a.customer_name, a.account_type, a.balance
+FROM accounts a
+WHERE a.balance > (
+  -- Correlated subquery computing AVG(balance) per account_type
+  
+)
+ORDER BY a.balance DESC;`,
     validationRules: [
       {
-        type: 'TABLE_EXISTS',
-        description: 'Verify suspicious_activity_flags table exists with required columns',
-        expectedTable: 'suspicious_activity_flags',
-        expectedColumns: [
-          'flag_id',
-          'account_id',
-          'reason',
-          'risk_score',
-          'flagged_at',
-        ],
+        type: 'SELECT_EXACT',
+        description: 'Verify correlated subquery identifying accounts above their account_type average balance',
+        expectedQuery:
+          'SELECT a.account_number, a.customer_name, a.account_type, a.balance FROM accounts a WHERE a.balance > (SELECT AVG(balance) FROM accounts WHERE account_type = a.account_type) ORDER BY a.balance DESC;',
+        orderSensitive: true,
       },
     ],
     xpReward: 100,
     badge: {
-      id: 'table_architect',
-      title: 'Table Architect',
-      icon: 'Database',
+      id: 'subquery_architect',
+      title: 'Subquery Specialist',
+      icon: 'Filter',
     },
   },
   {
     id: 'bk_m2',
     order: 2,
-    title: 'Open Commercial High-Net-Worth Account',
+    title: 'Common Table Expressions (CTE): High-Value Account Transference',
     role: 'Core Banking Database Analyst',
     storyline:
-      'Apex Sovereign Capital has deposited ₹50,000,000 to establish an institutional liquidity account at the Bengaluru Tech Hub branch (branch_id = 3). Commercial Banking VP Tanya asks for its immediate database opening.',
+      'Treasury VP Tanya needs a targeted compliance extract connecting institutional commercial accounts to their active transaction streams. To maintain readability and support downstream analytical queries, compliance standards require using a Common Table Expression (WITH clause) to filter tier-1 accounts (balance >= ₹10,000,000) before joining with transactions.',
     businessProblem:
-      'Institutional wire transfers cannot clear until the core ledger account number is committed to the accounts relational table.',
+      'Deeply nested subqueries and redundant join filters make compliance scripts difficult to audit and maintain. CTEs create modular, reusable temporary views that improve query clarity and operational debugging.',
     objective:
-      'Insert a new row into "accounts" with: account_id = 8, account_number = "ACC-BLR-3003", customer_name = "Apex Sovereign Capital", account_type = "Commercial", balance = 50000000.0, status = "Active", and branch_id = 3.',
+      'Define a CTE named "HighValueAccounts" that selects account_id, account_number, customer_name, and balance from accounts where balance >= 10000000.0. Then join HighValueAccounts hva with transactions t on hva.account_id = t.account_id to select hva.customer_name, hva.account_number, hva.balance, t.txn_type, and t.amount, ordered by t.amount DESC.',
     requiredOutcome:
-      'New commercial account record created in accounts with balance 50000000.0.',
+      'A joined report of tier-1 institutional accounts and their transaction entries, sorted by transaction amount descending.',
     checklist: [
-      'Use INSERT INTO accounts (...)',
-      'Specify account_id, account_number, customer_name, account_type, balance, status, branch_id',
-      'Provide matching values with text enclosed in single quotes',
+      'Define CTE: WITH HighValueAccounts AS (SELECT account_id, account_number, customer_name, balance FROM accounts WHERE balance >= 10000000.0)',
+      'Join HighValueAccounts hva with transactions t ON hva.account_id = t.account_id',
+      'SELECT hva.customer_name, hva.account_number, hva.balance, t.txn_type, t.amount',
+      'ORDER BY t.amount DESC',
     ],
-    sqlTopics: ['INSERT INTO', 'Commercial Accounts', 'Ledger Balances'],
+    sqlTopics: ['Common Table Expressions (CTE)', 'WITH Clause', 'INNER JOIN', 'Large Financial Thresholds', 'ORDER BY DESC'],
     hints: [
-      'Use INSERT INTO accounts (account_id, account_number, customer_name, account_type, balance, status, branch_id) VALUES (...);',
-      'Wrap string fields in single quotes.',
-      "INSERT INTO accounts (account_id, account_number, customer_name, account_type, balance, status, branch_id) VALUES (8, 'ACC-BLR-3003', 'Apex Sovereign Capital', 'Commercial', 50000000.0, 'Active', 3);",
+      'Use WITH HighValueAccounts AS (...) to define a temporary named result set, followed immediately by your SELECT query.',
+      'Join the CTE (hva) with transactions (t) using ON hva.account_id = t.account_id, and order by t.amount DESC.',
+      'WITH HighValueAccounts AS (SELECT account_id, account_number, customer_name, balance FROM accounts WHERE balance >= 10000000.0) SELECT hva.customer_name, hva.account_number, hva.balance, t.txn_type, t.amount FROM HighValueAccounts hva JOIN transactions t ON hva.account_id = t.account_id ORDER BY t.amount DESC;',
     ],
-    sampleSolution: `INSERT INTO accounts (account_id, account_number, customer_name, account_type, balance, status, branch_id)
-VALUES (8, 'ACC-BLR-3003', 'Apex Sovereign Capital', 'Commercial', 50000000.0, 'Active', 3);`,
+    sampleSolution: `WITH HighValueAccounts AS (
+  SELECT account_id, account_number, customer_name, balance
+  FROM accounts
+  WHERE balance >= 10000000.0
+)
+SELECT hva.customer_name, hva.account_number, hva.balance, t.txn_type, t.amount
+FROM HighValueAccounts hva
+JOIN transactions t ON hva.account_id = t.account_id
+ORDER BY t.amount DESC;`,
     solutionExplanation:
-      'Inserting normalized account records establishes foreign key integrity with branches and prepares the core database for incoming transaction logs.',
-    initialSqlPlaceholder: `-- Mission 2: Register ACC-BLR-3003 into accounts\nINSERT INTO accounts (\n  account_id, account_number, customer_name, account_type, balance, status, branch_id\n) VALUES (\n  \n);`,
+      'Common Table Expressions (CTEs) define clean temporary result sets before the main SELECT query runs. Here, HighValueAccounts encapsulates the ₹10M balance filter, allowing the main query to join directly against transactions cleanly.',
+    initialSqlPlaceholder: `-- Mission 2: Common Table Expression for Tier-1 accounts
+WITH HighValueAccounts AS (
+  SELECT account_id, account_number, customer_name, balance
+  FROM accounts
+  WHERE balance >= 10000000.0
+)
+SELECT hva.customer_name, hva.account_number, hva.balance, t.txn_type, t.amount
+FROM HighValueAccounts hva
+JOIN transactions t ON hva.account_id = t.account_id
+ORDER BY t.amount DESC;`,
     validationRules: [
       {
-        type: 'ROW_EXISTS',
-        description: 'Verify ACC-BLR-3003 is registered in accounts',
-        expectedTable: 'accounts',
-        expectedWhereClause: "account_number = 'ACC-BLR-3003' AND balance = 50000000.0",
-        expectedRowCount: 1,
+        type: 'SELECT_EXACT',
+        description: 'Verify CTE query joining HighValueAccounts with transactions ordered by amount DESC',
+        expectedQuery:
+          'WITH HighValueAccounts AS (SELECT account_id, account_number, customer_name, balance FROM accounts WHERE balance >= 10000000.0) SELECT hva.customer_name, hva.account_number, hva.balance, t.txn_type, t.amount FROM HighValueAccounts hva JOIN transactions t ON hva.account_id = t.account_id ORDER BY t.amount DESC;',
+        orderSensitive: true,
       },
     ],
     xpReward: 120,
     badge: {
-      id: 'ledger_auditor',
-      title: 'Ledger Audit Specialist',
-      icon: 'Landmark',
+      id: 'cte_pioneer',
+      title: 'CTE Architect',
+      icon: 'Layers',
     },
   },
   {
     id: 'bk_m3',
     order: 3,
-    title: 'Audit High-Value Cash Withdrawals',
+    title: 'Window Functions: Cumulative Cash Flow with SUM() OVER',
     role: 'Core Banking Database Analyst',
     storyline:
-      'Banking regulations require mandatory reporting for liquid cash debits equal to or exceeding ₹50,000. Senior Risk Auditor Meenakshi needs an immediate extract of all qualifying transactions.',
+      'Senior Risk Auditor Meenakshi needs to audit chronological cash turnover across all customer accounts. Collapsing records with a standard GROUP BY would lose the exact timeline of individual deposits and withdrawals. Instead, she requires an analytical window function that preserves all transaction rows while computing a running cumulative total per account.',
     businessProblem:
-      'Central bank compliance requires daily auditing of high-value cash withdrawals to prevent unauthorized branch treasury depletion and tax evasion.',
+      'Traditional GROUP BY aggregation collapses individual events into aggregate totals, erasing the chronological transaction progression. Window functions allow analysts to calculate cumulative totals across time without sacrificing row-level audit details.',
     objective:
-      'Select account_id, txn_type, amount, and channel from "transactions" where txn_type = "WITHDRAWAL" and amount >= 50000.',
+      'Select transaction_id, account_id, txn_type, amount, txn_timestamp, and compute SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS running_total from "transactions", ordered by account_id and txn_timestamp.',
     requiredOutcome:
-      'A targeted list of high-value cash withdrawals meeting the AML threshold (>= 50,000).',
+      'A comprehensive transaction audit log showing the running cumulative sum of transaction amounts partitioned by account and ordered by timestamp.',
     checklist: [
-      'SELECT account_id, txn_type, amount, channel',
+      'SELECT transaction_id, account_id, txn_type, amount, txn_timestamp',
+      'Compute SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS running_total',
       'FROM transactions',
-      'WHERE txn_type = \'WITHDRAWAL\' AND amount >= 50000',
+      'ORDER BY account_id, txn_timestamp',
     ],
-    sqlTopics: ['SELECT', 'Compound Conditions (AND)', 'Threshold Auditing'],
+    sqlTopics: ['Window Functions', 'OVER Clause', 'PARTITION BY', 'Cumulative SUM()', 'Ledger Audit Trails'],
     hints: [
-      'Use SELECT account_id, txn_type, amount, channel FROM transactions WHERE ...;',
-      'Combine conditions with AND: txn_type = \'WITHDRAWAL\' AND amount >= 50000.',
-      "SELECT account_id, txn_type, amount, channel FROM transactions WHERE txn_type = 'WITHDRAWAL' AND amount >= 50000;",
+      'Window functions calculate values across a set of rows related to the current row without collapsing the output.',
+      'Inside the OVER clause, use PARTITION BY account_id ORDER BY txn_timestamp to restart the running sum for each account.',
+      'SELECT transaction_id, account_id, txn_type, amount, txn_timestamp, SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS running_total FROM transactions ORDER BY account_id, txn_timestamp;',
     ],
-    sampleSolution: `SELECT account_id, txn_type, amount, channel
+    sampleSolution: `SELECT transaction_id, account_id, txn_type, amount, txn_timestamp,
+       SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS running_total
 FROM transactions
-WHERE txn_type = 'WITHDRAWAL' AND amount >= 50000;`,
+ORDER BY account_id, txn_timestamp;`,
     solutionExplanation:
-      'Compound boolean filters in WHERE clauses allow bank compliance systems to automatically isolate transactions requiring regulatory currency transaction reports (CTRs).',
-    initialSqlPlaceholder: `-- Mission 3: Query withdrawals >= 50000\nSELECT account_id, txn_type, amount, channel\nFROM transactions\nWHERE ...;`,
+      'The SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) window function divides rows into independent partitions per account and calculates a cumulative sum chronologically up to each row, preserving every single transaction in the output.',
+    initialSqlPlaceholder: `-- Mission 3: Cumulative running total per account using SUM() OVER
+SELECT transaction_id, account_id, txn_type, amount, txn_timestamp,
+       SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS running_total
+FROM transactions
+ORDER BY account_id, txn_timestamp;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify high-value cash withdrawals query',
+        description: 'Verify windowed running total partitioned by account_id ordered by txn_timestamp',
         expectedQuery:
-          "SELECT account_id, txn_type, amount, channel FROM transactions WHERE txn_type = 'WITHDRAWAL' AND amount >= 50000;",
+          'SELECT transaction_id, account_id, txn_type, amount, txn_timestamp, SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS running_total FROM transactions ORDER BY account_id, txn_timestamp;',
+        orderSensitive: true,
       },
     ],
-    xpReward: 130,
+    xpReward: 140,
+    badge: {
+      id: 'window_specialist',
+      title: 'Window Function Specialist',
+      icon: 'TrendingUp',
+    },
   },
   {
     id: 'bk_m4',
     order: 4,
-    title: 'Freeze Compromised Payment Card',
+    title: 'Window Functions: Offset Audit with LAG() OVER',
     role: 'Core Banking Database Analyst',
     storyline:
-      'Fraud monitoring detected abnormal international POS authorization requests on card 4532-8812-9901-3321. Customer Aarav Malhotra confirmed the card was misplaced and requested an emergency freeze.',
+      'The Automated Fraud Detection Unit is analyzing transaction patterns for rapid sequential debits and sudden volumetric surges. To evaluate volatility between consecutive events on the same account, Compliance Officer Devendra asks you to display the previous transaction amount alongside each transaction using the LAG() window function.',
     businessProblem:
-      'To prevent fraudulent card sweeps, the bank payment gateway must immediately decline authorizations by setting is_active = 0 in the cards database.',
+      'Detecting sudden spikes or rapid consecutive transactions previously required complex, slow self-joins on timestamps. LAG() provides direct relational access to preceding row values within a partition.',
     objective:
-      'Update "cards" to set is_active = 0 for card_number = "4532-8812-9901-3321".',
+      'Select transaction_id, account_id, txn_type, amount, txn_timestamp, and compute LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS prev_amount from "transactions", ordered by account_id and txn_timestamp.',
     requiredOutcome:
-      'Card 4532-8812-9901-3321 deactivated (is_active = 0).',
+      "Each transaction displayed with the prior transaction amount for the same account (or NULL if it is the account's first recorded transaction).",
     checklist: [
-      'Use UPDATE cards',
-      'SET is_active = 0',
-      'WHERE card_number = \'4532-8812-9901-3321\'',
+      'SELECT transaction_id, account_id, txn_type, amount, txn_timestamp',
+      'Compute LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS prev_amount',
+      'FROM transactions',
+      'ORDER BY account_id, txn_timestamp',
     ],
-    sqlTopics: ['UPDATE', 'Boolean flag modification', 'Card Security'],
+    sqlTopics: ['Window Functions', 'LAG() OVER', 'Offset Window Functions', 'Fraud Detection Auditing'],
     hints: [
-      'Syntax: UPDATE cards SET is_active = 0 WHERE condition;',
-      'Specify card_number = \'4532-8812-9901-3321\'.',
-      "UPDATE cards SET is_active = 0 WHERE card_number = '4532-8812-9901-3321';",
+      'LAG(column) accesses data from the preceding row within the defined partition window.',
+      'Specify the window clause as OVER (PARTITION BY account_id ORDER BY txn_timestamp).',
+      'SELECT transaction_id, account_id, txn_type, amount, txn_timestamp, LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS prev_amount FROM transactions ORDER BY account_id, txn_timestamp;',
     ],
-    sampleSolution: `UPDATE cards
-SET is_active = 0
-WHERE card_number = '4532-8812-9901-3321';`,
+    sampleSolution: `SELECT transaction_id, account_id, txn_type, amount, txn_timestamp,
+       LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS prev_amount
+FROM transactions
+ORDER BY account_id, txn_timestamp;`,
     solutionExplanation:
-      'Immediate UPDATE execution on customer security flags cuts off card network authorization paths and protects depositor funds.',
-    initialSqlPlaceholder: `-- Mission 4: Freeze compromised card\nUPDATE cards\nSET is_active = 0\nWHERE card_number = '4532-8812-9901-3321';`,
-    validationRules: [
-      {
-        type: 'ROW_EXISTS',
-        description: 'Verify card is deactivated',
-        expectedTable: 'cards',
-        expectedWhereClause: "card_number = '4532-8812-9901-3321' AND is_active = 0",
-        expectedRowCount: 1,
-      },
-    ],
-    xpReward: 140,
-  },
-  {
-    id: 'bk_m5',
-    order: 5,
-    title: 'Trace Multi-Million Commercial Wire Transfers',
-    role: 'Core Banking Database Analyst',
-    storyline:
-      'Treasury Operations is reconciling RTGS and inter-bank clearing feeds. The Chief Risk Officer requires a cross-table audit of all major transactions (amount >= 1,000,000) linked to account ownership details.',
-    businessProblem:
-      'Transactions reference account_id as a foreign key. Auditors need the account number, customer legal entity name, and channel combined in a single view.',
-    objective:
-      'Join "accounts" and "transactions". Select a.customer_name, a.account_number, t.amount, t.channel, and t.txn_timestamp where t.amount >= 1000000.0. Order by t.amount descending.',
-    requiredOutcome:
-      'A joined table linking customer account details with high-value transactions (>= 1,000,000), ordered highest amount first.',
-    checklist: [
-      'JOIN accounts a -> transactions t ON a.account_id = t.account_id',
-      'SELECT a.customer_name, a.account_number, t.amount, t.channel, t.txn_timestamp',
-      'WHERE t.amount >= 1000000.0',
-      'ORDER BY t.amount DESC',
-    ],
-    sqlTopics: ['INNER JOIN', 'Large Financial Thresholds', 'ORDER BY DESC'],
-    hints: [
-      'Join accounts (a) and transactions (t) using ON a.account_id = t.account_id.',
-      'Filter for t.amount >= 1000000.0 and order by t.amount DESC.',
-      'SELECT a.customer_name, a.account_number, t.amount, t.channel, t.txn_timestamp FROM accounts a JOIN transactions t ON a.account_id = t.account_id WHERE t.amount >= 1000000.0 ORDER BY t.amount DESC;',
-    ],
-    sampleSolution: `SELECT a.customer_name, a.account_number, t.amount, t.channel, t.txn_timestamp
-FROM accounts a
-JOIN transactions t ON a.account_id = t.account_id
-WHERE t.amount >= 1000000.0
-ORDER BY t.amount DESC;`,
-    solutionExplanation:
-      'Relational JOINs bridge banking ledger transaction streams with customer master records, providing treasury officers with full audit visibility.',
-    initialSqlPlaceholder: `-- Mission 5: Join accounts and transactions for wires >= 1000000\nSELECT a.customer_name, a.account_number, t.amount, t.channel, t.txn_timestamp\nFROM accounts a\nJOIN transactions t ON ...\nWHERE t.amount >= 1000000.0\nORDER BY ...;`,
+      'The LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) analytical function evaluates each account partition chronologically and retrieves the amount from the previous row. If no prior transaction exists for an account, it returns NULL.',
+    initialSqlPlaceholder: `-- Mission 4: Retrieve previous transaction amount using LAG() OVER
+SELECT transaction_id, account_id, txn_type, amount, txn_timestamp,
+       LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS prev_amount
+FROM transactions
+ORDER BY account_id, txn_timestamp;`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
-        description: 'Verify high-value wire transfers query',
+        description: 'Verify offset audit query using LAG() OVER partitioned by account_id',
         expectedQuery:
-          'SELECT a.customer_name, a.account_number, t.amount, t.channel, t.txn_timestamp FROM accounts a JOIN transactions t ON a.account_id = t.account_id WHERE t.amount >= 1000000.0 ORDER BY t.amount DESC;',
+          'SELECT transaction_id, account_id, txn_type, amount, txn_timestamp, LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS prev_amount FROM transactions ORDER BY account_id, txn_timestamp;',
         orderSensitive: true,
       },
     ],
     xpReward: 160,
     badge: {
-      id: 'join_master',
-      title: 'Join Master',
-      icon: 'GitFork',
+      id: 'offset_auditor',
+      title: 'Offset Audit Specialist',
+      icon: 'GitCommit',
+    },
+  },
+  {
+    id: 'bk_m5',
+    order: 5,
+    title: 'Window Functions: Partitioned Ranking with DENSE_RANK() OVER',
+    role: 'Core Banking Database Analyst',
+    storyline:
+      'Managing Director Aditya is preparing executive reports for regional branch managers in Mumbai, New Delhi, and Bengaluru. Rather than an unpartitioned nationwide list, branch executives need a competitive ranking of customer accounts specifically within each branch based on balance descending, without gaps in ranking sequence.',
+    businessProblem:
+      'National-level rankings fail to give branch managers actionable visibility into their local high-net-worth customer tiers. Window ranking functions allow per-branch competitive stratification without subquery duplication.',
+    objective:
+      'Select account_number, customer_name, branch_id, balance, and compute DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) AS branch_rank from "accounts", ordered by branch_id and branch_rank.',
+    requiredOutcome:
+      'A categorized customer ranking report where accounts are ranked from 1 to N within each branch based on ledger balance.',
+    checklist: [
+      'SELECT account_number, customer_name, branch_id, balance',
+      'Compute DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) AS branch_rank',
+      'FROM accounts',
+      'ORDER BY branch_id, branch_rank',
+    ],
+    sqlTopics: ['Window Functions', 'DENSE_RANK() OVER', 'Partitioned Ranking', 'Executive Branch Reporting'],
+    hints: [
+      'DENSE_RANK() assigns consecutive rankings (1, 2, 3...) based on the ORDER BY clause inside the window specification.',
+      'Partition by branch_id so that ranking resets to 1 for every individual branch location.',
+      'SELECT account_number, customer_name, branch_id, balance, DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) AS branch_rank FROM accounts ORDER BY branch_id, branch_rank;',
+    ],
+    sampleSolution: `SELECT account_number, customer_name, branch_id, balance,
+       DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) AS branch_rank
+FROM accounts
+ORDER BY branch_id, branch_rank;`,
+    solutionExplanation:
+      'The DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) window function groups accounts by branch_id, ranks accounts in descending order of balance within each branch, and ensures rank numbers increase without gaps.',
+    initialSqlPlaceholder: `-- Mission 5: Partitioned account ranking using DENSE_RANK() OVER
+SELECT account_number, customer_name, branch_id, balance,
+       DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) AS branch_rank
+FROM accounts
+ORDER BY branch_id, branch_rank;`,
+    validationRules: [
+      {
+        type: 'SELECT_EXACT',
+        description: 'Verify partitioned branch ranking query using DENSE_RANK() OVER',
+        expectedQuery:
+          'SELECT account_number, customer_name, branch_id, balance, DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) AS branch_rank FROM accounts ORDER BY branch_id, branch_rank;',
+        orderSensitive: true,
+      },
+    ],
+    xpReward: 180,
+    badge: {
+      id: 'ranking_expert',
+      title: 'Ranking Authority',
+      icon: 'Award',
     },
   },
   {
     id: 'bk_m6',
     order: 6,
-    title: 'Calculate Branch Deposit Liquidity Reserves',
+    title: 'ACID Transactions: Atomic Funds Transfer',
     role: 'Core Banking Database Analyst',
     storyline:
-      'Bank Managing Director Aditya is preparing the quarterly report for the central monetary authority. He requests a consolidated summary of total accounts and aggregate customer deposit balances grouped by branch location.',
+      'Customer Aarav Malhotra (account_id = 2) has initiated an urgent inter-account funds transfer of ₹50,000 to Simran Khurana (account_id = 4). In core banking ledgers, debiting the source account, crediting the destination account, and inserting the transaction audit log must occur as a single indivisible unit of work. Chief Compliance Officer Devendra requires you to execute this multi-statement operation within an ACID transaction block.',
     businessProblem:
-      'Central bank reserve requirements require computing cumulative branch liabilities by aggregating balances across checking, savings, and commercial accounts.',
+      'If a database crash or network disconnect occurs after the debit but before the credit, ₹50,000 would vanish from the ledger, violating fundamental double-entry balance sheet integrity. ACID transactions guarantee atomicity (all-or-nothing execution).',
     objective:
-      'Join "branches" and "accounts". Select b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, and SUM(a.balance) AS total_deposits. Group by b.branch_name, b.city and order by total_deposits descending.',
+      'Execute an atomic funds transfer wrapped in a transaction:\nBEGIN TRANSACTION;\nUPDATE accounts SET balance = balance - 50000.0 WHERE account_id = 2;\nUPDATE accounts SET balance = balance + 50000.0 WHERE account_id = 4;\nINSERT INTO transactions (account_id, txn_type, amount, txn_timestamp, channel) VALUES (2, \'TRANSFER\', 50000.0, \'2026-11-16 16:00:00\', \'Internal Transfer\');\nCOMMIT;',
     requiredOutcome:
-      'An aggregated branch liquidity table showing total accounts and deposit balances, sorted highest balance first.',
+      'Account 2 debited to 800000.0, Account 4 credited to 195000.0, and an internal transfer audit record inserted into transactions, all committed atomically.',
     checklist: [
-      'JOIN branches b -> accounts a ON b.branch_id = a.branch_id',
-      'SELECT b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, SUM(a.balance) AS total_deposits',
-      'GROUP BY b.branch_name, b.city',
-      'ORDER BY total_deposits DESC',
+      'Start the atomic block with BEGIN TRANSACTION;',
+      'UPDATE accounts SET balance = balance - 50000.0 WHERE account_id = 2;',
+      'UPDATE accounts SET balance = balance + 50000.0 WHERE account_id = 4;',
+      'INSERT INTO transactions (account_id, txn_type, amount, txn_timestamp, channel) VALUES (2, \'TRANSFER\', 50000.0, \'2026-11-16 16:00:00\', \'Internal Transfer\');',
+      'Seal and persist changes with COMMIT;',
     ],
-    sqlTopics: ['Multi-table GROUP BY', 'SUM / COUNT Aggregation', 'Liquidity Analysis', 'ORDER BY DESC'],
+    sqlTopics: ['ACID Transactions', 'BEGIN TRANSACTION', 'COMMIT', 'Atomic Funds Transfer', 'Ledger Integrity'],
     hints: [
-      'Join branches b and accounts a ON b.branch_id = a.branch_id.',
-      'Group by b.branch_name, b.city and compute COUNT(a.account_id) and SUM(a.balance).',
-      'SELECT b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, SUM(a.balance) AS total_deposits FROM branches b JOIN accounts a ON b.branch_id = a.branch_id GROUP BY b.branch_name, b.city ORDER BY total_deposits DESC;',
+      'Enclose multiple UPDATE and INSERT statements between BEGIN TRANSACTION; and COMMIT; to guarantee atomicity.',
+      'Debit Account 2 by 50000.0, credit Account 4 by 50000.0, and insert the TRANSFER transaction for Account 2.',
+      `BEGIN TRANSACTION;
+UPDATE accounts SET balance = balance - 50000.0 WHERE account_id = 2;
+UPDATE accounts SET balance = balance + 50000.0 WHERE account_id = 4;
+INSERT INTO transactions (account_id, txn_type, amount, txn_timestamp, channel) VALUES (2, 'TRANSFER', 50000.0, '2026-11-16 16:00:00', 'Internal Transfer');
+COMMIT;`,
     ],
-    sampleSolution: `SELECT b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, SUM(a.balance) AS total_deposits
-FROM branches b
-JOIN accounts a ON b.branch_id = a.branch_id
-GROUP BY b.branch_name, b.city
-ORDER BY total_deposits DESC;`,
+    sampleSolution: `BEGIN TRANSACTION;
+UPDATE accounts SET balance = balance - 50000.0 WHERE account_id = 2;
+UPDATE accounts SET balance = balance + 50000.0 WHERE account_id = 4;
+INSERT INTO transactions (account_id, txn_type, amount, txn_timestamp, channel)
+VALUES (2, 'TRANSFER', 50000.0, '2026-11-16 16:00:00', 'Internal Transfer');
+COMMIT;`,
     solutionExplanation:
-      'Aggregating depositor funds by branch location enables bank treasury management to maintain adequate cash reserves and comply with statutory liquidity ratios (SLR).',
-    initialSqlPlaceholder: `-- Mission 6: Branch deposit liquidity summary\nSELECT b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, SUM(a.balance) AS total_deposits\nFROM branches b\nJOIN accounts a ON ...\nGROUP BY ...\nORDER BY ...;`,
+      'ACID transactions (Atomicity, Consistency, Isolation, Durability) ensure that all constituent statements either succeed together or leave the database completely unchanged upon failure. Wrapping the debit, credit, and journal log in a transaction protects against partial updates.',
+    initialSqlPlaceholder: `-- Mission 6: Atomic funds transfer between Account 2 and Account 4
+BEGIN TRANSACTION;
+
+-- 1. Debit ₹50,000 from Account 2
+UPDATE accounts SET balance = balance - 50000.0 WHERE account_id = 2;
+
+-- 2. Credit ₹50,000 to Account 4
+UPDATE accounts SET balance = balance + 50000.0 WHERE account_id = 4;
+
+-- 3. Log internal transfer transaction record
+INSERT INTO transactions (account_id, txn_type, amount, txn_timestamp, channel)
+VALUES (2, 'TRANSFER', 50000.0, '2026-11-16 16:00:00', 'Internal Transfer');
+
+COMMIT;`,
     validationRules: [
       {
-        type: 'SELECT_EXACT',
-        description: 'Verify branch deposit liquidity aggregation',
-        expectedQuery:
-          'SELECT b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, SUM(a.balance) AS total_deposits FROM branches b JOIN accounts a ON b.branch_id = a.branch_id GROUP BY b.branch_name, b.city ORDER BY total_deposits DESC;',
-        orderSensitive: true,
+        type: 'ROW_EXISTS',
+        description: 'Verify Account 2 balance debited by 50,000 (balance = 800000.0)',
+        expectedTable: 'accounts',
+        expectedWhereClause: 'account_id = 2 AND balance = 800000.0',
+        expectedRowCount: 1,
+      },
+      {
+        type: 'ROW_EXISTS',
+        description: 'Verify Account 4 balance credited by 50,000 (balance = 195000.0)',
+        expectedTable: 'accounts',
+        expectedWhereClause: 'account_id = 4 AND balance = 195000.0',
+        expectedRowCount: 1,
+      },
+      {
+        type: 'ROW_EXISTS',
+        description: 'Verify transfer transaction record inserted with channel "Internal Transfer"',
+        expectedTable: 'transactions',
+        expectedWhereClause:
+          "account_id = 2 AND txn_type = 'TRANSFER' AND amount = 50000.0 AND channel = 'Internal Transfer'",
+        expectedRowCount: 1,
       },
     ],
     xpReward: 250,
     badge: {
-      id: 'bank_master',
-      title: 'Commercial Banking Certified',
-      icon: 'Award',
+      id: 'acid_master',
+      title: 'ACID Transaction Master',
+      icon: 'ShieldCheck',
     },
   },
 ];

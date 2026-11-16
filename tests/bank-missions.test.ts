@@ -143,7 +143,7 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       await initFreshDb();
     });
 
-    it('Mission 1 (bk_m1): Deploy suspicious_activity_flags table', async () => {
+    it('Mission 1 (bk_m1): Audit Peer-Group Outliers with Correlated Subqueries', async () => {
       const m1 = BANK_MISSIONS[0];
       const execRes = await executeSql(m1.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -151,13 +151,10 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       const ctx = getContext(m1.sampleSolution, execRes);
       const feedback = await ValidationEngine.validate(m1.validationRules, ctx);
       expect(feedback.passed).toBe(true);
-
-      // Verify table in sqlite_master
-      const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='suspicious_activity_flags';");
-      expect(res.length).toBe(1);
+      expect(execRes.results![0].values.length).toBeGreaterThan(0);
     });
 
-    it('Mission 2 (bk_m2): Open Commercial High-Net-Worth Account', async () => {
+    it('Mission 2 (bk_m2): High-Value Account Transference with CTE', async () => {
       const m2 = BANK_MISSIONS[1];
       const execRes = await executeSql(m2.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -165,13 +162,10 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       const ctx = getContext(m2.sampleSolution, execRes);
       const feedback = await ValidationEngine.validate(m2.validationRules, ctx);
       expect(feedback.passed).toBe(true);
-
-      // Verify row data in accounts
-      const res = db.exec("SELECT account_number, balance, branch_id FROM accounts WHERE account_id = 8;");
-      expect(res[0].values[0]).toEqual(['ACC-BLR-3003', 50000000.0, 3]);
+      expect(execRes.results![0].values.length).toBeGreaterThan(0);
     });
 
-    it('Mission 3 (bk_m3): Audit High-Value Cash Withdrawals', async () => {
+    it('Mission 3 (bk_m3): Window Functions: Cumulative Cash Flow with SUM() OVER', async () => {
       const m3 = BANK_MISSIONS[2];
       const execRes = await executeSql(m3.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -180,15 +174,12 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       const feedback = await ValidationEngine.validate(m3.validationRules, ctx);
       expect(feedback.passed).toBe(true);
 
-      // Should return 3 rows of withdrawals >= 50,000
-      expect(execRes.results![0].values).toHaveLength(3);
-      for (const row of execRes.results![0].values) {
-        expect(row[1]).toBe('WITHDRAWAL');
-        expect(row[2]).toBeGreaterThanOrEqual(50000);
-      }
+      const cols = execRes.results![0].columns;
+      expect(cols).toEqual(['transaction_id', 'account_id', 'txn_type', 'amount', 'txn_timestamp', 'running_total']);
+      expect(execRes.results![0].values.length).toBe(8);
     });
 
-    it('Mission 4 (bk_m4): Freeze Compromised Payment Card', async () => {
+    it('Mission 4 (bk_m4): Window Functions: Offset Audit with LAG() OVER', async () => {
       const m4 = BANK_MISSIONS[3];
       const execRes = await executeSql(m4.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -197,11 +188,12 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       const feedback = await ValidationEngine.validate(m4.validationRules, ctx);
       expect(feedback.passed).toBe(true);
 
-      const res = db.exec("SELECT is_active FROM cards WHERE card_number = '4532-8812-9901-3321';");
-      expect(res[0].values[0][0]).toBe(0);
+      const cols = execRes.results![0].columns;
+      expect(cols).toEqual(['transaction_id', 'account_id', 'txn_type', 'amount', 'txn_timestamp', 'prev_amount']);
+      expect(execRes.results![0].values.length).toBe(8);
     });
 
-    it('Mission 5 (bk_m5): Trace Multi-Million Commercial Wire Transfers', async () => {
+    it('Mission 5 (bk_m5): Window Functions: Partitioned Ranking with DENSE_RANK() OVER', async () => {
       const m5 = BANK_MISSIONS[4];
       const execRes = await executeSql(m5.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -210,19 +202,12 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       const feedback = await ValidationEngine.validate(m5.validationRules, ctx);
       expect(feedback.passed).toBe(true);
 
-      // 3 high-value wire transfers (>= 1,000,000)
-      const rows = execRes.results![0].values;
-      expect(rows).toHaveLength(3);
-      // Ordered descending: 4.5M, 3.5M, 1.2M
-      expect(rows[0][2]).toBe(4500000.0);
-      expect(rows[1][2]).toBe(3500000.0);
-      expect(rows[2][2]).toBe(1200000.0);
+      const cols = execRes.results![0].columns;
+      expect(cols).toEqual(['account_number', 'customer_name', 'branch_id', 'balance', 'branch_rank']);
+      expect(execRes.results![0].values.length).toBe(7);
     });
 
-    it('Mission 6 (bk_m6): Calculate Branch Deposit Liquidity Reserves', async () => {
-      // Execute m2 first so accounts has the full state
-      await executeSql(BANK_MISSIONS[1].sampleSolution);
-
+    it('Mission 6 (bk_m6): ACID Transactions: Atomic Funds Transfer', async () => {
       const m6 = BANK_MISSIONS[5];
       const execRes = await executeSql(m6.sampleSolution);
       expect(execRes.success).toBe(true);
@@ -231,11 +216,14 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       const feedback = await ValidationEngine.validate(m6.validationRules, ctx);
       expect(feedback.passed).toBe(true);
 
-      const rows = execRes.results![0].values;
-      expect(rows).toHaveLength(3);
-      // Verify descending order
-      expect(rows[0][3]).toBeGreaterThanOrEqual(rows[1][3]);
-      expect(rows[1][3]).toBeGreaterThanOrEqual(rows[2][3]);
+      const acc2 = db.exec('SELECT balance FROM accounts WHERE account_id = 2;')[0].values[0][0];
+      const acc4 = db.exec('SELECT balance FROM accounts WHERE account_id = 4;')[0].values[0][0];
+      expect(acc2).toBe(800000.0);
+      expect(acc4).toBe(195000.0);
+
+      const txn = db.exec("SELECT amount, channel FROM transactions WHERE account_id = 2 AND txn_type = 'TRANSFER';");
+      expect(txn.length).toBe(1);
+      expect(txn[0].values[0]).toEqual([50000.0, 'Internal Transfer']);
     });
   });
 
@@ -244,9 +232,8 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       await initFreshDb();
     });
 
-    // Mission 1 intentional errors
-    it('Mission 1: catches SQL syntax error when CREATE TABLE is malformed', async () => {
-      const badSql = 'CREATE TABLE suspicious_activity_flags (flag_id INT PRIMARY KEY;';
+    it('Mission 1: catches syntax error in correlated subquery', async () => {
+      const badSql = 'SELECT a.account_number FROM accounts a WHERE a.balance > (SELECT AVG(balance FROM accounts);';
       const execRes = await executeSql(badSql);
       expect(execRes.success).toBe(false);
 
@@ -256,223 +243,86 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       expect(feedback.message).toMatch(/SQL error|syntax error/i);
     });
 
-    it('Mission 1: catches missing required column (e.g. omitted risk_score)', async () => {
-      const missingColSql = `CREATE TABLE suspicious_activity_flags (
-        flag_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        account_id INTEGER NOT NULL,
-        reason TEXT NOT NULL,
-        flagged_at TEXT NOT NULL
-      );`;
-      const execRes = await executeSql(missingColSql);
+    it('Mission 1: catches inverted comparison (< instead of >)', async () => {
+      const invertedSql = 'SELECT a.account_number, a.customer_name, a.account_type, a.balance FROM accounts a WHERE a.balance < (SELECT AVG(balance) FROM accounts WHERE account_type = a.account_type) ORDER BY a.balance DESC;';
+      const execRes = await executeSql(invertedSql);
       expect(execRes.success).toBe(true);
 
-      const ctx = getContext(missingColSql, execRes);
+      const ctx = getContext(invertedSql, execRes);
       const feedback = await ValidationEngine.validate(BANK_MISSIONS[0].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain("column 'risk_score' is missing");
     });
 
-    it('Mission 1: catches wrong table name', async () => {
-      const wrongTableSql = `CREATE TABLE wrong_aml_table (
-        flag_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        account_id INTEGER NOT NULL,
-        reason TEXT NOT NULL,
-        risk_score INTEGER NOT NULL,
-        flagged_at TEXT NOT NULL
-      );`;
-      const execRes = await executeSql(wrongTableSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(wrongTableSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[0].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain("Table 'suspicious_activity_flags' does not exist");
-    });
-
-    // Mission 2 intentional errors
-    it('Mission 2: catches syntax mistake on INSERT', async () => {
-      const badInsertSql = 'INSERT INTO accounts (account_id) VALUES (8, ';
-      const execRes = await executeSql(badInsertSql);
+    it('Mission 2: catches syntax error when WITH keyword is missing in CTE', async () => {
+      const badCteSql = 'HighValueAccounts AS (SELECT account_id FROM accounts) SELECT * FROM HighValueAccounts;';
+      const execRes = await executeSql(badCteSql);
       expect(execRes.success).toBe(false);
 
-      const ctx = getContext(badInsertSql, execRes);
+      const ctx = getContext(badCteSql, execRes);
       const feedback = await ValidationEngine.validate(BANK_MISSIONS[1].validationRules, ctx);
       expect(feedback.passed).toBe(false);
       expect(feedback.message).toMatch(/syntax error/i);
     });
 
-    it('Mission 2: catches wrong account number', async () => {
-      const typoSql = `INSERT INTO accounts (account_id, account_number, customer_name, account_type, balance, status, branch_id)
-        VALUES (8, 'ACC-BLR-9999', 'Apex Sovereign Capital', 'Commercial', 50000000.0, 'Active', 3);`;
-      const execRes = await executeSql(typoSql);
+    it('Mission 2: catches wrong balance filter threshold in CTE', async () => {
+      const wrongThreshSql = 'WITH HighValueAccounts AS (SELECT account_id, account_number, customer_name, balance FROM accounts WHERE balance >= 50000000.0) SELECT hva.customer_name, hva.account_number, hva.balance, t.txn_type, t.amount FROM HighValueAccounts hva JOIN transactions t ON hva.account_id = t.account_id ORDER BY t.amount DESC;';
+      const execRes = await executeSql(wrongThreshSql);
       expect(execRes.success).toBe(true);
 
-      const ctx = getContext(typoSql, execRes);
+      const ctx = getContext(wrongThreshSql, execRes);
       const feedback = await ValidationEngine.validate(BANK_MISSIONS[1].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toMatch(/Verify ACC-BLR-3003 is registered/i);
     });
 
-    it('Mission 2: catches balance calculation mismatch (e.g. 5,000,000 instead of 50,000,000)', async () => {
-      const wrongBalanceSql = `INSERT INTO accounts (account_id, account_number, customer_name, account_type, balance, status, branch_id)
-        VALUES (8, 'ACC-BLR-3003', 'Apex Sovereign Capital', 'Commercial', 5000000.0, 'Active', 3);`;
-      const execRes = await executeSql(wrongBalanceSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(wrongBalanceSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[1].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.details?.expected).toContain('50000000');
-    });
-
-    // Mission 3 intentional errors
-    it('Mission 3: catches syntax mistake on SELECT', async () => {
-      const badSql = 'SELECT account_id, txn_type FROMM transactions;';
-      const execRes = await executeSql(badSql);
-      expect(execRes.success).toBe(false);
-
-      const ctx = getContext(badSql, execRes);
+    it('Mission 3: catches missing OVER clause in window function', async () => {
+      const badWinSql = 'SELECT transaction_id, account_id, txn_type, amount, txn_timestamp, SUM(amount) AS running_total FROM transactions;';
+      const execRes = await executeSql(badWinSql);
+      const ctx = getContext(badWinSql, execRes);
       const feedback = await ValidationEngine.validate(BANK_MISSIONS[2].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toMatch(/syntax error/i);
     });
 
-    it('Mission 3: catches transaction type filtering error (filtering DEPOSIT instead of WITHDRAWAL)', async () => {
-      const wrongTypeSql = "SELECT account_id, txn_type, amount, channel FROM transactions WHERE txn_type = 'DEPOSIT' AND amount >= 50000;";
-      const execRes = await executeSql(wrongTypeSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(wrongTypeSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[2].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toMatch(/data values returned do not match/i);
-    });
-
-    it('Mission 3: catches threshold filtering error (amount >= 100000)', async () => {
-      const highThresholdSql = "SELECT account_id, txn_type, amount, channel FROM transactions WHERE txn_type = 'WITHDRAWAL' AND amount >= 100000;";
-      const execRes = await executeSql(highThresholdSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(highThresholdSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[2].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('Returned 1 record(s), but 3 were expected');
-    });
-
-    // Mission 4 intentional errors
-    it('Mission 4: catches wrong card number on UPDATE', async () => {
-      const wrongCardSql = "UPDATE cards SET is_active = 0 WHERE card_number = '5421-1190-4432-8765';";
-      const execRes = await executeSql(wrongCardSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(wrongCardSql, execRes);
+    it('Mission 4: catches LAG without PARTITION BY clause', async () => {
+      const badLagSql = 'SELECT transaction_id, account_id, txn_type, amount, txn_timestamp, LAG(amount) OVER (ORDER BY txn_timestamp) AS prev_amount FROM transactions ORDER BY account_id, txn_timestamp;';
+      const execRes = await executeSql(badLagSql);
+      const ctx = getContext(badLagSql, execRes);
       const feedback = await ValidationEngine.validate(BANK_MISSIONS[3].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toMatch(/Verify card is deactivated/i);
     });
 
-    it('Mission 4: catches setting is_active = 1 instead of 0', async () => {
-      const wrongStatusSql = "UPDATE cards SET is_active = 1 WHERE card_number = '4532-8812-9901-3321';";
-      const execRes = await executeSql(wrongStatusSql);
+    it('Mission 5: catches ordering error in DENSE_RANK', async () => {
+      const ascRankSql = 'SELECT account_number, customer_name, branch_id, balance, DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance ASC) AS branch_rank FROM accounts ORDER BY branch_id, branch_rank;';
+      const execRes = await executeSql(ascRankSql);
       expect(execRes.success).toBe(true);
 
-      const ctx = getContext(wrongStatusSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[3].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.details?.expected).toContain('is_active = 0');
-    });
-
-    // Mission 5 intentional errors
-    it('Mission 5: catches threshold filtering error (amount >= 4000000 returns 1 row instead of 3)', async () => {
-      const highThreshSql = `SELECT a.customer_name, a.account_number, t.amount, t.channel, t.txn_timestamp
-        FROM accounts a JOIN transactions t ON a.account_id = t.account_id
-        WHERE t.amount >= 4000000.0 ORDER BY t.amount DESC;`;
-      const execRes = await executeSql(highThreshSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(highThreshSql, execRes);
+      const ctx = getContext(ascRankSql, execRes);
       const feedback = await ValidationEngine.validate(BANK_MISSIONS[4].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('Returned 1 record(s), but 3 were expected');
     });
 
-    it('Mission 5: catches threshold filtering error (amount >= 5000000 returns 0 rows)', async () => {
-      const emptyThreshSql = `SELECT a.customer_name, a.account_number, t.amount, t.channel, t.txn_timestamp
-        FROM accounts a JOIN transactions t ON a.account_id = t.account_id
-        WHERE t.amount >= 5000000.0 ORDER BY t.amount DESC;`;
-      const execRes = await executeSql(emptyThreshSql);
+    it('Mission 6: catches wrong transfer amount in ACID transaction', async () => {
+      const wrongAmtSql = `BEGIN TRANSACTION;
+UPDATE accounts SET balance = balance - 10000.0 WHERE account_id = 2;
+UPDATE accounts SET balance = balance + 10000.0 WHERE account_id = 4;
+INSERT INTO transactions (account_id, txn_type, amount, txn_timestamp, channel) VALUES (2, 'TRANSFER', 10000.0, '2026-11-16 16:00:00', 'Internal Transfer');
+COMMIT;`;
+      const execRes = await executeSql(wrongAmtSql);
       expect(execRes.success).toBe(true);
 
-      const ctx = getContext(emptyThreshSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[4].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('Your query did not return any data rows. A SELECT query is required.');
-    });
-
-    it('Mission 5: catches ordering error (ASC instead of DESC) due to orderSensitive check', async () => {
-      const ascSql = `SELECT a.customer_name, a.account_number, t.amount, t.channel, t.txn_timestamp
-        FROM accounts a JOIN transactions t ON a.account_id = t.account_id
-        WHERE t.amount >= 1000000.0 ORDER BY t.amount ASC;`;
-      const execRes = await executeSql(ascSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(ascSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[4].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toMatch(/ordering|ORDER BY/i);
-    });
-
-    // Mission 6 intentional errors
-    it('Mission 6: catches missing GROUP BY resulting in single aggregated row', async () => {
-      const noGroupSql = `SELECT b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, SUM(a.balance) AS total_deposits
-        FROM branches b JOIN accounts a ON b.branch_id = a.branch_id
-        ORDER BY total_deposits DESC;`;
-      const execRes = await executeSql(noGroupSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(noGroupSql, execRes);
+      const ctx = getContext(wrongAmtSql, execRes);
       const feedback = await ValidationEngine.validate(BANK_MISSIONS[5].validationRules, ctx);
       expect(feedback.passed).toBe(false);
-      expect(feedback.message).toContain('Returned 1 record(s), but 3 were expected');
-    });
-
-    it('Mission 6: catches wrong aggregation function (AVG instead of SUM)', async () => {
-      const avgSql = `SELECT b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, AVG(a.balance) AS total_deposits
-        FROM branches b JOIN accounts a ON b.branch_id = a.branch_id
-        GROUP BY b.branch_name, b.city
-        ORDER BY total_deposits DESC;`;
-      const execRes = await executeSql(avgSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(avgSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[5].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toMatch(/values|ordering/i);
-    });
-
-    it('Mission 6: catches ascending order instead of descending order', async () => {
-      const ascSql = `SELECT b.branch_name, b.city, COUNT(a.account_id) AS total_accounts, SUM(a.balance) AS total_deposits
-        FROM branches b JOIN accounts a ON b.branch_id = a.branch_id
-        GROUP BY b.branch_name, b.city
-        ORDER BY total_deposits ASC;`;
-      const execRes = await executeSql(ascSql);
-      expect(execRes.success).toBe(true);
-
-      const ctx = getContext(ascSql, execRes);
-      const feedback = await ValidationEngine.validate(BANK_MISSIONS[5].validationRules, ctx);
-      expect(feedback.passed).toBe(false);
-      expect(feedback.message).toMatch(/ordering|ORDER BY/i);
     });
   });
 
   describe('4. XP Calculations and Gamification Progression', () => {
-    it('should have correct mission XP rewards totaling 900 XP', () => {
-      const expectedRewards = [100, 120, 130, 140, 160, 250];
+    it('should have correct mission XP rewards totaling 950 XP', () => {
+      const expectedRewards = [100, 120, 140, 160, 180, 250];
       const actualRewards = BANK_MISSIONS.map((m) => m.xpReward);
       expect(actualRewards).toEqual(expectedRewards);
 
       const totalWorldXp = actualRewards.reduce((sum, r) => sum + r, 0);
-      expect(totalWorldXp).toBe(900);
+      expect(totalWorldXp).toBe(950);
     });
 
     it('should correctly calculate user levels across the playthrough', () => {
@@ -500,41 +350,49 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
         progressPercent: 88,
       });
 
-      // After bk_m3: +130 = 350 XP -> Level up to Level 2!
-      expect(calculateLevel(350)).toEqual({
+      // After bk_m3: +140 = 360 XP -> Level up to Level 2!
+      expect(calculateLevel(360)).toEqual({
         level: 2,
-        currentLevelXp: 100,
+        currentLevelXp: 110,
         nextLevelXp: 250,
-        progressPercent: 40,
+        progressPercent: 44,
       });
 
-      // After bk_m4: +140 = 490 XP -> Level 2
-      expect(calculateLevel(490)).toEqual({
-        level: 2,
-        currentLevelXp: 240,
-        nextLevelXp: 250,
-        progressPercent: 96,
-      });
-
-      // After bk_m5: +160 = 650 XP -> Level 3
-      expect(calculateLevel(650)).toEqual({
+      // After bk_m4: +160 = 520 XP -> Level up to Level 3!
+      expect(calculateLevel(520)).toEqual({
         level: 3,
-        currentLevelXp: 150,
+        currentLevelXp: 20,
         nextLevelXp: 250,
-        progressPercent: 60,
+        progressPercent: 8,
       });
 
-      // After bk_m6: +250 = 900 XP -> Level 4
-      expect(calculateLevel(900)).toEqual({
-        level: 4,
-        currentLevelXp: 150,
+      // After bk_m5: +180 = 700 XP -> Level 3
+      expect(calculateLevel(700)).toEqual({
+        level: 3,
+        currentLevelXp: 200,
         nextLevelXp: 250,
-        progressPercent: 60,
+        progressPercent: 80,
+      });
+
+      // After bk_m6: +250 = 950 XP -> Level 4
+      expect(calculateLevel(950)).toEqual({
+        level: 4,
+        currentLevelXp: 200,
+        nextLevelXp: 250,
+        progressPercent: 80,
       });
     });
 
     it('should have all bank badges and achievements properly registered in ALL_ACHIEVEMENTS', () => {
-      const requiredBadges = ['table_architect', 'ledger_auditor', 'join_master', 'bank_master'];
+      const requiredBadges = [
+        'subquery_architect',
+        'cte_pioneer',
+        'window_specialist',
+        'offset_auditor',
+        'ranking_expert',
+        'acid_master',
+        'bank_master',
+      ];
 
       for (const badgeId of requiredBadges) {
         const found = ALL_ACHIEVEMENTS.find((a) => a.id === badgeId);
@@ -543,11 +401,6 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
         expect(found?.description).toBeTruthy();
         expect(found?.xpReward).toBeGreaterThan(0);
       }
-
-      // Check specific bank achievements
-      const ledgerAuditor = ALL_ACHIEVEMENTS.find((a) => a.id === 'ledger_auditor')!;
-      expect(ledgerAuditor.category).toBe('missions');
-      expect(ledgerAuditor.xpReward).toBe(120);
 
       const bankMaster = ALL_ACHIEVEMENTS.find((a) => a.id === 'bank_master')!;
       expect(bankMaster.category).toBe('worlds');
@@ -558,29 +411,26 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       vi.spyOn(persistenceService, 'saveUserProfile').mockResolvedValue(undefined as any);
       const userStore = useUserStore.getState();
 
-      // Test unlocking ledger_auditor
-      const initialAchievements = userStore.profile.achievements;
       const initialXp = userStore.profile.xp;
 
-      const unlocked = await userStore.unlockAchievement('ledger_auditor');
+      const unlocked = await userStore.unlockAchievement('subquery_architect');
       expect(unlocked).toBe(true);
 
       const updatedProfile = useUserStore.getState().profile;
-      expect(updatedProfile.achievements).toContain('ledger_auditor');
-      // ledger_auditor awards 120 XP as defined in ALL_ACHIEVEMENTS
-      expect(updatedProfile.xp).toBe(initialXp + 120);
+      expect(updatedProfile.achievements).toContain('subquery_architect');
+      expect(updatedProfile.xp).toBe(initialXp + 100);
 
       // Duplicate unlock should return false and not add duplicate XP
-      const unlockedAgain = await userStore.unlockAchievement('ledger_auditor');
+      const unlockedAgain = await userStore.unlockAchievement('subquery_architect');
       expect(unlockedAgain).toBe(false);
-      expect(useUserStore.getState().profile.xp).toBe(initialXp + 120);
+      expect(useUserStore.getState().profile.xp).toBe(initialXp + 100);
 
       // Unlock world completion badge bank_master (+300 XP)
       await userStore.markWorldCompleted('bank');
       await userStore.unlockAchievement('bank_master');
       expect(useUserStore.getState().profile.completedWorlds).toContain('bank');
       expect(useUserStore.getState().profile.achievements).toContain('bank_master');
-      expect(useUserStore.getState().profile.xp).toBe(initialXp + 120 + 300);
+      expect(useUserStore.getState().profile.xp).toBe(initialXp + 100 + 300);
     });
   });
 });

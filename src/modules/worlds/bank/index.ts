@@ -27,7 +27,7 @@ export const bankWorld: WorldDefinition = {
   iconName: 'Landmark',
   accentColor: 'indigo',
   dbFileName: 'bank.db',
-  sqlTopics: ['CREATE TABLE', 'INSERT', 'SELECT', 'WHERE', 'UPDATE', 'JOIN', 'GROUP BY', 'Aggregation'],
+  sqlTopics: ['Correlated Subqueries', 'Common Table Expressions', 'Window Functions', 'ACID Transactions'],
   isAvailable: true,
   missions: BANK_MISSIONS,
   initialSchemaSql: BANK_BASE_SCHEMA,

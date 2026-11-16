@@ -215,20 +215,20 @@ describe('Supermarket Operations Audit & Playthrough Verification', () => {
       expect(feedback.message).toContain("discontinued");
     });
 
-    it('Mission 7 (JOIN product & inventory): detects missing join or wrong product_id filter', async () => {
+    it('Mission 7 (LIKE text search): detects missing status filter or wrong search pattern', async () => {
       const m7 = SUPERMARKET_MISSIONS[6];
 
-      // Wrong product ID
-      const wrongFilterRes = await executeSql('SELECT p.product_name, i.quantity_on_hand, i.aisle_number FROM products p JOIN inventory i ON p.product_id = i.product_id WHERE p.product_id = 1;');
+      // Wrong pattern / missing filter
+      const wrongFilterRes = await executeSql("SELECT product_id, product_name, category_id, unit_price FROM products WHERE product_name LIKE '%NonExistent%' AND status = 'Active';");
       const feedback = await ValidationEngine.validate(m7.validationRules, createValidationContext(wrongFilterRes));
       expect(feedback.passed).toBe(false);
     });
 
-    it('Mission 8 (Multi-table JOIN): detects missing ORDER BY clause when orderSensitive is true', async () => {
+    it('Mission 8 (BETWEEN filter): detects missing ORDER BY or inverted sort order', async () => {
       const m8 = SUPERMARKET_MISSIONS[7];
 
-      // Query without proper ORDER BY
-      const unorderedRes = await executeSql('SELECT c.customer_id, c.first_name, o.order_id, oi.product_id, oi.quantity FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id ORDER BY c.customer_id DESC;');
+      // Query with ASC instead of DESC
+      const unorderedRes = await executeSql("SELECT order_id, customer_id, order_date, total_amount FROM orders WHERE status = 'Completed' AND total_amount BETWEEN 500 AND 2500 ORDER BY total_amount ASC;");
       const feedback = await ValidationEngine.validate(m8.validationRules, createValidationContext(unorderedRes));
       expect(feedback.passed).toBe(false);
       expect(feedback.message).toContain('ORDER BY');
@@ -239,40 +239,35 @@ describe('Supermarket Operations Audit & Playthrough Verification', () => {
 
       // 1. Aggregate in WHERE clause
       const aggWhereRes = await executeSql(`
-        SELECT c.category_name, SUM(oi.quantity * oi.unit_price) AS total_revenue
-        FROM categories c
-        JOIN products p ON c.category_id = p.category_id
-        JOIN order_items oi ON p.product_id = oi.product_id
-        WHERE SUM(oi.quantity * oi.unit_price) > 1000
-        GROUP BY c.category_name;
+        SELECT payment_method, COUNT(payment_id) AS total_transactions, SUM(amount) AS total_revenue
+        FROM payments
+        WHERE SUM(amount) > 2000
+        GROUP BY payment_method;
       `);
       expect(aggWhereRes.success).toBe(false);
       expect(aggWhereRes.hint).toContain('Misuse of aggregate function');
 
       // 2. Incorrect HAVING threshold
       const wrongHavingRes = await executeSql(`
-        SELECT c.category_name, SUM(oi.quantity * oi.unit_price) AS total_revenue
-        FROM categories c
-        JOIN products p ON c.category_id = p.category_id
-        JOIN order_items oi ON p.product_id = oi.product_id
-        GROUP BY c.category_name
-        HAVING total_revenue > 10000
+        SELECT payment_method, COUNT(payment_id) AS total_transactions, SUM(amount) AS total_revenue
+        FROM payments
+        GROUP BY payment_method
+        HAVING total_revenue > 50000
         ORDER BY total_revenue DESC;
       `);
       const feedback = await ValidationEngine.validate(m9.validationRules, createValidationContext(wrongHavingRes));
       expect(feedback.passed).toBe(false);
     });
 
-    it('Mission 10 (Best-Selling Products): catches missing LIMIT and inverted sort order', async () => {
+    it('Mission 10 (Top 3 Spending Customers): catches missing LIMIT and inverted sort order', async () => {
       const m10 = SUPERMARKET_MISSIONS[9];
 
       // 1. Missing LIMIT 3 (returns all rows)
       const noLimitRes = await executeSql(`
-        SELECT p.product_name, SUM(oi.quantity) AS units_sold
-        FROM products p
-        JOIN order_items oi ON p.product_id = oi.product_id
-        GROUP BY p.product_name
-        ORDER BY units_sold DESC;
+        SELECT customer_id, COUNT(order_id) AS total_orders, SUM(total_amount) AS total_spent
+        FROM orders
+        GROUP BY customer_id
+        ORDER BY total_spent DESC;
       `);
       const noLimitFeedback = await ValidationEngine.validate(m10.validationRules, createValidationContext(noLimitRes));
       expect(noLimitFeedback.passed).toBe(false);
@@ -280,11 +275,10 @@ describe('Supermarket Operations Audit & Playthrough Verification', () => {
 
       // 2. Inverted ORDER BY (ASC instead of DESC)
       const ascRes = await executeSql(`
-        SELECT p.product_name, SUM(oi.quantity) AS units_sold
-        FROM products p
-        JOIN order_items oi ON p.product_id = oi.product_id
-        GROUP BY p.product_name
-        ORDER BY units_sold ASC
+        SELECT customer_id, COUNT(order_id) AS total_orders, SUM(total_amount) AS total_spent
+        FROM orders
+        GROUP BY customer_id
+        ORDER BY total_spent ASC
         LIMIT 3;
       `);
       const ascFeedback = await ValidationEngine.validate(m10.validationRules, createValidationContext(ascRes));

@@ -27,7 +27,7 @@ export const airportWorld: WorldDefinition = {
   iconName: 'Plane',
   accentColor: 'sky',
   dbFileName: 'airport.db',
-  sqlTopics: ['CREATE TABLE', 'INSERT', 'SELECT', 'WHERE', 'UPDATE', 'JOIN', 'GROUP BY', 'Aggregation'],
+  sqlTopics: ['INNER JOIN', 'Multi-Table JOIN', 'LEFT JOIN', 'CASE WHEN', 'GROUP BY', 'HAVING'],
   isAvailable: true,
   missions: AIRPORT_MISSIONS,
   initialSchemaSql: AIRPORT_BASE_SCHEMA,

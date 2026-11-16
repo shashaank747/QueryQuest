@@ -27,7 +27,7 @@ export const warehouseWorld: WorldDefinition = {
   iconName: 'Boxes',
   accentColor: 'amber',
   dbFileName: 'warehouse.db',
-  sqlTopics: ['CREATE TABLE', 'INSERT', 'SELECT', 'WHERE', 'UPDATE', 'JOIN', 'GROUP BY', 'HAVING'],
+  sqlTopics: ['INNER JOIN', 'Multi-table JOIN', 'LEFT JOIN', 'CASE WHEN', 'GROUP BY', 'HAVING'],
   isAvailable: true,
   missions: WAREHOUSE_MISSIONS,
   initialSchemaSql: WAREHOUSE_BASE_SCHEMA,
