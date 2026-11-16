@@ -22,11 +22,10 @@ export const WorldGrid: React.FC = () => {
       <div className="mb-8 flex items-center justify-between">
         <button
           onClick={() => setSelectedTrack(null)}
-          className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-            isLight
-              ? 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm'
-              : 'bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white border border-slate-800'
-          }`}
+          className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${isLight
+            ? 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm'
+            : 'bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white border border-slate-800'
+            }`}
         >
           <ArrowLeft className="w-3.5 h-3.5 text-emerald-500" />
           <span>Back to All Tracks (Excel, MySQL, Power BI)</span>
@@ -49,16 +48,14 @@ export const WorldGrid: React.FC = () => {
           <span>MySQL Track &bull; 5 Interactive Business Case Studies</span>
         </div>
         <h1
-          className={`text-3xl sm:text-5xl font-black tracking-tight ${
-            isLight ? 'text-slate-900' : 'text-white'
-          } mb-4`}
+          className={`text-3xl sm:text-5xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'
+            } mb-4`}
         >
           Master MySQL by Solving Real-World Breakdowns
         </h1>
         <p
-          className={`text-sm sm:text-base ${
-            isLight ? 'text-slate-600' : 'text-slate-300'
-          } leading-relaxed`}
+          className={`text-sm sm:text-base ${isLight ? 'text-slate-600' : 'text-slate-300'
+            } leading-relaxed`}
         >
           No dry tutorials or artificial quizzes. Step into real organizations, inspect genuine
           database schemas, and write authentic SQL to restore broken operations and report insights.
@@ -68,25 +65,23 @@ export const WorldGrid: React.FC = () => {
         <div className="flex items-center justify-center gap-2 mt-8">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-              filter === 'all'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                : isLight
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${filter === 'all'
+              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+              : isLight
                 ? 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
                 : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
-            }`}
+              }`}
           >
             All Industry Worlds ({worlds.length})
           </button>
           <button
             onClick={() => setFilter('available')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-              filter === 'available'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                : isLight
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${filter === 'available'
+              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+              : isLight
                 ? 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
                 : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
-            }`}
+              }`}
           >
             Playable Now (All 5 Worlds)
           </button>
