@@ -11,11 +11,11 @@
 <p align="center">
   <a href="https://query-quest-livid.vercel.app/"><img src="https://img.shields.io/badge/Live_Demo-query--quest--livid.vercel.app-10b981.svg?style=flat-square&logo=vercel" alt="Live Demo on Vercel" /></a>
   <a href="#-data-tracks-hub"><img src="https://img.shields.io/badge/Tracks-Excel_•_MySQL_•_Power_BI-0ea5e9.svg?style=flat-square" alt="Data Tracks" /></a>
-  <a href="#-tier-based-world-progression--locking"><img src="https://img.shields.io/badge/Worlds-6_Interactive_Worlds-f59e0b.svg?style=flat-square" alt="6 Worlds" /></a>
-  <a href="#-industry-worlds--curriculum"><img src="https://img.shields.io/badge/Missions-43_Enterprise_Scenarios-10b981.svg?style=flat-square" alt="43 Missions" /></a>
+  <a href="#-tier-based-world-progression--locking"><img src="https://img.shields.io/badge/Worlds-7_Interactive_Worlds-f59e0b.svg?style=flat-square" alt="7 Worlds" /></a>
+  <a href="#-industry-worlds--curriculum"><img src="https://img.shields.io/badge/Missions-52_Enterprise_Scenarios-10b981.svg?style=flat-square" alt="52 Missions" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/SQLite-WASM_In--Browser-0284c7.svg?style=flat-square" alt="SQLite WASM" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/Editor-Monaco_IDE-6366f1.svg?style=flat-square" alt="Monaco Editor" /></a>
-  <a href="#-test-suite-execution"><img src="https://img.shields.io/badge/Tests-219_Passed-emerald.svg?style=flat-square" alt="Test Status" /></a>
+  <a href="#-test-suite-execution"><img src="https://img.shields.io/badge/Tests-229_Passed-emerald.svg?style=flat-square" alt="Test Status" /></a>
   <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License" /></a>
 </p>
 
@@ -79,7 +79,7 @@ Quest Query features a curated track selection portal introducing the essential 
 - 15 planned hands-on workbooks.
 
 ### 2. MySQL (Relational Databases & Enterprise Simulation) &bull; *Playable Now*
-- The flagship Quest Query simulation: 6 interactive industry worlds and 43 progressive missions running on an in-browser SQLite WASM engine.
+- The flagship Quest Query simulation: 7 interactive industry worlds and 52 progressive missions running on an in-browser SQLite WASM engine.
 - Structured across 3 pedagogical tiers: **Beginner** (100% single-table mastery), **Intermediate** (relational multi-table joins & dates), and **Advanced** (subqueries, CTEs, self-joins, window functions & ACID transactions).
 - 100% playable client-side with zero latency.
 
@@ -94,10 +94,10 @@ Quest Query features a curated track selection portal introducing the essential 
 
 To guarantee a pedagogically sound learning curve, Quest Query organizes worlds into **Skill Tiers** with a **"Play Any 2 to Unlock Next Tier"** progression rule:
 
-1. **Tier 1: Beginner Worlds** (*Supermarket Operations* & *Namma Metro — Transit Command*):
+1. **Tier 1: Beginner Worlds** (*Supermarket Operations*, *Namma Metro — Transit Command*, & *Query & Kaapi — Tiffin & Filter Coffee*):
    - **Unlocked by default** for all players.
    - **Zero-Join Focus**: Dedicated 100% to single-table mastery (table creation, strict constraints, batch inserts, range/pattern filtering, conditional updates, safe deletes, and single-table aggregations).
-   - Playing a 2nd world in the tier acts as **spaced repetition & revision**, reinforcing identical SQL concepts in a completely fresh business domain.
+   - Playing a 2nd or 3rd world in the tier acts as **spaced repetition & revision**, reinforcing identical SQL concepts in completely fresh business domains.
 2. **Tier 2: Intermediate Worlds** (*Airport Operations* & *Warehouse Management*):
    - Unlocked once any **2 Beginner Worlds** reach 100% completion.
    - Dedicated to relational normalization, `FOREIGN KEY` references, `INNER JOIN`, multi-table chains, `LEFT JOIN` discrepancy detection, date/time math, and `CASE WHEN`.
@@ -113,16 +113,17 @@ To guarantee a pedagogically sound learning curve, Quest Query organizes worlds 
 
 ## 📸 Industry Worlds & Curriculum
 
-Quest Query features **6 distinct industry worlds** with **43 hands-on scenario missions**:
+Quest Query features **7 distinct industry worlds** with **52 hands-on scenario missions**:
 
 | World | Tier | Industry | Operational Reference | Missions | SQL Focus | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **1. Supermarket Operations** | Beginner | Retail & Consumer Goods | Checkout POS, inventory aisles, supplier manifests | 10 | `CREATE TABLE`, `PRIMARY KEY`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `DELETE`, `GROUP BY`, `HAVING` | **Unlocked (Playable)** |
 | **2. Namma Metro — Transit Command** | Beginner | Public Transit & Mobility | BMRCL OCC room, station lines, smart-cards, footfall | 9 | `CREATE TABLE`, `AUTOINCREMENT`, `UNIQUE`, `CHECK`, `INSERT`, `WHERE`, `BETWEEN`, `IN`, `LIKE`, `IS NULL`, `UPDATE`, `DELETE`, Aggregations | **Unlocked (Playable)** |
-| **3. Airport Operations** | Intermediate | Aviation & Transportation | Radar tracking, flight schedules (FIDS), passenger gates | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires 2/2 T1)** |
-| **4. Warehouse Management** | Intermediate | Logistics & Supply Chain | Automated conveyors, pallet racks, temperature vaults | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, `HAVING` | **Playable (Requires 2/2 T1)** |
-| **5. Hospital Administration** | Advanced | Healthcare & Clinical | Emergency admissions, doctor clinic rosters, bed wards | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires 2/2 T2)** |
-| **6. Bank Operations** | Advanced | Banking & Financial Services | Ledger balances, wire transfers, fraud anomaly audits | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires 2/2 T2)** |
+| **3. Query & Kaapi — Tiffin & Filter Coffee** | Beginner | Food & Beverage / Hospitality | Heritage tiffin counter, Chikmagalur coffee, loyalty passes | 9 | `CREATE TABLE`, `AUTOINCREMENT`, `UNIQUE`, `CHECK`, `INSERT`, `WHERE`, `BETWEEN`, `IN`, `LIKE`, `IS NULL`, `UPDATE`, `DELETE`, Aggregations | **Unlocked (Playable)** |
+| **4. Airport Operations** | Intermediate | Aviation & Transportation | Radar tracking, flight schedules (FIDS), passenger gates | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires Any 2 T1)** |
+| **5. Warehouse Management** | Intermediate | Logistics & Supply Chain | Automated conveyors, pallet racks, temperature vaults | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, `HAVING` | **Playable (Requires Any 2 T1)** |
+| **6. Hospital Administration** | Advanced | Healthcare & Clinical | Emergency admissions, doctor clinic rosters, bed wards | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires Any 2 T2)** |
+| **7. Bank Operations** | Advanced | Banking & Financial Services | Ledger balances, wire transfers, fraud anomaly audits | 6 | `CREATE TABLE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `JOIN`, `GROUP BY`, Aggregations | **Playable (Requires Any 2 T2)** |
 
 ---
 
@@ -139,7 +140,7 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 
 ---
 
-## 🛒 Curriculum Details: All 6 Worlds (43 Missions)
+## 🛒 Curriculum Details: All 7 Worlds (52 Missions)
 
 ### World 1: Supermarket Operations &bull; FreshMart Hypermarkets (Beginner &bull; 10 Missions)
 1. **Initialize Supermarket Store Workspace**: `CREATE TABLE store_branches` with `INTEGER PRIMARY KEY` and `NOT NULL`.
@@ -164,7 +165,18 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 8. **Purging Ghost Stations**: Execute `DELETE FROM stations WHERE status = 'Closed'` to remove migration test entries.
 9. **End-of-Day Executive Telemetry**: Single aggregate query computing `COUNT(*)`, `SUM()`, `ROUND(AVG(), 2)`, `MIN()`, and `MAX()`.
 
-### World 3: Airport Operations &bull; SkyHarbor International (Intermediate &bull; 6 Missions)
+### World 3: Query & Kaapi — Tiffin & Filter Coffee &bull; Heritage Tiffin Room (Beginner &bull; 9 Missions)
+1. **Booting the Menu Board**: `CREATE TABLE menu_items` with `INTEGER PRIMARY KEY`, `NOT NULL`, `DEFAULT 'Mild'`, and `DEFAULT 'Available'`.
+2. **Davara Loyalty Pass Vault**: `CREATE TABLE kaapi_passes` with `AUTOINCREMENT`, `UNIQUE`, and `CHECK (cups_left >= 0)`.
+3. **Stocking the Morning Counter**: Batch `INSERT INTO menu_items` loading 8 authentic South Indian tiffin items (Mysore Masala Dosa, Filter Coffee, Idli Vada Combo, etc.).
+4. **Counter Menu Recon**: Query `item_name AS dish_name` and `orders_today AS plates_sold` sorted by orders `DESC`.
+5. **Budget Tiffin & Combo Audit**: Query items in categories Dosa and Kaapi with `IN ('Dosa', 'Kaapi')` and `BETWEEN 30 AND 90`.
+6. **Calorie Audit & Name Scan**: Match newly introduced items missing calorie estimates (`IS NULL`) or containing "Masala" (`LIKE '%Masala%'`) with `status = 'Available'`.
+7. **Seasonal Brew Activation**: Update seasonal drink via `UPDATE menu_items SET status = 'Available', price_inr = 55 WHERE status = 'Seasonal'`.
+8. **Purging Deprecated Menu Dishes**: Execute `DELETE FROM menu_items WHERE status = 'Discontinued'` to clean up legacy test dishes.
+9. **Closing Shift Executive Tally**: Single aggregate query computing `COUNT(*)`, `SUM()`, `ROUND(AVG(), 2)`, `MIN()`, and `MAX()`.
+
+### World 4: Airport Operations &bull; SkyHarbor International (Intermediate &bull; 6 Missions)
 1. **Initialize Flights Tracking Table**: `CREATE TABLE flights` with aircraft codes, routes, and departure times.
 2. **Log Passenger Manifest Registrations**: `INSERT INTO passengers` with booking references.
 3. **Identify Delayed Flights**: Filter radar logs where `status = 'DELAYED'` or `departure_time` exceeds schedule.
@@ -172,7 +184,7 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 5. **Join Flights with Airline Carriers**: Link flight records with carrier partner manifests using `INNER JOIN`.
 6. **Analyze Terminal Passenger Traffic**: Aggregate departures and passenger volume per terminal with `GROUP BY` and `COUNT()`.
 
-### World 4: Warehouse Management &bull; Apex Global Logistics (Intermediate &bull; 6 Missions)
+### World 5: Warehouse Management &bull; Apex Global Logistics (Intermediate &bull; 6 Missions)
 1. **Deploy Pallet Storage Schema**: `CREATE TABLE storage_bins` with zone codes and weight capacities.
 2. **Receive Inbound Stock Manifest**: Record inbound pallet quantities into `inventory_stock`.
 3. **Audit Low-Stock Pallet Bins**: Query storage bins with stock levels falling below emergency reorder thresholds.
@@ -180,7 +192,7 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 5. **Reconcile Inbound Shipments with Vendors**: Join shipment tables with supplier directories to audit lead times.
 6. **Evaluate Departmental Space Utilization**: Calculate total cubic volume and utilized bins using `GROUP BY` and `HAVING`.
 
-### World 5: Hospital Administration &bull; Metro General Hospital (Advanced &bull; 6 Missions)
+### World 6: Hospital Administration &bull; Metro General Hospital (Advanced &bull; 6 Missions)
 1. **Initialize Ward & Bed Allocation Registry**: `CREATE TABLE beds` with ward identifiers and availability flags.
 2. **Admit Inpatient Case Records**: Insert patient intake manifests with attending physician associations.
 3. **Filter Active Emergency Admissions**: Query patient admissions filtered by triage urgency status.
@@ -188,7 +200,7 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 5. **Correlate Patients with Attending Doctors**: Multi-table relational query connecting `patients`, `admissions`, and `physicians`.
 6. **Analyze Average Departmental Length of Stay**: Compute patient occupancy times across medical departments using aggregations.
 
-### World 6: Bank Operations &bull; Apex National Trust (Advanced &bull; 6 Missions)
+### World 7: Bank Operations &bull; Apex National Trust (Advanced &bull; 6 Missions)
 1. **Create Customer Accounts Ledger**: `CREATE TABLE accounts` with balance constraints and account tiers.
 2. **Open High-Yield Savings Accounts**: Record new client account profiles with initial balances.
 3. **Audit High-Value Transactions**: Detect anomalous wire transfers exceeding compliance monitoring thresholds.
@@ -288,7 +300,7 @@ Visit **[http://localhost:3000](http://localhost:3000)** in your browser.
 ### Test Suite Execution
 
 ```bash
-# Run complete automated test suite (12 suites, 209 unit & scenario tests)
+# Run complete automated test suite (14 suites, 229 unit & scenario tests)
 npm test
 
 # Run tests in watch mode

@@ -20,6 +20,7 @@ import {
   Building2,
   Briefcase,
   TrainFront,
+  Coffee,
 } from 'lucide-react';
 
 interface WorldCardProps {
@@ -29,6 +30,7 @@ interface WorldCardProps {
 const iconComponentMap: Record<string, React.ReactNode> = {
   ShoppingCart: <ShoppingCart className="w-4 h-4" />,
   TrainFront: <TrainFront className="w-4 h-4" />,
+  Coffee: <Coffee className="w-4 h-4" />,
   Plane: <Plane className="w-4 h-4" />,
   Boxes: <Boxes className="w-4 h-4" />,
   Activity: <Activity className="w-4 h-4" />,

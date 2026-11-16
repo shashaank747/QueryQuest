@@ -22,12 +22,13 @@ describe('Tier-Based World Progression & Lock System (3x3)', () => {
     });
   });
 
-  it('should unlock all Beginner worlds (supermarket and metro) by default and lock Intermediate/Advanced', () => {
+  it('should unlock all 3 Beginner worlds (supermarket, metro, kaapi) by default and lock Intermediate/Advanced', () => {
     const { isWorldUnlocked } = useWorldStore.getState();
 
-    // Both Beginner worlds are open by default
+    // All 3 Beginner worlds are open by default
     expect(isWorldUnlocked('supermarket')).toBe(true);
     expect(isWorldUnlocked('metro')).toBe(true);
+    expect(isWorldUnlocked('kaapi')).toBe(true);
 
     // Intermediate and Advanced worlds are locked by default
     expect(isWorldUnlocked('airport')).toBe(false);
@@ -141,8 +142,8 @@ describe('Tier-Based World Progression & Lock System (3x3)', () => {
     expect(isWorldUnlocked('hospital')).toBe(true);
     expect(isWorldUnlocked('bank')).toBe(true);
 
-    // All 6 registered worlds are now unlocked
-    for (const id of ['supermarket', 'metro', 'airport', 'warehouse', 'hospital', 'bank']) {
+    // All 7 registered worlds are now unlocked
+    for (const id of ['supermarket', 'metro', 'kaapi', 'airport', 'warehouse', 'hospital', 'bank']) {
       expect(isWorldUnlocked(id)).toBe(true);
     }
   });
