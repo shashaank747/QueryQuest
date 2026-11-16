@@ -14,6 +14,10 @@ import {
   CheckCircle2,
   Lock,
   Truck,
+  Plane,
+  Boxes,
+  Activity,
+  Landmark,
 } from 'lucide-react';
 
 interface AchievementsModalProps {
@@ -29,6 +33,10 @@ const iconMap: Record<string, React.ReactNode> = {
   BarChart2: <BarChart2 className="w-5 h-5" />,
   Award: <Award className="w-5 h-5" />,
   Truck: <Truck className="w-5 h-5" />,
+  Plane: <Plane className="w-5 h-5" />,
+  Boxes: <Boxes className="w-5 h-5" />,
+  Activity: <Activity className="w-5 h-5" />,
+  Landmark: <Landmark className="w-5 h-5" />,
 };
 
 export const AchievementsModal: React.FC<AchievementsModalProps> = ({

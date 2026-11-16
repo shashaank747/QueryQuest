@@ -62,7 +62,7 @@ export const WorldGrid: React.FC = () => {
                 : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
             }`}
           >
-            Playable Now (World 1)
+            Playable Now (All 5 Worlds)
           </button>
         </div>
       </div>

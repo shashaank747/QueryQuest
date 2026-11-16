@@ -309,26 +309,30 @@ export const WorkspaceLayout: React.FC = () => {
               Certification Unlocked
             </span>
             <h3 className="text-xl font-black text-white mt-1">
-              Retail Data Analyst
+              {activeWorld?.storyIntro.roleTitle || 'Certified Database Analyst'}
             </h3>
             <p className="text-xs text-slate-300 mt-2 max-w-sm mx-auto leading-relaxed">
-              You engineered tables, audited inventories, solved checkout lane errors, and calculated category-wise sales metrics like a seasoned database analyst.
+              {activeWorld?.description || 'You engineered schemas, resolved operational bottlenecks, and generated executive intelligence like a seasoned database professional.'}
             </p>
           </div>
 
           <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-around font-mono text-xs">
             <div>
               <span className="text-slate-500 block text-[10px]">Total XP Earned</span>
-              <span className="font-bold text-emerald-400 text-sm">+1,570 XP</span>
+              <span className="font-bold text-emerald-400 text-sm">
+                +{activeWorld?.missions.reduce((sum, m) => sum + m.xpReward, 0) || 1500} XP
+              </span>
             </div>
             <div className="h-6 w-px bg-slate-800" />
             <div>
               <span className="text-slate-500 block text-[10px]">Missions Solved</span>
-              <span className="font-bold text-sky-400 text-sm">10 / 10</span>
+              <span className="font-bold text-sky-400 text-sm">
+                {activeWorld?.missions.length} / {activeWorld?.missions.length}
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
             <Button
               variant="secondary"
               size="md"
@@ -343,10 +347,13 @@ export const WorkspaceLayout: React.FC = () => {
             <Button
               variant="primary"
               size="md"
-              onClick={closeWorldCompletedModal}
+              onClick={() => {
+                closeWorldCompletedModal();
+                useWorldStore.getState().setActiveWorld(null);
+              }}
               icon={<ArrowRight className="w-4 h-4" />}
             >
-              Continue Practice
+              Next Industry World
             </Button>
           </div>
         </div>

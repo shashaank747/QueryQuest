@@ -383,7 +383,8 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       );
       if (allCompleted) {
         await useUserStore.getState().markWorldCompleted(activeWorld.id);
-        await useUserStore.getState().unlockAchievement('supermarket_master');
+        const worldMasterBadge = `${activeWorld.id}_master`;
+        await useUserStore.getState().unlockAchievement(worldMasterBadge);
         set({ isWorldCompletedModalOpen: true });
       } else if (nextMission) {
         // "if correct and expected output is there then next task will be shown"
