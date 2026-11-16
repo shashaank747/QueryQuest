@@ -53,7 +53,7 @@ const getInitialRightWidth = (): number => {
 };
 
 export const WorkspaceLayout: React.FC = () => {
-  const { activeWorld } = useWorldStore();
+  const { activeWorld, worlds, setActiveWorld } = useWorldStore();
   const { initializeForWorld } = useSqlStore();
   const { theme } = useThemeStore();
   const isLight = theme === 'slate-100';
@@ -62,6 +62,12 @@ export const WorkspaceLayout: React.FC = () => {
     isWorldCompletedModalOpen,
     closeWorldCompletedModal,
   } = useMissionStore();
+
+  const currentWorldIndex = activeWorld ? worlds.findIndex((w) => w.id === activeWorld.id) : -1;
+  const nextWorld =
+    currentWorldIndex >= 0 && currentWorldIndex < worlds.length - 1
+      ? worlds[currentWorldIndex + 1]
+      : null;
 
   const [activeMobileTab, setActiveMobileTab] = useState<'mission' | 'editor' | 'schema'>('editor');
   const [isReportOpen, setIsReportOpen] = useState(false);
@@ -344,17 +350,31 @@ export const WorkspaceLayout: React.FC = () => {
             >
               Inspect Final Business Report
             </Button>
-            <Button
-              variant="primary"
-              size="md"
-              onClick={() => {
-                closeWorldCompletedModal();
-                useWorldStore.getState().setActiveWorld(null);
-              }}
-              icon={<ArrowRight className="w-4 h-4" />}
-            >
-              Next Industry World
-            </Button>
+            {nextWorld ? (
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => {
+                  closeWorldCompletedModal();
+                  setActiveWorld(nextWorld.id);
+                }}
+                icon={<ArrowRight className="w-4 h-4" />}
+              >
+                Launch Next World: {nextWorld.name} &rarr;
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => {
+                  closeWorldCompletedModal();
+                  setActiveWorld(null);
+                }}
+                icon={<ArrowRight className="w-4 h-4" />}
+              >
+                Back to Dashboard (All Mastered!)
+              </Button>
+            )}
           </div>
         </div>
       </Modal>

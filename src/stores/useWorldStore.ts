@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { WorldDefinition, WorldProgress } from '../types/world';
 import { WORLDS_REGISTRY, getWorldById } from '../modules/worlds/registry';
 import { persistenceService } from '../services/persistence/db-store';
+import { useUserStore } from './useUserStore';
 
 interface WorldState {
   worlds: WorldDefinition[];
@@ -10,6 +11,7 @@ interface WorldState {
   setActiveWorld: (worldId: string | null) => void;
   refreshWorldProgress: (worldId: string) => Promise<void>;
   initWorlds: () => Promise<void>;
+  isWorldUnlocked: (worldId: string) => boolean;
 }
 
 export const useWorldStore = create<WorldState>((set, get) => ({
@@ -17,9 +19,39 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   activeWorld: null,
   worldProgress: {},
 
+  isWorldUnlocked: (worldId: string): boolean => {
+    const { worlds, worldProgress } = get();
+    const index = worlds.findIndex((w) => w.id === worldId);
+    if (index <= 0) return true; // World 1 is always unlocked
+
+    const prevWorld = worlds[index - 1];
+    if (!prevWorld) return false;
+
+    // Check if previous world is completed in worldProgress
+    if (worldProgress[prevWorld.id]?.isCompleted) {
+      return true;
+    }
+
+    // Check if previous world is marked completed in user profile
+    try {
+      const { profile } = useUserStore.getState();
+      if (profile?.completedWorlds?.includes(prevWorld.id)) {
+        return true;
+      }
+    } catch {
+      // User store fallback
+    }
+
+    return false;
+  },
+
   setActiveWorld: (worldId: string | null) => {
     if (!worldId) {
       set({ activeWorld: null });
+      return;
+    }
+    // Only allow setting active world if it is unlocked
+    if (!get().isWorldUnlocked(worldId)) {
       return;
     }
     const world = getWorldById(worldId);

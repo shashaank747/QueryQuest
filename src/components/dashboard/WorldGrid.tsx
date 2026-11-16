@@ -6,15 +6,15 @@ import { WorldCard } from './WorldCard';
 import { Sparkles, ArrowLeft, Database } from 'lucide-react';
 
 export const WorldGrid: React.FC = () => {
-  const { worlds } = useWorldStore();
+  const { worlds, isWorldUnlocked } = useWorldStore();
   const { theme } = useThemeStore();
   const { setSelectedTrack } = useTrackStore();
-  const [filter, setFilter] = useState<'all' | 'available'>('all');
+  const [filter, setFilter] = useState<'all' | 'unlocked'>('all');
 
   const isLight = theme === 'slate-100';
 
   const filteredWorlds =
-    filter === 'available' ? worlds.filter((w) => w.isAvailable) : worlds;
+    filter === 'unlocked' ? worlds.filter((w) => isWorldUnlocked(w.id)) : worlds;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
@@ -43,9 +43,9 @@ export const WorldGrid: React.FC = () => {
 
       {/* Hero Section */}
       <div className="mb-10 text-center max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-xs font-semibold mb-4">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-xs font-semibold mb-4">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>MySQL Track &bull; 5 Interactive Business Case Studies</span>
+          <span>Progressive World Unlock &bull; Complete World 1 (Supermarket) to unlock next industries</span>
         </div>
         <h1
           className={`text-3xl sm:text-5xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'
@@ -75,15 +75,15 @@ export const WorldGrid: React.FC = () => {
             All Industry Worlds ({worlds.length})
           </button>
           <button
-            onClick={() => setFilter('available')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${filter === 'available'
+            onClick={() => setFilter('unlocked')}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${filter === 'unlocked'
               ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
               : isLight
                 ? 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
                 : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
               }`}
           >
-            Playable Now (All 5 Worlds)
+            Unlocked Worlds ({worlds.filter((w) => isWorldUnlocked(w.id)).length})
           </button>
         </div>
       </div>

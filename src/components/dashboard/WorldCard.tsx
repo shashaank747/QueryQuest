@@ -48,10 +48,14 @@ const accentColors: Record<string, { light: string; dark: string; border: string
 };
 
 export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
-  const { setActiveWorld, worldProgress } = useWorldStore();
+  const { setActiveWorld, worldProgress, worlds, isWorldUnlocked } = useWorldStore();
   const { theme } = useThemeStore();
   const isLight = theme === 'slate-100';
   const [isFlipped, setIsFlipped] = useState(false);
+
+  const isUnlocked = isWorldUnlocked(world.id);
+  const worldIndex = worlds.findIndex((w) => w.id === world.id);
+  const prevWorld = worldIndex > 0 ? worlds[worldIndex - 1] : null;
 
   // Auto-flip back to front after 60 seconds if not turned back by the user
   useEffect(() => {
@@ -76,15 +80,14 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
   // Front Face Component
   const frontContent = (
     <div
-      className={`w-full h-full flex flex-col justify-between border rounded-[26px] overflow-hidden select-none transition-colors duration-200 ${
-        world.isAvailable
+      className={`w-full h-full flex flex-col justify-between border rounded-[26px] overflow-hidden select-none transition-colors duration-200 ${isUnlocked
           ? isLight
             ? 'bg-white border-slate-200/90 shadow-sm'
             : 'bg-slate-900 border-slate-800'
           : isLight
-          ? 'bg-slate-100/80 border-slate-200 opacity-90'
-          : 'bg-slate-900/60 border-slate-800/80 opacity-85'
-      }`}
+            ? 'bg-slate-100/90 border-slate-200 opacity-85'
+            : 'bg-slate-900/60 border-slate-800/80 opacity-75'
+        }`}
     >
       {/* Visual Thumbnail Cover Banner */}
       {world.thumbnailUrl ? (
@@ -92,20 +95,37 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           <img
             src={world.thumbnailUrl}
             alt={world.name}
-            className="w-full h-full object-cover transition-transform duration-700 hover:scale-105 pointer-events-none"
+            className={`w-full h-full object-cover transition-transform duration-700 hover:scale-105 pointer-events-none ${!isUnlocked ? 'filter grayscale-[0.4] brightness-75' : ''
+              }`}
           />
           {/* Subtle gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-black/35 pointer-events-none" />
 
+          {/* Locked State Frost Overlay */}
+          {!isUnlocked && (
+            <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] flex flex-col items-center justify-center text-center p-3 pointer-events-none z-10">
+              <div className="w-9 h-9 rounded-full bg-slate-900/90 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-1.5 shadow-lg shadow-black/50">
+                <Lock className="w-4 h-4" />
+              </div>
+              <span className="text-xs font-bold text-slate-100">
+                Locked &bull; World {worldIndex + 1}
+              </span>
+              <span className="text-[10px] text-slate-300 mt-0.5 max-w-[210px] leading-tight">
+                Complete {prevWorld?.name || 'Previous World'} to unlock
+              </span>
+            </div>
+          )}
+
           {/* Top badges on image */}
-          <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-auto">
-            {world.isAvailable ? (
+          <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-auto z-20">
+            {isUnlocked ? (
               <span className="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 backdrop-blur-md">
                 Live Case Study
               </span>
             ) : (
-              <span className="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-slate-900/80 text-slate-400 border border-slate-700/50 backdrop-blur-md">
-                Roadmap Preview
+              <span className="px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider bg-amber-950/85 text-amber-300 border border-amber-500/40 backdrop-blur-md flex items-center gap-1">
+                <Lock className="w-3 h-3 text-amber-400" />
+                Locked
               </span>
             )}
 
@@ -135,11 +155,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           {/* Floating category icon overlapping bottom edge */}
           <div className="absolute -bottom-3 left-4 pointer-events-none">
             <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center border shadow-md ${
-                isLight
+              className={`w-9 h-9 rounded-xl flex items-center justify-center border shadow-md ${isLight
                   ? `bg-white border-slate-200 ${activeColor.light} shadow-slate-200/60`
                   : `bg-slate-900 border-slate-700 ${activeColor.dark} shadow-black/50`
-              }`}
+                }`}
             >
               {iconComponentMap[world.iconName] || <Landmark className="w-4 h-4" />}
             </div>
@@ -149,11 +168,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
         /* Fallback if no thumbnail */
         <div className="p-4 pb-0 flex items-start justify-between">
           <div
-            className={`w-9 h-9 rounded-xl flex items-center justify-center border ${
-              isLight
+            className={`w-9 h-9 rounded-xl flex items-center justify-center border ${isLight
                 ? `bg-white border-slate-200 ${activeColor.light}`
                 : `bg-slate-900 border-slate-700 ${activeColor.dark}`
-            }`}
+              }`}
           >
             {iconComponentMap[world.iconName] || <ShoppingCart className="w-4 h-4" />}
           </div>
@@ -188,16 +206,14 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
             {world.industry}
           </div>
           <h3
-            className={`text-lg font-bold tracking-tight leading-snug ${
-              isLight ? 'text-slate-900' : 'text-slate-100'
-            }`}
+            className={`text-lg font-bold tracking-tight leading-snug ${isLight ? 'text-slate-900' : 'text-slate-100'
+              }`}
           >
             {world.name}
           </h3>
           <p
-            className={`text-xs ${
-              isLight ? 'text-slate-600' : 'text-slate-400'
-            } mt-1 line-clamp-2 leading-relaxed`}
+            className={`text-xs ${isLight ? 'text-slate-600' : 'text-slate-400'
+              } mt-1 line-clamp-2 leading-relaxed`}
           >
             {world.tagline || world.description}
           </p>
@@ -208,20 +224,18 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
           {world.sqlTopics.slice(0, 3).map((topic, i) => (
             <span
               key={i}
-              className={`text-[9.5px] px-2 py-0.5 rounded-md ${
-                isLight
+              className={`text-[9.5px] px-2 py-0.5 rounded-md ${isLight
                   ? 'bg-slate-100 text-slate-700 border border-slate-200'
                   : 'bg-slate-800 text-slate-300 border border-slate-700/60'
-              } font-mono`}
+                } font-mono`}
             >
               {topic}
             </span>
           ))}
           {world.sqlTopics.length > 3 && (
             <span
-              className={`text-[9.5px] px-1.5 py-0.5 rounded-md ${
-                isLight ? 'bg-slate-100 text-slate-500' : 'bg-slate-800 text-slate-500'
-              } font-mono`}
+              className={`text-[9.5px] px-1.5 py-0.5 rounded-md ${isLight ? 'bg-slate-100 text-slate-500' : 'bg-slate-800 text-slate-500'
+                } font-mono`}
             >
               +{world.sqlTopics.length - 3} more
             </span>
@@ -231,21 +245,19 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
       {/* Footer & Primary Action */}
       <div
-        className={`px-4 py-2.5 border-t ${
-          isLight ? 'border-slate-100 bg-slate-50/70' : 'border-slate-800/60 bg-slate-950/30'
-        }`}
+        className={`px-4 py-2.5 border-t ${isLight ? 'border-slate-100 bg-slate-50/70' : 'border-slate-800/60 bg-slate-950/30'
+          }`}
       >
-        {world.isAvailable ? (
+        {isUnlocked ? (
           <div>
             <div
-              className={`flex items-center justify-between text-[11px] ${
-                isLight ? 'text-slate-600' : 'text-slate-400'
-              } mb-1.5`}
+              className={`flex items-center justify-between text-[11px] ${isLight ? 'text-slate-600' : 'text-slate-400'
+                } mb-1.5`}
             >
               <span className="font-medium">
                 {progress.isCompleted ? (
                   <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> All 10 Missions Completed
+                    <CheckCircle2 className="w-3 h-3" /> All {progress.totalMissionsCount} Missions Completed
                   </span>
                 ) : (
                   `${progress.completedMissionsCount} of ${progress.totalMissionsCount} Missions`
@@ -258,9 +270,8 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
             {/* Progress Bar */}
             <div
-              className={`w-full h-1.5 ${
-                isLight ? 'bg-slate-200' : 'bg-slate-800'
-              } rounded-full overflow-hidden mb-2`}
+              className={`w-full h-1.5 ${isLight ? 'bg-slate-200' : 'bg-slate-800'
+                } rounded-full overflow-hidden mb-2`}
             >
               <div
                 className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300 rounded-full"
@@ -281,17 +292,22 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
         ) : (
           <div>
             <div
-              className={`flex items-center justify-between text-[11px] ${
-                isLight ? 'text-slate-500' : 'text-slate-500'
-              } mb-2`}
+              className={`flex items-center justify-between text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'
+                } mb-2`}
             >
-              <span className="flex items-center gap-1">
-                <Lock className="w-3 h-3" /> Coming in Next Phase
+              <span className="flex items-center gap-1 text-amber-500 font-semibold">
+                <Lock className="w-3 h-3 text-amber-500" /> Complete World {worldIndex}: {prevWorld?.name || 'Previous World'}
               </span>
-              <span className="font-mono text-[10px]">Roadmap</span>
+              <span className="font-mono text-[10px] text-slate-400">World {worldIndex + 1} of {worlds.length}</span>
             </div>
-            <Button variant="secondary" className="w-full py-1.5 text-xs" disabled data-no-flip>
-              Preview Only
+            <Button
+              variant="secondary"
+              className="w-full py-1.5 text-xs opacity-60 cursor-not-allowed"
+              disabled
+              data-no-flip
+              icon={<Lock className="w-3.5 h-3.5" />}
+            >
+              Locked (Complete World {worldIndex} First)
             </Button>
           </div>
         )}
@@ -308,11 +324,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
   // Back Face Component (Full Dossier & Architecture Specs)
   const backContent = (
     <div
-      className={`w-full h-full flex flex-col justify-between p-4 border rounded-[26px] overflow-hidden select-none transition-colors duration-200 ${
-        isLight
+      className={`w-full h-full flex flex-col justify-between p-4 border rounded-[26px] overflow-hidden select-none transition-colors duration-200 ${isLight
           ? 'bg-gradient-to-br from-white via-slate-50 to-slate-100/90 border-slate-200 text-slate-800'
           : 'bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 border-slate-800 text-slate-100'
-      }`}
+        }`}
     >
       {/* Dossier Header */}
       <div>
@@ -354,11 +369,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
       <div className="flex-1 flex flex-col justify-between my-2 overflow-hidden">
         {/* Scenario Background */}
         <div
-          className={`p-2 rounded-xl border text-xs leading-relaxed ${
-            isLight
+          className={`p-2 rounded-xl border text-xs leading-relaxed ${isLight
               ? 'bg-slate-100/70 border-slate-200 text-slate-700'
               : 'bg-slate-950/60 border-slate-800 text-slate-300'
-          }`}
+            }`}
         >
           <div className="text-[9.5px] uppercase font-bold tracking-wider text-emerald-600 dark:text-emerald-400 mb-0.5">
             Operational Context
@@ -390,22 +404,20 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
             {world.sqlTopics.slice(0, 8).map((topic, idx) => (
               <span
                 key={idx}
-                className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono border ${
-                  isLight
+                className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono border ${isLight
                     ? 'bg-white border-slate-200 text-slate-700'
                     : 'bg-slate-800/80 border-slate-700/60 text-slate-300'
-                }`}
+                  }`}
               >
                 {topic}
               </span>
             ))}
             {world.sqlTopics.length > 8 && (
               <span
-                className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono border ${
-                  isLight
+                className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono border ${isLight
                     ? 'bg-slate-100 border-slate-200 text-slate-500'
                     : 'bg-slate-800 border-slate-700 text-slate-400'
-                }`}
+                  }`}
               >
                 +{world.sqlTopics.length - 8} more
               </span>
@@ -416,11 +428,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
       {/* Dossier Footer Actions */}
       <div
-        className={`pt-2 border-t ${
-          isLight ? 'border-slate-200' : 'border-slate-800'
-        }`}
+        className={`pt-2 border-t ${isLight ? 'border-slate-200' : 'border-slate-800'
+          }`}
       >
-        {world.isAvailable ? (
+        {isUnlocked ? (
           <Button
             variant="primary"
             className="w-full py-1.5 text-xs"
@@ -431,8 +442,14 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
             {progress.completedMissionsCount > 0 ? 'Resume Operations' : 'Enter World'}
           </Button>
         ) : (
-          <Button variant="secondary" className="w-full py-1.5 text-xs" disabled data-no-flip>
-            <Lock className="w-3 h-3 mr-1" /> Preview Only (Coming Soon)
+          <Button
+            variant="secondary"
+            className="w-full py-1.5 text-xs opacity-60 cursor-not-allowed"
+            disabled
+            data-no-flip
+            icon={<Lock className="w-3.5 h-3.5" />}
+          >
+            Locked &bull; Complete {prevWorld?.name || 'Previous World'}
           </Button>
         )}
       </div>
