@@ -57,7 +57,7 @@ export const TrackSelectionPage: React.FC = () => {
         >
           <div>
             {/* Header & Badges */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-4">
               <div className="w-13 h-13 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center p-3 text-emerald-500 group-hover:scale-110 transition-transform">
                 <FileSpreadsheet className="w-7 h-7" />
               </div>
@@ -65,6 +65,17 @@ export const TrackSelectionPage: React.FC = () => {
                 <Clock className="w-3 h-3" />
                 Coming Soon
               </span>
+            </div>
+
+            {/* Track Banner Illustration */}
+            <div className="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden mb-5 border border-slate-200/80 dark:border-slate-800/80 bg-slate-950 flex-shrink-0 group/banner shadow-inner">
+              <img
+                src="/images/tracks/excel-track-banner.svg"
+                alt="Excel Track Banner"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
             </div>
 
             {/* Title & Subtitle */}
@@ -139,7 +150,7 @@ export const TrackSelectionPage: React.FC = () => {
 
           <div>
             {/* Header & Badges */}
-            <div className="flex items-center justify-between mb-5 mt-1">
+            <div className="flex items-center justify-between mb-4 mt-1">
               <div className="w-13 h-13 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center p-3 text-cyan-400 group-hover:scale-110 transition-transform">
                 <Database className="w-7 h-7 text-cyan-500" />
               </div>
@@ -147,6 +158,17 @@ export const TrackSelectionPage: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 Featured Game
               </span>
+            </div>
+
+            {/* Track Banner Illustration */}
+            <div className="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden mb-5 border border-cyan-500/30 dark:border-cyan-500/40 bg-slate-950 flex-shrink-0 group/banner shadow-inner">
+              <img
+                src="/images/tracks/mysql-track-banner.svg"
+                alt="MySQL Track Banner"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
             </div>
 
             {/* Title & Subtitle */}
@@ -214,7 +236,7 @@ export const TrackSelectionPage: React.FC = () => {
         >
           <div>
             {/* Header & Badges */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-4">
               <div className="w-13 h-13 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center p-3 text-amber-500 group-hover:scale-110 transition-transform">
                 <BarChart3 className="w-7 h-7" />
               </div>
@@ -222,6 +244,17 @@ export const TrackSelectionPage: React.FC = () => {
                 <Clock className="w-3 h-3" />
                 Coming Soon
               </span>
+            </div>
+
+            {/* Track Banner Illustration */}
+            <div className="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden mb-5 border border-slate-200/80 dark:border-slate-800/80 bg-slate-950 flex-shrink-0 group/banner shadow-inner">
+              <img
+                src="/images/tracks/powerbi-track-banner.svg"
+                alt="Power BI Track Banner"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
             </div>
 
             {/* Title & Subtitle */}
