@@ -16,7 +16,11 @@ interface WorkerMessage {
 }
 
 function determineAction(sql: string): 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'CREATE' | 'ALTER' | 'DROP' | 'TRANSACTION' | 'OTHER' {
-  const clean = sql.trim().toUpperCase();
+  const clean = sql
+    .replace(/--[^\n]*/g, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .trim()
+    .toUpperCase();
   if (/^(BEGIN|COMMIT|ROLLBACK)/.test(clean)) return 'TRANSACTION';
   if (/^SELECT\b|^WITH\b|^EXPLAIN\b/.test(clean)) return 'SELECT';
   if (/^INSERT\b/.test(clean)) return 'INSERT';

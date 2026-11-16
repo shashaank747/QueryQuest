@@ -13,6 +13,7 @@ import {
   Award,
   CheckCircle2,
   Lock,
+  Truck,
 } from 'lucide-react';
 
 interface AchievementsModalProps {
@@ -27,6 +28,7 @@ const iconMap: Record<string, React.ReactNode> = {
   GitFork: <GitFork className="w-5 h-5" />,
   BarChart2: <BarChart2 className="w-5 h-5" />,
   Award: <Award className="w-5 h-5" />,
+  Truck: <Truck className="w-5 h-5" />,
 };
 
 export const AchievementsModal: React.FC<AchievementsModalProps> = ({

@@ -18,6 +18,14 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
     xpReward: 100,
   },
   {
+    id: 'supply_partner',
+    title: 'Supply Chain Partner',
+    description: 'Register a new strategic vendor record into the suppliers registry.',
+    icon: 'Truck',
+    category: 'missions',
+    xpReward: 120,
+  },
+  {
     id: 'data_investigator',
     title: 'Data Investigator',
     description: 'Diagnose and pinpoint the operational root cause behind an inventory mismatch.',
