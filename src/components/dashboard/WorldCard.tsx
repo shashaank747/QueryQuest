@@ -19,6 +19,7 @@ import {
   Database,
   Building2,
   Briefcase,
+  TrainFront,
 } from 'lucide-react';
 
 interface WorldCardProps {
@@ -27,6 +28,7 @@ interface WorldCardProps {
 
 const iconComponentMap: Record<string, React.ReactNode> = {
   ShoppingCart: <ShoppingCart className="w-4 h-4" />,
+  TrainFront: <TrainFront className="w-4 h-4" />,
   Plane: <Plane className="w-4 h-4" />,
   Boxes: <Boxes className="w-4 h-4" />,
   Activity: <Activity className="w-4 h-4" />,
@@ -41,6 +43,7 @@ const difficultyVariants: Record<string, 'emerald' | 'amber' | 'rose'> = {
 
 const accentColors: Record<string, { light: string; dark: string; border: string }> = {
   emerald: { light: 'text-emerald-600', dark: 'text-emerald-400', border: 'border-emerald-500/30' },
+  purple: { light: 'text-purple-600', dark: 'text-purple-400', border: 'border-purple-500/30' },
   sky: { light: 'text-sky-600', dark: 'text-sky-400', border: 'border-sky-500/30' },
   amber: { light: 'text-amber-600', dark: 'text-amber-400', border: 'border-amber-500/30' },
   rose: { light: 'text-rose-600', dark: 'text-rose-400', border: 'border-rose-500/30' },
@@ -48,14 +51,13 @@ const accentColors: Record<string, { light: string; dark: string; border: string
 };
 
 export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
-  const { setActiveWorld, worldProgress, worlds, isWorldUnlocked } = useWorldStore();
+  const { setActiveWorld, worldProgress, isWorldUnlocked, getWorldUnlockRequirement } = useWorldStore();
   const { theme } = useThemeStore();
   const isLight = theme === 'slate-100';
   const [isFlipped, setIsFlipped] = useState(false);
 
   const isUnlocked = isWorldUnlocked(world.id);
-  const worldIndex = worlds.findIndex((w) => w.id === world.id);
-  const prevWorld = worldIndex > 0 ? worlds[worldIndex - 1] : null;
+  const unlockReq = getWorldUnlockRequirement(world.id);
 
   // Auto-flip back to front after 60 seconds if not turned back by the user
   useEffect(() => {
@@ -108,10 +110,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
                 <Lock className="w-4 h-4" />
               </div>
               <span className="text-xs font-bold text-slate-100">
-                Locked &bull; World {worldIndex + 1}
+                Locked &bull; {world.difficulty} Tier
               </span>
               <span className="text-[10px] text-slate-300 mt-0.5 max-w-[210px] leading-tight">
-                Complete {prevWorld?.name || 'Previous World'} to unlock
+                {unlockReq.description}
               </span>
             </div>
           )}
@@ -295,10 +297,10 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
               className={`flex items-center justify-between text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'
                 } mb-2`}
             >
-              <span className="flex items-center gap-1 text-amber-500 font-semibold">
-                <Lock className="w-3 h-3 text-amber-500" /> Complete World {worldIndex}: {prevWorld?.name || 'Previous World'}
+              <span className="flex items-center gap-1 text-amber-500 font-semibold truncate max-w-[210px]">
+                <Lock className="w-3 h-3 text-amber-500 flex-shrink-0" /> {unlockReq.description}
               </span>
-              <span className="font-mono text-[10px] text-slate-400">World {worldIndex + 1} of {worlds.length}</span>
+              <span className="font-mono text-[10px] text-slate-400 flex-shrink-0">{world.difficulty} Tier</span>
             </div>
             <Button
               variant="secondary"
@@ -307,7 +309,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
               data-no-flip
               icon={<Lock className="w-3.5 h-3.5" />}
             >
-              Locked (Complete World {worldIndex} First)
+              Locked ({unlockReq.description})
             </Button>
           </div>
         )}
@@ -449,7 +451,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
             data-no-flip
             icon={<Lock className="w-3.5 h-3.5" />}
           >
-            Locked &bull; Complete {prevWorld?.name || 'Previous World'}
+            Locked &bull; {unlockReq.description}
           </Button>
         )}
       </div>

@@ -38,12 +38,13 @@ describe('Quest Query Track Selection & Navigation', () => {
     expect(useTrackStore.getState().previewTrack).toBeNull();
   });
 
-  it('should maintain all 5 worlds in the registry when on MySQL track', () => {
+  it('should maintain all active worlds in the registry when on MySQL track', () => {
     useTrackStore.getState().setSelectedTrack('mysql');
     const { worlds } = useWorldStore.getState();
-    expect(worlds).toHaveLength(5);
+    expect(worlds).toHaveLength(6);
     expect(worlds.map((w) => w.id)).toEqual([
       'supermarket',
+      'metro',
       'airport',
       'warehouse',
       'hospital',

@@ -36,7 +36,7 @@ export const WorldGrid: React.FC = () => {
           <span>/</span>
           <span className="text-cyan-500 flex items-center gap-1 font-bold">
             <Database className="w-3.5 h-3.5" />
-            MySQL Track (5 Worlds)
+            MySQL Track ({worlds.length} Worlds)
           </span>
         </div>
       </div>
@@ -45,7 +45,7 @@ export const WorldGrid: React.FC = () => {
       <div className="mb-10 text-center max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-xs font-semibold mb-4">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Progressive World Unlock &bull; Complete World 1 (Supermarket) to unlock next industries</span>
+          <span>Progressive 3-Tier System &bull; Complete any 2 Beginner worlds to unlock Intermediate</span>
         </div>
         <h1
           className={`text-3xl sm:text-5xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'

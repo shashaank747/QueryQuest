@@ -12,6 +12,13 @@ interface WorldState {
   refreshWorldProgress: (worldId: string) => Promise<void>;
   initWorlds: () => Promise<void>;
   isWorldUnlocked: (worldId: string) => boolean;
+  getWorldUnlockRequirement: (worldId: string) => {
+    isUnlocked: boolean;
+    requiredTier: string;
+    completedInTier: number;
+    requiredCount: number;
+    description: string;
+  };
 }
 
 export const useWorldStore = create<WorldState>((set, get) => ({
@@ -20,29 +27,87 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   worldProgress: {},
 
   isWorldUnlocked: (worldId: string): boolean => {
+    return get().getWorldUnlockRequirement(worldId).isUnlocked;
+  },
+
+  getWorldUnlockRequirement: (worldId: string) => {
     const { worlds, worldProgress } = get();
-    const index = worlds.findIndex((w) => w.id === worldId);
-    if (index <= 0) return true; // World 1 is always unlocked
-
-    const prevWorld = worlds[index - 1];
-    if (!prevWorld) return false;
-
-    // Check if previous world is completed in worldProgress
-    if (worldProgress[prevWorld.id]?.isCompleted) {
-      return true;
+    const world = worlds.find((w) => w.id === worldId);
+    if (!world) {
+      return {
+        isUnlocked: false,
+        requiredTier: 'Unknown',
+        completedInTier: 0,
+        requiredCount: 0,
+        description: 'World not found',
+      };
     }
 
-    // Check if previous world is marked completed in user profile
-    try {
-      const { profile } = useUserStore.getState();
-      if (profile?.completedWorlds?.includes(prevWorld.id)) {
-        return true;
+    // All Beginner worlds are unlocked by default
+    if (world.difficulty === 'Beginner') {
+      return {
+        isUnlocked: true,
+        requiredTier: 'Beginner',
+        completedInTier: 0,
+        requiredCount: 0,
+        description: 'Unlocked by default',
+      };
+    }
+
+    const isWorldDone = (id: string) => {
+      if (worldProgress[id]?.isCompleted) return true;
+      try {
+        const { profile } = useUserStore.getState();
+        if (profile?.completedWorlds?.includes(id)) return true;
+      } catch {
+        // User store fallback
       }
-    } catch {
-      // User store fallback
+      return false;
+    };
+
+    const beginnerWorlds = worlds.filter((w) => w.difficulty === 'Beginner');
+    const intermediateWorlds = worlds.filter((w) => w.difficulty === 'Intermediate');
+
+    const completedBeginnerCount = beginnerWorlds.filter((w) => isWorldDone(w.id)).length;
+    const completedIntermediateCount = intermediateWorlds.filter((w) => isWorldDone(w.id)).length;
+
+    if (world.difficulty === 'Intermediate') {
+      const required = Math.min(2, beginnerWorlds.length);
+      const isUnlocked = completedBeginnerCount >= required;
+      const remaining = Math.max(0, required - completedBeginnerCount);
+      return {
+        isUnlocked,
+        requiredTier: 'Beginner',
+        completedInTier: completedBeginnerCount,
+        requiredCount: required,
+        description: isUnlocked
+          ? 'Unlocked'
+          : `Complete ${remaining} more Beginner World${remaining > 1 ? 's' : ''} to unlock`,
+      };
     }
 
-    return false;
+    if (world.difficulty === 'Advanced') {
+      const required = Math.min(2, intermediateWorlds.length);
+      const isUnlocked = completedIntermediateCount >= required;
+      const remaining = Math.max(0, required - completedIntermediateCount);
+      return {
+        isUnlocked,
+        requiredTier: 'Intermediate',
+        completedInTier: completedIntermediateCount,
+        requiredCount: required,
+        description: isUnlocked
+          ? 'Unlocked'
+          : `Complete ${remaining} more Intermediate World${remaining > 1 ? 's' : ''} to unlock`,
+      };
+    }
+
+    return {
+      isUnlocked: true,
+      requiredTier: 'Beginner',
+      completedInTier: 0,
+      requiredCount: 0,
+      description: 'Unlocked',
+    };
   },
 
   setActiveWorld: (worldId: string | null) => {

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useWorldStore } from '../src/stores/useWorldStore';
 import { useUserStore } from '../src/stores/useUserStore';
 
-describe('Sequential World Progression & Lock System', () => {
+describe('Tier-Based World Progression & Lock System (3x3)', () => {
   beforeEach(() => {
     useWorldStore.setState({
       activeWorld: null,
@@ -22,20 +22,21 @@ describe('Sequential World Progression & Lock System', () => {
     });
   });
 
-  it('should unlock World 1 (supermarket) by default and lock Worlds 2 to 5', () => {
+  it('should unlock all Beginner worlds (supermarket and metro) by default and lock Intermediate/Advanced', () => {
     const { isWorldUnlocked } = useWorldStore.getState();
 
-    // World 1 must be unlocked
+    // Both Beginner worlds are open by default
     expect(isWorldUnlocked('supermarket')).toBe(true);
+    expect(isWorldUnlocked('metro')).toBe(true);
 
-    // Worlds 2 to 5 must be locked
+    // Intermediate and Advanced worlds are locked by default
     expect(isWorldUnlocked('airport')).toBe(false);
     expect(isWorldUnlocked('warehouse')).toBe(false);
     expect(isWorldUnlocked('hospital')).toBe(false);
     expect(isWorldUnlocked('bank')).toBe(false);
   });
 
-  it('should prevent entering locked worlds via setActiveWorld', () => {
+  it('should prevent entering locked Intermediate/Advanced worlds via setActiveWorld', () => {
     const { setActiveWorld } = useWorldStore.getState();
 
     // Attempting to set locked world as active
@@ -45,15 +46,18 @@ describe('Sequential World Progression & Lock System', () => {
     setActiveWorld('bank');
     expect(useWorldStore.getState().activeWorld).toBeNull();
 
-    // Unlocked world (supermarket) can be entered
+    // Unlocked worlds (supermarket, metro) can be entered
     setActiveWorld('supermarket');
     expect(useWorldStore.getState().activeWorld?.id).toBe('supermarket');
+
+    setActiveWorld('metro');
+    expect(useWorldStore.getState().activeWorld?.id).toBe('metro');
   });
 
-  it('should unlock World 2 (airport) when World 1 (supermarket) is completed', () => {
-    const { isWorldUnlocked } = useWorldStore.getState();
+  it('should unlock Intermediate tier when any 2 Beginner worlds are completed', () => {
+    const { isWorldUnlocked, getWorldUnlockRequirement } = useWorldStore.getState();
 
-    // Complete supermarket in worldProgress
+    // Completing 1 beginner world leaves Intermediate locked (1 more needed)
     useWorldStore.setState({
       worldProgress: {
         supermarket: {
@@ -66,12 +70,27 @@ describe('Sequential World Progression & Lock System', () => {
       },
     });
 
-    // World 1 & 2 now unlocked
-    expect(isWorldUnlocked('supermarket')).toBe(true);
-    expect(isWorldUnlocked('airport')).toBe(true);
+    expect(isWorldUnlocked('airport')).toBe(false);
+    expect(getWorldUnlockRequirement('airport').description).toContain('Complete 1 more Beginner World');
 
-    // Worlds 3 to 5 remain locked
-    expect(isWorldUnlocked('warehouse')).toBe(false);
+    // Completing 2nd beginner world (metro) unlocks Intermediate tier!
+    useWorldStore.setState((state) => ({
+      worldProgress: {
+        ...state.worldProgress,
+        metro: {
+          worldId: 'metro',
+          completedMissionsCount: 9,
+          totalMissionsCount: 9,
+          isCompleted: true,
+          percentComplete: 100,
+        },
+      },
+    }));
+
+    expect(isWorldUnlocked('airport')).toBe(true);
+    expect(isWorldUnlocked('warehouse')).toBe(true);
+
+    // Advanced tier remains locked until 2 Intermediate worlds are completed
     expect(isWorldUnlocked('hospital')).toBe(false);
     expect(isWorldUnlocked('bank')).toBe(false);
 
@@ -80,64 +99,50 @@ describe('Sequential World Progression & Lock System', () => {
     expect(useWorldStore.getState().activeWorld?.id).toBe('airport');
   });
 
-  it('should unlock World 2 when supermarket is in user profile completedWorlds', () => {
+  it('should unlock Intermediate tier when completed in user profile completedWorlds', () => {
     const { isWorldUnlocked } = useWorldStore.getState();
 
     useUserStore.setState({
       profile: {
         ...useUserStore.getState().profile,
-        completedWorlds: ['supermarket'],
+        completedWorlds: ['supermarket', 'metro'],
       },
     });
 
     expect(isWorldUnlocked('airport')).toBe(true);
-    expect(isWorldUnlocked('warehouse')).toBe(false);
+    expect(isWorldUnlocked('warehouse')).toBe(true);
+    expect(isWorldUnlocked('hospital')).toBe(false);
   });
 
-  it('should progressively unlock all 5 worlds sequentially', () => {
+  it('should progressively unlock Advanced tier when any 2 Intermediate worlds are completed', () => {
     const { isWorldUnlocked } = useWorldStore.getState();
 
-    // Step 1: Complete Supermarket -> Airport unlocks
-    useWorldStore.setState((state) => ({
+    // Complete 2 Beginner worlds -> Intermediate unlocked
+    useWorldStore.setState({
       worldProgress: {
-        ...state.worldProgress,
         supermarket: { worldId: 'supermarket', completedMissionsCount: 10, totalMissionsCount: 10, isCompleted: true, percentComplete: 100 },
+        metro: { worldId: 'metro', completedMissionsCount: 9, totalMissionsCount: 9, isCompleted: true, percentComplete: 100 },
       },
-    }));
-    expect(isWorldUnlocked('airport')).toBe(true);
-    expect(isWorldUnlocked('warehouse')).toBe(false);
+    });
 
-    // Step 2: Complete Airport -> Warehouse unlocks
+    expect(isWorldUnlocked('airport')).toBe(true);
+    expect(isWorldUnlocked('warehouse')).toBe(true);
+    expect(isWorldUnlocked('hospital')).toBe(false);
+
+    // Complete 2 Intermediate worlds (airport + warehouse) -> Advanced unlocked!
     useWorldStore.setState((state) => ({
       worldProgress: {
         ...state.worldProgress,
         airport: { worldId: 'airport', completedMissionsCount: 6, totalMissionsCount: 6, isCompleted: true, percentComplete: 100 },
-      },
-    }));
-    expect(isWorldUnlocked('warehouse')).toBe(true);
-    expect(isWorldUnlocked('hospital')).toBe(false);
-
-    // Step 3: Complete Warehouse -> Hospital unlocks
-    useWorldStore.setState((state) => ({
-      worldProgress: {
-        ...state.worldProgress,
         warehouse: { worldId: 'warehouse', completedMissionsCount: 6, totalMissionsCount: 6, isCompleted: true, percentComplete: 100 },
       },
     }));
-    expect(isWorldUnlocked('hospital')).toBe(true);
-    expect(isWorldUnlocked('bank')).toBe(false);
 
-    // Step 4: Complete Hospital -> Bank unlocks
-    useWorldStore.setState((state) => ({
-      worldProgress: {
-        ...state.worldProgress,
-        hospital: { worldId: 'hospital', completedMissionsCount: 6, totalMissionsCount: 6, isCompleted: true, percentComplete: 100 },
-      },
-    }));
+    expect(isWorldUnlocked('hospital')).toBe(true);
     expect(isWorldUnlocked('bank')).toBe(true);
 
-    // All 5 worlds unlocked!
-    for (const id of ['supermarket', 'airport', 'warehouse', 'hospital', 'bank']) {
+    // All 6 registered worlds are now unlocked
+    for (const id of ['supermarket', 'metro', 'airport', 'warehouse', 'hospital', 'bank']) {
       expect(isWorldUnlocked(id)).toBe(true);
     }
   });
