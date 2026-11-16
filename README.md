@@ -10,12 +10,13 @@
 
 <p align="center">
   <a href="https://query-quest-livid.vercel.app/"><img src="https://img.shields.io/badge/Live_Demo-query--quest--livid.vercel.app-10b981.svg?style=flat-square&logo=vercel" alt="Live Demo on Vercel" /></a>
+  <a href="https://github.com/shashaank747/QueryQuest"><img src="https://img.shields.io/badge/Version-2.0_Released-6366f1.svg?style=flat-square" alt="Version 2.0" /></a>
   <a href="#-data-tracks-hub"><img src="https://img.shields.io/badge/Tracks-Excel_•_MySQL_•_Power_BI-0ea5e9.svg?style=flat-square" alt="Data Tracks" /></a>
   <a href="#-tier-based-world-progression--locking"><img src="https://img.shields.io/badge/Worlds-7_Interactive_Worlds-f59e0b.svg?style=flat-square" alt="7 Worlds" /></a>
   <a href="#-industry-worlds--curriculum"><img src="https://img.shields.io/badge/Missions-52_Enterprise_Scenarios-10b981.svg?style=flat-square" alt="52 Missions" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/SQLite-WASM_In--Browser-0284c7.svg?style=flat-square" alt="SQLite WASM" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/Editor-Monaco_IDE-6366f1.svg?style=flat-square" alt="Monaco Editor" /></a>
-  <a href="#-test-suite-execution"><img src="https://img.shields.io/badge/Tests-229_Passed-emerald.svg?style=flat-square" alt="Test Status" /></a>
+  <a href="#-test-suite-execution"><img src="https://img.shields.io/badge/Tests-206_Passed-emerald.svg?style=flat-square" alt="Test Status" /></a>
   <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License" /></a>
 </p>
 
@@ -300,7 +301,7 @@ Visit **[http://localhost:3000](http://localhost:3000)** in your browser.
 ### Test Suite Execution
 
 ```bash
-# Run complete automated test suite (14 suites, 229 unit & scenario tests)
+# Run complete automated test suite (14 suites, 206 unit & scenario tests)
 npm test
 
 # Run tests in watch mode

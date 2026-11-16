@@ -55,7 +55,7 @@ export const Header: React.FC = () => {
                   Quest Query
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  {selectedTrack === 'mysql' ? 'MySQL Track' : 'v1.0 MVP'}
+                  {selectedTrack === 'mysql' ? 'MySQL Track (v2.0)' : 'v2.0'}
                 </span>
               </div>
               <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'} hidden sm:block`}>

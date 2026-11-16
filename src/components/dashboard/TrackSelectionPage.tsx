@@ -134,7 +134,7 @@ export const TrackSelectionPage: React.FC = () => {
           {/* Active Highlight Banner */}
           <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-cyan-600 via-emerald-600 to-cyan-600 text-white text-[11px] font-black uppercase tracking-wider shadow-md flex items-center gap-1.5 whitespace-nowrap">
             <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            <span>Playable Now &bull; 5 Worlds Ready</span>
+            <span>Version 2.0 &bull; 7 Worlds Ready</span>
           </div>
 
           <div>
@@ -168,14 +168,14 @@ export const TrackSelectionPage: React.FC = () => {
                 isLight ? 'text-slate-600' : 'text-slate-300'
               } leading-relaxed mb-6`}
             >
-              The flagship Quest Query simulation! Jump into 5 realistic corporate database environments, fix data outages, optimize complex multi-table joins, and deliver boardroom analytics reports.
+              The flagship Quest Query simulation! Jump into 7 realistic corporate database environments across 3 progressive skill tiers (Beginner, Intermediate, Advanced), fix data outages, optimize complex multi-table joins, and deliver boardroom analytics reports.
             </p>
 
             {/* Core Competencies List */}
             <div className="space-y-2 mb-6">
               {[
-                '5 Interactive Worlds (Supermarket, Airport, Warehouse, Hospital, Bank)',
-                '34 Scenario Missions with Progressive Difficulty',
+                '7 Interactive Worlds Across 3 Skill Tiers (Beginner, Intermediate, Advanced)',
+                '52 Scenario Missions with Strict 3-Tier Progression',
                 'Zero-Latency In-Browser WASM SQLite Engine',
                 'Real-Time Compiler & Logic Error Diagnostics',
               ].map((item, idx) => (
@@ -191,7 +191,7 @@ export const TrackSelectionPage: React.FC = () => {
 
           <div>
             <div className="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between mb-4 text-[11px] font-semibold text-cyan-600 dark:text-cyan-400">
-              <span>5 Worlds &bull; 34 Missions</span>
+              <span>7 Worlds &bull; 52 Missions</span>
               <span>100% In-Browser</span>
             </div>
             <button
