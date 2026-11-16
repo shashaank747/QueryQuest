@@ -10,6 +10,22 @@ export const ALL_ACHIEVEMENTS: Achievement[] = [
     xpReward: 50,
   },
   {
+    id: 'sql_novice',
+    title: 'SQL Novice',
+    description: 'Complete your initial database operations mission.',
+    icon: 'Terminal',
+    category: 'mastery',
+    xpReward: 100,
+  },
+  {
+    id: 'bug_hunter',
+    title: 'Bug Hunter',
+    description: 'Diagnose and pinpoint an operational data defect or inventory error.',
+    icon: 'Search',
+    category: 'missions',
+    xpReward: 120,
+  },
+  {
     id: 'table_architect',
     title: 'Table Architect',
     description: 'Create a new relational table with PRIMARY KEY and column constraints.',

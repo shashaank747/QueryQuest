@@ -29,5 +29,19 @@ describe('Gamification System', () => {
     expect(firstQuery).toBeDefined();
     expect(firstQuery?.xpReward).toBe(50);
   });
+
+  it('should include core achievements such as supermarket_master, sql_novice, and bug_hunter', () => {
+    const smMaster = ALL_ACHIEVEMENTS.find(a => a.id === 'supermarket_master');
+    expect(smMaster).toBeDefined();
+    expect(smMaster?.xpReward).toBe(300);
+
+    const sqlNovice = ALL_ACHIEVEMENTS.find(a => a.id === 'sql_novice');
+    expect(sqlNovice).toBeDefined();
+    expect(sqlNovice?.xpReward).toBe(100);
+
+    const bugHunter = ALL_ACHIEVEMENTS.find(a => a.id === 'bug_hunter');
+    expect(bugHunter).toBeDefined();
+    expect(bugHunter?.xpReward).toBe(120);
+  });
 });
 

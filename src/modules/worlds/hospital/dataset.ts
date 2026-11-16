@@ -40,9 +40,9 @@ INSERT INTO wards (ward_id, ward_name, ward_type, total_beds, occupied_beds) VAL
 -- Admissions Seed Data
 INSERT INTO admissions (admission_id, patient_id, doctor_id, ward_id, admission_date, discharge_date, status) VALUES
   (101, 1, 1, 1, '2026-11-12', NULL, 'Admitted'),
-  (102, 2, 2, 2, '2026-11-13', NULL, 'Admitted'),
-  (103, 3, 3, 1, '2026-11-14', NULL, 'Admitted'),
+  (102, 2, 5, 2, '2026-11-13', NULL, 'Admitted'),
+  (103, 3, 1, 1, '2026-11-14', NULL, 'Admitted'),
   (104, 4, 4, 3, '2026-11-10', NULL, 'Admitted'),
-  (105, 5, 5, 2, '2026-11-11', '2026-11-15', 'Discharged'),
-  (106, 6, 6, 4, '2026-11-15', NULL, 'Admitted');
+  (105, 5, 2, 2, '2026-11-11', '2026-11-15', 'Discharged'),
+  (106, 6, 3, 4, '2026-11-15', NULL, 'Admitted');
 `;

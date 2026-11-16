@@ -173,7 +173,7 @@ SET status = 'In Transit'
 WHERE tracking_number = 'APX-9041';`,
     solutionExplanation:
       'Targeted UPDATE operations maintain synchronization between dock floor operations and enterprise supply chain portals.',
-    initialSqlPlaceholder: `-- Mission 4: Dispatch APX-9041 to In Transit\nUPDATE shipments\nSET status = 'In Transit'\nWHERE tracking_number = 'APX-9041';`,
+    initialSqlPlaceholder: `-- Mission 4: Dispatch APX-9041 to In Transit\nUPDATE shipments\nSET status = '...'\nWHERE tracking_number = '...';`,
     validationRules: [
       {
         type: 'ROW_EXISTS',
@@ -224,6 +224,7 @@ ORDER BY b.quantity DESC;`,
       {
         type: 'SELECT_EXACT',
         description: 'Verify cold storage inventory query',
+        orderSensitive: true,
         expectedQuery:
           'SELECT p.sku, p.product_name, b.bin_code, b.quantity, z.zone_name FROM products p JOIN inventory_bins b ON p.product_id = b.product_id JOIN zones z ON b.zone_id = z.zone_id WHERE z.temp_controlled = 1 ORDER BY b.quantity DESC;',
       },
@@ -273,6 +274,7 @@ ORDER BY total_pallets DESC;`,
       {
         type: 'SELECT_EXACT',
         description: 'Verify carrier freight volume aggregation',
+        orderSensitive: true,
         expectedQuery:
           'SELECT carrier, COUNT(shipment_id) AS total_shipments, SUM(pallet_count) AS total_pallets FROM shipments GROUP BY carrier HAVING total_pallets > 15 ORDER BY total_pallets DESC;',
       },

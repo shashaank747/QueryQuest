@@ -376,6 +376,12 @@ export const useMissionStore = create<MissionState>((set, get) => ({
       if (activeMission.badge) {
         await useUserStore.getState().unlockAchievement(activeMission.badge.id);
       }
+      if (activeMission.id === 'sm_m1') {
+        await useUserStore.getState().unlockAchievement('sql_novice');
+      }
+      if (activeMission.id === 'sm_m7') {
+        await useUserStore.getState().unlockAchievement('bug_hunter');
+      }
 
       // Check if all missions in world are completed!
       const allCompleted = missions.every(

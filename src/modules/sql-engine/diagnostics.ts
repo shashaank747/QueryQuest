@@ -20,6 +20,10 @@ export function generateSqlDiagnostic(errorMessage: string, sql: string): string
     return `SQLite operates in an isolated world file. DROP DATABASE is not supported; use DROP TABLE to remove specific tables.`;
   }
 
+  if (err.includes('incomplete input')) {
+    return `Incomplete SQL query: You may be missing a closing parenthesis, quotation mark, or terminating clause.`;
+  }
+
   if (err.includes('syntax error')) {
     const nearMatch = errorMessage.match(/near\s+["'](.*?)["']/i);
     if (nearMatch && nearMatch[1]) {
@@ -41,8 +45,8 @@ export function generateSqlDiagnostic(errorMessage: string, sql: string): string
     return `Table "${tbl}" was not found in the database. Check the Database Explorer panel on the right for available table names and spelling.`;
   }
 
-  if (err.includes('no such column')) {
-    const colMatch = errorMessage.match(/no such column:\s*([\w_]+)/i);
+  if (err.includes('no such column') || err.includes('has no column named')) {
+    const colMatch = errorMessage.match(/(?:no such column:\s*|has no column named\s*)([\w_.]+)/i);
     const col = colMatch ? colMatch[1] : 'the column';
     return `Column "${col}" does not exist. Check the column names and spelling in the Database Explorer panel. Also ensure string literals use single quotes ('value') instead of double quotes.`;
   }
@@ -63,7 +67,11 @@ export function generateSqlDiagnostic(errorMessage: string, sql: string): string
     return `Foreign key constraint failed: You are referencing an identifier that does not exist in the parent table. Ensure the parent record exists before linking.`;
   }
 
-  if (err.includes('misuse of aggregate:')) {
+  if (err.includes('values for') && err.includes('columns')) {
+    return `Column and value count mismatch: The number of values provided in VALUES (...) does not match the number of target columns specified.`;
+  }
+
+  if (err.includes('misuse of aggregate')) {
     return `Misuse of aggregate function: In SQL, aggregate functions like COUNT(), SUM(), AVG() cannot be placed directly inside a WHERE clause. Use a HAVING clause or subquery instead.`;
   }
 

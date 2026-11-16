@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { UserProfile } from '../types/user';
 import { persistenceService } from '../services/persistence/db-store';
-import { calculateLevel } from '../modules/gamification/achievements';
+import { calculateLevel, ALL_ACHIEVEMENTS } from '../modules/gamification/achievements';
 
 interface UserState {
   profile: UserProfile;
@@ -74,7 +74,9 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     set({ profile: updated });
     await persistenceService.saveUserProfile(updated);
-    await addXp(50); // Bonus achievement XP
+    const achievementDef = ALL_ACHIEVEMENTS.find((a) => a.id === achievementId);
+    const bonusXp = achievementDef?.xpReward ?? 50;
+    await addXp(bonusXp); // Award achievement XP defined in achievements registry
     return true;
   },
 
