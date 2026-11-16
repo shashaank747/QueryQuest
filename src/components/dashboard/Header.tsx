@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Flame, Trophy, BookOpen, Volume2, VolumeX, Sparkles, Sun, Moon } from 'lucide-react';
+import { Flame, Trophy, BookOpen, Volume2, VolumeX, Sparkles, Sun, Moon, ArrowLeft } from 'lucide-react';
 import { useUserStore } from '../../stores/useUserStore';
 import { useThemeStore } from '../../stores/useThemeStore';
+import { useTrackStore } from '../../stores/useTrackStore';
 import { soundService } from '../../services/sound/sound-effects';
 import { AchievementsModal } from './AchievementsModal';
 import { FoundationModal } from '../foundation/FoundationModal';
@@ -9,6 +10,7 @@ import { FoundationModal } from '../foundation/FoundationModal';
 export const Header: React.FC = () => {
   const { profile, levelInfo } = useUserStore();
   const { theme, toggleTheme } = useThemeStore();
+  const { selectedTrack, setSelectedTrack } = useTrackStore();
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isFoundationOpen, setIsFoundationOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(soundService.isMuted);
@@ -31,30 +33,52 @@ export const Header: React.FC = () => {
       >
         {/* Logo and Brand */}
         <div className="flex items-center gap-3">
-          <img
-            src="/logo.png"
-            alt="QueryQuest Logo Badge"
-            className="h-10 sm:h-11 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform select-none"
-          />
-          <div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`font-black text-xl tracking-tight ${
-                  isLight
-                    ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-600'
-                    : 'bg-gradient-to-r from-white via-slate-200 to-emerald-300'
-                } bg-clip-text text-transparent`}
-              >
-                QueryQuest
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                v1.0 MVP
-              </span>
+          <button
+            onClick={() => setSelectedTrack(null)}
+            className="flex items-center gap-3 text-left group focus:outline-none"
+            title="Return to Quest Query Home"
+          >
+            <img
+              src="/logo.png"
+              alt="Quest Query Logo Badge"
+              className="h-10 sm:h-11 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform select-none"
+            />
+            <div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`font-black text-xl tracking-tight ${
+                    isLight
+                      ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-600'
+                      : 'bg-gradient-to-r from-white via-slate-200 to-emerald-300'
+                  } bg-clip-text text-transparent`}
+                >
+                  Quest Query
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  {selectedTrack === 'mysql' ? 'MySQL Track' : 'v1.0 MVP'}
+                </span>
+              </div>
+              <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'} hidden sm:block`}>
+                Real-world problems. Data-powered solutions.
+              </p>
             </div>
-            <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'} hidden sm:block`}>
-              Real-world problems. SQL-powered solutions.
-            </p>
-          </div>
+          </button>
+
+          {/* Quick Back to All Tracks button when in MySQL track */}
+          {selectedTrack === 'mysql' && (
+            <button
+              onClick={() => setSelectedTrack(null)}
+              className={`hidden sm:flex items-center gap-1.5 ml-2 px-2.5 py-1.5 rounded-lg ${
+                isLight
+                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                  : 'bg-slate-850 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700/60'
+              } border text-xs font-semibold transition-colors`}
+              title="Back to All Tracks (Excel, MySQL, Power BI)"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-emerald-500" />
+              <span>All Tracks</span>
+            </button>
+          )}
         </div>
 
         {/* User Stats & Navigation */}

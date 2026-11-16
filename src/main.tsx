@@ -8,6 +8,7 @@ import { useSqlStore } from './stores/useSqlStore';
 import { useMissionStore } from './stores/useMissionStore';
 import { useUserStore } from './stores/useUserStore';
 import { useWorldStore } from './stores/useWorldStore';
+import { useTrackStore } from './stores/useTrackStore';
 
 // Expose stores for automated testing and e2e validation
 if (typeof window !== 'undefined') {
@@ -16,6 +17,7 @@ if (typeof window !== 'undefined') {
     useMissionStore,
     useUserStore,
     useWorldStore,
+    useTrackStore,
   };
 }
 

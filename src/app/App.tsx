@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import { useWorldStore } from '../stores/useWorldStore';
 import { useUserStore } from '../stores/useUserStore';
 import { useThemeStore } from '../stores/useThemeStore';
+import { useTrackStore } from '../stores/useTrackStore';
 import { Header } from '../components/dashboard/Header';
 import { WorldGrid } from '../components/dashboard/WorldGrid';
+import { TrackSelectionPage } from '../components/dashboard/TrackSelectionPage';
 import { WorkspaceLayout } from '../components/workspace/WorkspaceLayout';
 import { Code2, ExternalLink } from 'lucide-react';
 
@@ -11,6 +13,7 @@ export const App: React.FC = () => {
   const { activeWorld, initWorlds } = useWorldStore();
   const { initUser } = useUserStore();
   const { theme } = useThemeStore();
+  const { selectedTrack } = useTrackStore();
 
   useEffect(() => {
     initUser();
@@ -31,7 +34,7 @@ export const App: React.FC = () => {
     >
       <Header />
       <main className="flex-1">
-        <WorldGrid />
+        {selectedTrack === 'mysql' ? <WorldGrid /> : <TrackSelectionPage />}
       </main>
       <footer
         className={`border-t ${
@@ -43,13 +46,13 @@ export const App: React.FC = () => {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 px-4">
           {/* Brand Info */}
           <div className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="QueryQuest" className="h-7 w-auto object-contain select-none" />
+            <img src="/logo.png" alt="Quest Query" className="h-7 w-auto object-contain select-none" />
             <div className="text-left">
               <p className={`font-bold text-sm ${isLight ? 'text-slate-900' : 'text-slate-100'}`}>
-                QueryQuest
+                Quest Query
               </p>
               <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-                Interactive business SQL simulation & training
+                Interactive enterprise data simulation & analytics training
               </p>
             </div>
           </div>
