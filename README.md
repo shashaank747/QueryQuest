@@ -12,7 +12,7 @@
   <a href="https://query-quest-livid.vercel.app/"><img src="https://img.shields.io/badge/Live_Demo-query--quest--livid.vercel.app-10b981.svg?style=flat-square&logo=vercel" alt="Live Demo on Vercel" /></a>
   <a href="https://github.com/shashaank747/QueryQuest"><img src="https://img.shields.io/badge/Version-2.0_Released-6366f1.svg?style=flat-square" alt="Version 2.0" /></a>
   <a href="#-data-tracks-hub"><img src="https://img.shields.io/badge/Tracks-Excel_•_MySQL_•_Power_BI-0ea5e9.svg?style=flat-square" alt="Data Tracks" /></a>
-  <a href="#-tier-based-world-progression--locking"><img src="https://img.shields.io/badge/Worlds-7_Interactive_Worlds-f59e0b.svg?style=flat-square" alt="7 Worlds" /></a>
+  <a href="#-tier-based-world-progression--locking-system-3x3-model"><img src="https://img.shields.io/badge/Worlds-7_Interactive_Worlds-f59e0b.svg?style=flat-square" alt="7 Worlds" /></a>
   <a href="#-industry-worlds--curriculum"><img src="https://img.shields.io/badge/Missions-52_Enterprise_Scenarios-10b981.svg?style=flat-square" alt="52 Missions" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/SQLite-WASM_In--Browser-0284c7.svg?style=flat-square" alt="SQLite WASM" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/Editor-Monaco_IDE-6366f1.svg?style=flat-square" alt="Monaco Editor" /></a>
@@ -61,16 +61,16 @@ Quest Query features a curated track selection portal introducing the essential 
                       ▼                                               ▼
          ┌─────────────────────────┐                     ┌─────────────────────────┐
          │ TIER 1: BEGINNER (100%) │  ──(Complete 2)──▶  │ TIER 2: INTERMEDIATE    │
-         │ Supermarket, Namma Metro│                     │ Airport, Warehouse      │
-         │  [Unlocked by Default]  │                     │   [Requires 2/2 T1]     │
-         └─────────────────────────┘                     └────────────┬────────────┘
-                                                                      │
+         │ Supermarket, Metro,     │                     │ Airport, Warehouse      │
+         │ Query & Kaapi           │                     │   [Play Any 2 T1]       │
+         │  [Unlocked by Default]  │                     └────────────┬────────────┘
+         └─────────────────────────┘                                  │
                                                           (Complete 2)│
                                                                       ▼
                                                          ┌─────────────────────────┐
                                                          │ TIER 3: ADVANCED        │
                                                          │ Hospital, Bank          │
-                                                         │   [Requires 2/2 T2]     │
+                                                         │   [Play Any 2 T2]       │
                                                          └─────────────────────────┘
 ```
 
@@ -98,7 +98,7 @@ To guarantee a pedagogically sound learning curve, Quest Query organizes worlds 
 1. **Tier 1: Beginner Worlds** (*Supermarket Operations*, *Namma Metro — Transit Command*, & *Query & Kaapi — Tiffin & Filter Coffee*):
    - **Unlocked by default** for all players.
    - **Zero-Join Focus**: Dedicated 100% to single-table mastery (table creation, strict constraints, batch inserts, range/pattern filtering, conditional updates, safe deletes, and single-table aggregations).
-   - Playing a 2nd or 3rd world in the tier acts as **spaced repetition & revision**, reinforcing identical SQL concepts in completely fresh business domains.
+   - Playing a 2nd or 3rd world in the tier acts as **spaced repetition & revision**, reinforcing identical SQL concepts in completely fresh business domains without premature foreign keys or multi-table joins.
 2. **Tier 2: Intermediate Worlds** (*Airport Operations* & *Warehouse Management*):
    - Unlocked once any **2 Beginner Worlds** reach 100% completion.
    - Dedicated to relational normalization, `FOREIGN KEY` references, `INNER JOIN`, multi-table chains, `LEFT JOIN` discrepancy detection, date/time math, and `CASE WHEN`.
@@ -114,17 +114,17 @@ To guarantee a pedagogically sound learning curve, Quest Query organizes worlds 
 
 ## 📸 Industry Worlds & Curriculum
 
-Quest Query features **7 distinct industry worlds** with **52 hands-on scenario missions**:
+Quest Query features **7 distinct industry worlds** with **52 hands-on scenario missions**, each equipped with dedicated custom artwork:
 
-| World | Tier | Industry | Operational Reference | Missions | SQL Focus | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1. Supermarket Operations** | Beginner | Retail & Consumer Goods | Checkout POS, inventory aisles, supplier manifests | 10 | `CREATE TABLE`, `PRIMARY KEY`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `DELETE`, `LIKE`, `BETWEEN`, `GROUP BY`, `HAVING` (No JOINs!) | **Unlocked (Playable)** |
-| **2. Namma Metro — Transit Command** | Beginner | Public Transit & Mobility | BMRCL OCC room, station lines, smart-cards, footfall | 9 | `CREATE TABLE`, `AUTOINCREMENT`, `UNIQUE`, `CHECK`, `INSERT`, `WHERE`, `BETWEEN`, `IN`, `LIKE`, `IS NULL`, `UPDATE`, `DELETE`, Aggregations | **Unlocked (Playable)** |
-| **3. Query & Kaapi — Tiffin & Filter Coffee** | Beginner | Food & Beverage / Hospitality | Heritage tiffin counter, Chikmagalur coffee, loyalty passes | 9 | `CREATE TABLE`, `AUTOINCREMENT`, `UNIQUE`, `CHECK`, `INSERT`, `WHERE`, `BETWEEN`, `IN`, `LIKE`, `IS NULL`, `UPDATE`, `DELETE`, Aggregations | **Unlocked (Playable)** |
-| **4. Airport Operations** | Intermediate | Aviation & Transportation | Radar tracking, flight schedules (FIDS), passenger gates | 6 | `INNER JOIN`, Multi-Table Chains, `LEFT JOIN`, `CASE WHEN`, `GROUP BY`, `HAVING`, Aggregations | **Playable (Requires Any 2 T1)** |
-| **5. Warehouse Management** | Intermediate | Logistics & Supply Chain | Automated conveyors, pallet racks, temperature vaults | 6 | `INNER JOIN`, Multi-Table Chains, `LEFT JOIN`, `CASE WHEN`, `GROUP BY`, `HAVING`, Aggregations | **Playable (Requires Any 2 T1)** |
-| **6. Hospital Administration** | Advanced | Healthcare & Clinical | Emergency admissions, doctor clinic rosters, bed wards | 6 | Scalar & Correlated Subqueries (`EXISTS`), CTEs (`WITH`), Window Functions (`DENSE_RANK`, `LAG`), ACID Transactions | **Playable (Requires Any 2 T2)** |
-| **7. Bank Operations** | Advanced | Banking & Financial Services | Ledger balances, wire transfers, fraud anomaly audits | 6 | Correlated Subqueries, CTEs (`WITH`), Window Functions (`SUM OVER`, `LAG`, `DENSE_RANK`), ACID Transactions | **Playable (Requires Any 2 T2)** |
+| World | Tier | Industry | Operational Reference | Missions | SQL Focus | Status | Artwork Asset |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **1. Supermarket Operations** | Beginner | Retail & Consumer Goods | Checkout POS, inventory aisles, supplier manifests | 10 | `CREATE TABLE`, `PRIMARY KEY`, `AUTOINCREMENT`, `UNIQUE`, `INSERT`, `SELECT`, `WHERE`, `UPDATE`, `DELETE`, `LIKE`, `BETWEEN`, `GROUP BY`, `HAVING` (Zero JOINs) | **Unlocked (Playable)** | `supermarket-world.jpg` |
+| **2. Namma Metro — Transit Command** | Beginner | Public Transit & Mobility | BMRCL OCC room, station lines, smart-cards, footfall | 9 | `CREATE TABLE`, `AUTOINCREMENT`, `UNIQUE`, `CHECK`, `INSERT`, `WHERE`, `BETWEEN`, `IN`, `LIKE`, `IS NULL`, `UPDATE`, `DELETE`, Aggregations (Zero JOINs) | **Unlocked (Playable)** | `metro-world.jpg` |
+| **3. Query & Kaapi — Tiffin & Filter Coffee** | Beginner | Food & Beverage / Hospitality | Heritage tiffin counter, Chikmagalur coffee, loyalty passes | 9 | `CREATE TABLE`, `AUTOINCREMENT`, `UNIQUE`, `CHECK`, `INSERT`, `WHERE`, `BETWEEN`, `IN`, `LIKE`, `IS NULL`, `UPDATE`, `DELETE`, Aggregations (Zero JOINs) | **Unlocked (Playable)** | `kaapi-world.jpg` |
+| **4. Airport Operations** | Intermediate | Aviation & Transportation | Radar tracking, flight schedules (FIDS), passenger gates | 6 | `INNER JOIN`, Multi-Table Chains, `LEFT JOIN`, `CASE WHEN`, `GROUP BY`, `HAVING`, Aggregations | **Playable (Requires Any 2 T1)** | `airport-world.jpg` |
+| **5. Warehouse Management** | Intermediate | Logistics & Supply Chain | Automated conveyors, pallet racks, temperature vaults | 6 | `INNER JOIN`, Multi-Table Chains, `LEFT JOIN`, `CASE WHEN`, `GROUP BY`, `HAVING`, Aggregations | **Playable (Requires Any 2 T1)** | `warehouse-world.jpg` |
+| **6. Hospital Administration** | Advanced | Healthcare & Clinical | Emergency admissions, doctor clinic rosters, bed wards | 6 | Scalar & Correlated Subqueries (`EXISTS`), CTEs (`WITH`), Window Functions (`DENSE_RANK`, `LAG`), ACID Transactions | **Playable (Requires Any 2 T2)** | `hospital-world.jpg` |
+| **7. Bank Operations** | Advanced | Banking & Financial Services | Ledger balances, wire transfers, fraud anomaly audits | 6 | Correlated Subqueries, CTEs (`WITH`), Window Functions (`SUM OVER`, `LAG`, `DENSE_RANK`), ACID Transactions | **Playable (Requires Any 2 T2)** | `bank-world.jpg` |
 
 ---
 
@@ -133,10 +133,10 @@ Quest Query features **7 distinct industry worlds** with **52 hands-on scenario 
 The dashboard presents industry worlds as interactive **3D collectible physical cards**:
 
 - **Front Face**: High-resolution operational cover banner (`h-44`), role badge, difficulty indicator, estimated time, mastered SQL tags, mission progress bar, and immediate "Enter World" / "Locked" action.
-- **Back Face (Operational Dossier)**: Company profile, database file name (`supermarket.db`), operational context brief, key responsibilities, and comprehensive SQL topics.
+- **Back Face (Operational Dossier)**: Company profile, database file name (`supermarket.db`, `metro.db`, `kaapi.db`), operational context brief, key responsibilities, and mastered SQL concepts.
 - **Physical 3D Depth**: Realistic 14px slab thickness with multi-shaded edge walls.
 - **Gentle Cursor Tilt**: Subtle reactive tilt dynamics responding smoothly to mouse movement.
-- **Card Flip Mechanics**: 1-click flip button or drag gesture with smooth spring physics.
+- **Card Flip Mechanics**: 1-click flip button with smooth 3D spring transition.
 - **Auto-Reset Safety Timer**: Automatically flips cards back to the front face after 60 seconds of inactivity.
 
 ---
@@ -255,7 +255,7 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 
 | Metric | Measurement |
 | :--- | :--- |
-| **Gzipped JavaScript Bundle** | **~195 kB** (`dist/assets/index-*.js` including Monaco, SQLite WASM client, Lucide icons) |
+| **Gzipped JavaScript Bundle** | **~211 kB** (`dist/assets/index-*.js` including Monaco, SQLite WASM client, Lucide icons) |
 | **Gzipped CSS Bundle** | **~10.2 kB** (`dist/assets/index-*.css`) |
 | **Web Worker Bundle** | **45.3 kB** (`dist/assets/sql.worker-*.js`) |
 | **Initial Boot Time** | **< 300 ms** in modern browsers |
