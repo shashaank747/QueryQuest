@@ -63,6 +63,12 @@ export function generateSqlDiagnostic(errorMessage: string, sql: string): string
     return `NOT NULL constraint violation on ${target}. This field is required and cannot be omitted or set to NULL.`;
   }
 
+  if (err.includes('check constraint failed')) {
+    const match = errorMessage.match(/check constraint failed:\s*(.+)/i);
+    const target = match ? match[1] : 'a column rule';
+    return `CHECK constraint violation: ${target}. The value provided violates a table data integrity check rule.`;
+  }
+
   if (err.includes('foreign key constraint failed')) {
     return `Foreign key constraint failed: You are referencing an identifier that does not exist in the parent table. Ensure the parent record exists before linking.`;
   }

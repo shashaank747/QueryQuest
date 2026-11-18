@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import initSqlJs from 'sql.js';
+import { supermarketWorld } from '../src/modules/worlds/supermarket';
 import { SUPERMARKET_MISSIONS } from '../src/modules/worlds/supermarket/missions';
 import { SUPERMARKET_BASE_SCHEMA } from '../src/modules/worlds/supermarket/schema';
 import { SUPERMARKET_FULL_SEED, SUPERMARKET_CATALOG_AND_SALES_SEED } from '../src/modules/worlds/supermarket/dataset';
@@ -184,7 +185,7 @@ describe('Supermarket Operations Audit & Playthrough Verification', () => {
       expect(feedback.message).toContain('record(s)');
     });
 
-    it('Mission 5 (UPDATE price): detects non-existent column and incorrect target row', async () => {
+    it('Mission 5 (UPDATE price): detects non-existent column, incorrect target row, and unconstrained update', async () => {
       const m5 = SUPERMARKET_MISSIONS[4];
 
       // 1. Non-existent column
@@ -197,9 +198,15 @@ describe('Supermarket Operations Audit & Playthrough Verification', () => {
       const wrongRowRes = await executeSql('UPDATE products SET unit_price = 480 WHERE product_id = 999;', wrongRowDb);
       const feedback = await ValidationEngine.validate(m5.validationRules, createValidationContext(wrongRowRes, wrongRowDb));
       expect(feedback.passed).toBe(false);
+
+      // 3. Unconstrained UPDATE without WHERE (modifies all products)
+      const unconstrainedDb = await createFreshDb();
+      const unconstrainedRes = await executeSql('UPDATE products SET unit_price = 480;', unconstrainedDb);
+      const unconstrainedFeedback = await ValidationEngine.validate(m5.validationRules, createValidationContext(unconstrainedRes, unconstrainedDb));
+      expect(unconstrainedFeedback.passed).toBe(false);
     });
 
-    it('Mission 6 (DELETE discontinued): detects wrong table and incomplete purge', async () => {
+    it('Mission 6 (DELETE discontinued): detects wrong table, incomplete purge, and unconstrained wipe', async () => {
       const m6 = SUPERMARKET_MISSIONS[5];
 
       // 1. Wrong table
@@ -213,6 +220,12 @@ describe('Supermarket Operations Audit & Playthrough Verification', () => {
       const feedback = await ValidationEngine.validate(m6.validationRules, createValidationContext(wrongDelRes, wrongDelDb));
       expect(feedback.passed).toBe(false);
       expect(feedback.message).toContain("discontinued");
+
+      // 3. Unconstrained wipe (DELETE FROM products without WHERE)
+      const wipeDb = await createFreshDb();
+      const wipeRes = await executeSql('DELETE FROM products;', wipeDb);
+      const wipeFeedback = await ValidationEngine.validate(m6.validationRules, createValidationContext(wipeRes, wipeDb));
+      expect(wipeFeedback.passed).toBe(false);
     });
 
     it('Mission 7 (LIKE text search): detects missing status filter or wrong search pattern', async () => {
@@ -368,6 +381,165 @@ describe('Supermarket Operations Audit & Playthrough Verification', () => {
       // Unlock bug_hunter (120 XP)
       await useUserStore.getState().unlockAchievement('bug_hunter');
       expect(useUserStore.getState().profile.xp).toBe(420);
+    });
+  });
+
+  describe('Section 5: Valid Alternate Query Verification', () => {
+    it('accepts valid syntactic and logical alternate queries for all missions', async () => {
+      const altDb = await createFreshDb();
+
+      // Mission 1: IF NOT EXISTS with different column order
+      const m1 = SUPERMARKET_MISSIONS[0];
+      const m1AltRes = await executeSql(`
+        CREATE TABLE IF NOT EXISTS store_branches (
+          branch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          opening_year INTEGER,
+          city TEXT NOT NULL,
+          branch_name TEXT NOT NULL
+        );
+      `, altDb);
+      expect(m1AltRes.success).toBe(true);
+      const m1Feedback = await ValidationEngine.validate(m1.validationRules, createValidationContext(m1AltRes, altDb));
+      expect(m1Feedback.passed, m1Feedback.message).toBe(true);
+
+      // Mission 2: IF NOT EXISTS
+      const m2 = SUPERMARKET_MISSIONS[1];
+      const m2AltRes = await executeSql(`
+        CREATE TABLE IF NOT EXISTS departments (
+          department_id INTEGER PRIMARY KEY,
+          department_name TEXT UNIQUE NOT NULL,
+          description TEXT
+        );
+      `, altDb);
+      expect(m2AltRes.success).toBe(true);
+      const m2Feedback = await ValidationEngine.validate(m2.validationRules, createValidationContext(m2AltRes, altDb));
+      expect(m2Feedback.passed, m2Feedback.message).toBe(true);
+
+      // Mission 3: INSERT with reordered columns
+      const m3 = SUPERMARKET_MISSIONS[2];
+      const m3AltRes = await executeSql(`
+        INSERT INTO suppliers (city, phone, contact_name, company_name)
+        VALUES ('Bengaluru', '+91 98888 77777', 'Kavita Rao', 'FreshRoots Organics');
+      `, altDb);
+      expect(m3AltRes.success).toBe(true);
+      const m3Feedback = await ValidationEngine.validate(m3.validationRules, createValidationContext(m3AltRes, altDb));
+      expect(m3Feedback.passed, m3Feedback.message).toBe(true);
+
+      // Mission 4: Inverted comparison operator (reorder_level > quantity_on_hand)
+      const m4 = SUPERMARKET_MISSIONS[3];
+      const m4AltRes = await executeSql(`
+        SELECT inventory.product_id, inventory.quantity_on_hand, inventory.reorder_level
+        FROM inventory
+        WHERE reorder_level > quantity_on_hand;
+      `, altDb);
+      expect(m4AltRes.success).toBe(true);
+      const m4Feedback = await ValidationEngine.validate(m4.validationRules, createValidationContext(m4AltRes, altDb));
+      expect(m4Feedback.passed, m4Feedback.message).toBe(true);
+
+      // Mission 5: UPDATE using product_name predicate instead of id
+      const m5 = SUPERMARKET_MISSIONS[4];
+      const m5AltRes = await executeSql(`
+        UPDATE products
+        SET unit_price = 480.0
+        WHERE product_name LIKE 'Arabica Roasted Coffee%';
+      `, altDb);
+      expect(m5AltRes.success).toBe(true);
+      const m5Feedback = await ValidationEngine.validate(m5.validationRules, createValidationContext(m5AltRes, altDb));
+      expect(m5Feedback.passed, m5Feedback.message).toBe(true);
+
+      // Mission 6: DELETE using LOWER() function
+      const m6 = SUPERMARKET_MISSIONS[5];
+      const m6AltRes = await executeSql(`
+        DELETE FROM products
+        WHERE LOWER(status) = 'discontinued';
+      `, altDb);
+      expect(m6AltRes.success).toBe(true);
+      const m6Feedback = await ValidationEngine.validate(m6.validationRules, createValidationContext(m6AltRes, altDb));
+      expect(m6Feedback.passed, m6Feedback.message).toBe(true);
+
+      // Mission 7: LIKE with swapped AND conditions and lowercase pattern
+      const m7 = SUPERMARKET_MISSIONS[6];
+      const m7AltRes = await executeSql(`
+        SELECT p.product_id, p.product_name, p.category_id, p.unit_price
+        FROM products p
+        WHERE p.status = 'Active' AND p.product_name LIKE '%organic%';
+      `, altDb);
+      expect(m7AltRes.success).toBe(true);
+      const m7Feedback = await ValidationEngine.validate(m7.validationRules, createValidationContext(m7AltRes, altDb));
+      expect(m7Feedback.passed, m7Feedback.message).toBe(true);
+
+      // Mission 8: Comparison operators instead of BETWEEN
+      const m8 = SUPERMARKET_MISSIONS[7];
+      const m8AltRes = await executeSql(`
+        SELECT order_id, customer_id, order_date, total_amount
+        FROM orders
+        WHERE status = 'Completed' AND total_amount >= 500 AND total_amount <= 2500
+        ORDER BY total_amount DESC;
+      `, altDb);
+      expect(m8AltRes.success).toBe(true);
+      const m8Feedback = await ValidationEngine.validate(m8.validationRules, createValidationContext(m8AltRes, altDb));
+      expect(m8Feedback.passed, m8Feedback.message).toBe(true);
+
+      // Mission 9: HAVING with explicit SUM() and COUNT(*)
+      const m9 = SUPERMARKET_MISSIONS[8];
+      const m9AltRes = await executeSql(`
+        SELECT payment_method, COUNT(*) AS total_transactions, SUM(amount) AS total_revenue
+        FROM payments
+        GROUP BY payment_method
+        HAVING SUM(amount) > 2000
+        ORDER BY total_revenue DESC;
+      `, altDb);
+      expect(m9AltRes.success).toBe(true);
+      const m9Feedback = await ValidationEngine.validate(m9.validationRules, createValidationContext(m9AltRes, altDb));
+      expect(m9Feedback.passed, m9Feedback.message).toBe(true);
+
+      // Mission 10: ORDER BY aggregate directly with COUNT(*)
+      const m10 = SUPERMARKET_MISSIONS[9];
+      const m10AltRes = await executeSql(`
+        SELECT customer_id, COUNT(*) AS total_orders, SUM(total_amount) AS total_spent
+        FROM orders
+        GROUP BY customer_id
+        ORDER BY SUM(total_amount) DESC
+        LIMIT 3;
+      `, altDb);
+      expect(m10AltRes.success).toBe(true);
+      const m10Feedback = await ValidationEngine.validate(m10.validationRules, createValidationContext(m10AltRes, altDb));
+      expect(m10Feedback.passed, m10Feedback.message).toBe(true);
+    });
+  });
+
+  describe('Section 6: World Definition & Executive Business Report Metrics Verification', () => {
+    it('validates supermarketWorld metadata, topics, and initial schema/seed integrity', () => {
+      expect(supermarketWorld.id).toBe('supermarket');
+      expect(supermarketWorld.name).toBe('Supermarket Operations');
+      expect(supermarketWorld.difficulty).toBe('Beginner');
+      expect(supermarketWorld.isAvailable).toBe(true);
+      expect(supermarketWorld.missions).toHaveLength(10);
+      expect(supermarketWorld.initialSchemaSql).toBeTruthy();
+      expect(supermarketWorld.initialDatasetSql).toBeTruthy();
+      expect(supermarketWorld.sqlTopics.length).toBeGreaterThanOrEqual(10);
+      expect(supermarketWorld.sqlTopics).toContain('CREATE TABLE');
+      expect(supermarketWorld.sqlTopics).toContain('LIKE');
+      expect(supermarketWorld.sqlTopics).toContain('BETWEEN');
+      expect(supermarketWorld.sqlTopics).toContain('GROUP BY');
+      expect(supermarketWorld.sqlTopics).toContain('HAVING');
+    });
+
+    it('executes all executive business report metrics cleanly against live SQLite instance', async () => {
+      const reportDb = await createFreshDb();
+      // Apply world progression state (M5 update, M6 purge)
+      await executeSql(SUPERMARKET_MISSIONS[4].sampleSolution, reportDb);
+      await executeSql(SUPERMARKET_MISSIONS[5].sampleSolution, reportDb);
+
+      expect(supermarketWorld.reportConfig.metrics.length).toBeGreaterThanOrEqual(6);
+
+      for (const metric of supermarketWorld.reportConfig.metrics) {
+        const res = await executeSql(metric.query, reportDb);
+        expect(res.success, `Metric query failed for "${metric.title}" (${metric.id}): ${res.error}`).toBe(true);
+        expect(res.results).toBeDefined();
+        expect(res.results!.length).toBeGreaterThan(0);
+        expect(res.results![0].values.length, `Metric "${metric.id}" returned empty values`).toBeGreaterThan(0);
+      }
     });
   });
 });

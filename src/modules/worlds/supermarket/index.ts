@@ -97,10 +97,28 @@ export const supermarketWorld: WorldDefinition = {
         type: 'table',
       },
       {
+        id: 'revenue_by_category',
+        title: 'Revenue by Department / Category',
+        query:
+          'SELECT c.category_name, ROUND(SUM(oi.quantity * oi.unit_price), 2) as revenue FROM categories c JOIN products p ON c.category_id = p.category_id JOIN order_items oi ON p.product_id = oi.product_id GROUP BY c.category_name ORDER BY revenue DESC;',
+        description: 'Departmental sales distribution across store merchandise lines.',
+        type: 'bar_chart',
+        labelKey: 'category_name',
+        valueKey: 'revenue',
+      },
+      {
+        id: 'best_sellers',
+        title: 'Top Best-Selling Products',
+        query:
+          'SELECT p.product_name, SUM(oi.quantity) as units_sold FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_name ORDER BY units_sold DESC LIMIT 5;',
+        description: 'High-velocity SKUs commanding the largest order volume.',
+        type: 'table',
+      },
+      {
         id: 'low_stock_items',
         title: 'Immediate Reorder Action List',
         query:
-          'SELECT product_id, quantity_on_hand, reorder_level, aisle_number FROM inventory WHERE quantity_on_hand < reorder_level;',
+          'SELECT p.product_name, i.quantity_on_hand, i.reorder_level, i.aisle_number FROM products p JOIN inventory i ON p.product_id = i.product_id WHERE i.quantity_on_hand < i.reorder_level;',
         description: 'Stock deficit records requiring warehouse replenishment.',
         type: 'table',
       },

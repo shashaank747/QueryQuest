@@ -115,6 +115,42 @@ describe('Tier-Based World Progression & Lock System (3x3)', () => {
     expect(isWorldUnlocked('hospital')).toBe(false);
   });
 
+  it('should unlock Intermediate tier for any combination of 2 Beginner worlds (supermarket+kaapi, metro+kaapi)', () => {
+    const { isWorldUnlocked } = useWorldStore.getState();
+
+    // Combination A: Supermarket + Kaapi
+    useUserStore.setState({
+      profile: {
+        ...useUserStore.getState().profile,
+        completedWorlds: ['supermarket', 'kaapi'],
+      },
+    });
+    expect(isWorldUnlocked('airport')).toBe(true);
+    expect(isWorldUnlocked('warehouse')).toBe(true);
+    expect(isWorldUnlocked('hospital')).toBe(false);
+
+    // Combination B: Metro + Kaapi
+    useUserStore.setState({
+      profile: {
+        ...useUserStore.getState().profile,
+        completedWorlds: ['metro', 'kaapi'],
+      },
+    });
+    expect(isWorldUnlocked('airport')).toBe(true);
+    expect(isWorldUnlocked('warehouse')).toBe(true);
+    expect(isWorldUnlocked('hospital')).toBe(false);
+
+    // Single world only: Kaapi only
+    useUserStore.setState({
+      profile: {
+        ...useUserStore.getState().profile,
+        completedWorlds: ['kaapi'],
+      },
+    });
+    expect(isWorldUnlocked('airport')).toBe(false);
+    expect(isWorldUnlocked('warehouse')).toBe(false);
+  });
+
   it('should progressively unlock Advanced tier when any 2 Intermediate worlds are completed', () => {
     const { isWorldUnlocked } = useWorldStore.getState();
 

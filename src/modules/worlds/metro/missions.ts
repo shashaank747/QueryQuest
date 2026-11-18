@@ -69,6 +69,26 @@ export const METRO_MISSIONS: Mission[] = [
           'status',
         ],
       },
+      {
+        type: 'CUSTOM',
+        description: 'Verify station_id is designated as PRIMARY KEY',
+        customValidator: async (context) => {
+          const schema = await context.getSchema();
+          const table = schema['stations'] || schema['stations'.toLowerCase()];
+          if (!table) return { passed: false, message: 'Table stations not found.' };
+          const pkCol = table.columns.find((c: any) => c.pk === 1 || c.pk === true);
+          if (!pkCol || pkCol.name.toLowerCase() !== 'station_id') {
+            return {
+              passed: false,
+              message: 'The station_id column must be designated as PRIMARY KEY.',
+              details: {
+                hint: 'Define station_id as: station_id INTEGER PRIMARY KEY',
+              },
+            };
+          }
+          return { passed: true, message: 'Primary key constraint verified on station_id.' };
+        },
+      },
     ],
     xpReward: 100,
     badge: {
@@ -150,6 +170,27 @@ export const METRO_MISSIONS: Mission[] = [
             };
           }
           return { passed: true, message: 'CHECK constraint verified: negative balances are blocked.' };
+        },
+      },
+      {
+        type: 'CUSTOM',
+        description: 'Verify UNIQUE constraint on card_serial blocks duplicate cards',
+        customValidator: async (context) => {
+          const insert1 = `INSERT INTO smart_cards (card_serial, holder_type, balance_inr) VALUES ('NM-TEST-UNIQ', 'Regular', 100);`;
+          const insert2 = `INSERT INTO smart_cards (card_serial, holder_type, balance_inr) VALUES ('NM-TEST-UNIQ', 'Regular', 200);`;
+          await context.executeSql(insert1);
+          const res2 = await context.executeSql(insert2);
+          await context.executeSql(`DELETE FROM smart_cards WHERE card_serial = 'NM-TEST-UNIQ';`);
+          if (res2.success) {
+            return {
+              passed: false,
+              message: 'The UNIQUE constraint on card_serial is missing. Duplicate card serials must be rejected.',
+              details: {
+                hint: 'Define card_serial as: card_serial TEXT UNIQUE NOT NULL',
+              },
+            };
+          }
+          return { passed: true, message: 'UNIQUE constraint verified: duplicate card serials are blocked.' };
         },
       },
     ],
@@ -416,6 +457,12 @@ WHERE status = 'Under_Trial';`,
         description: 'Verify no stations remain Under_Trial',
         expectedTable: 'stations',
         expectedWhereClause: "status = 'Under_Trial'",
+      },
+      {
+        type: 'ROW_EXISTS',
+        description: 'Verify other stations were not inadvertently modified by unconstrained UPDATE',
+        expectedTable: 'stations',
+        expectedWhereClause: "station_name = 'Majestic' AND base_fare_inr = 30",
       },
     ],
     xpReward: 100,
