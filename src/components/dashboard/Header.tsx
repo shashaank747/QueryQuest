@@ -3,6 +3,8 @@ import { Flame, Trophy, BookOpen, Volume2, VolumeX, Sparkles, Sun, Moon, ArrowLe
 import { useUserStore } from '../../stores/useUserStore';
 import { useThemeStore } from '../../stores/useThemeStore';
 import { useTrackStore } from '../../stores/useTrackStore';
+import { useExcelStore } from '../../stores/useExcelStore';
+import { useWorldStore } from '../../stores/useWorldStore';
 import { soundService } from '../../services/sound/sound-effects';
 import { AchievementsModal } from './AchievementsModal';
 import { FoundationModal } from '../foundation/FoundationModal';
@@ -22,6 +24,12 @@ export const Header: React.FC = () => {
     setIsMuted(muted);
   };
 
+  const handleHomeClick = () => {
+    setSelectedTrack(null);
+    useExcelStore.getState().setActiveWorld(null);
+    useWorldStore.getState().setActiveWorld(null);
+  };
+
   return (
     <>
       <header
@@ -34,7 +42,7 @@ export const Header: React.FC = () => {
         {/* Logo and Brand */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setSelectedTrack(null)}
+            onClick={handleHomeClick}
             className="flex items-center gap-3 text-left group focus:outline-none"
             title="Return to Quest Query Home"
           >
@@ -55,7 +63,11 @@ export const Header: React.FC = () => {
                   Quest Query
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  {selectedTrack === 'mysql' ? 'MySQL Track (v2.0)' : 'v2.0'}
+                  {selectedTrack === 'mysql'
+                    ? 'MySQL Track (v2.0)'
+                    : selectedTrack === 'excel'
+                    ? 'Excel Track (v2.0)'
+                    : 'v2.0'}
                 </span>
               </div>
               <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'} hidden sm:block`}>
@@ -64,10 +76,10 @@ export const Header: React.FC = () => {
             </div>
           </button>
 
-          {/* Quick Back to All Tracks button when in MySQL track */}
-          {selectedTrack === 'mysql' && (
+          {/* Quick Back to All Tracks button when in a specific track */}
+          {selectedTrack !== null && (
             <button
-              onClick={() => setSelectedTrack(null)}
+              onClick={handleHomeClick}
               className={`hidden sm:flex items-center gap-1.5 ml-2 px-2.5 py-1.5 rounded-lg ${
                 isLight
                   ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'

@@ -3,14 +3,18 @@ import { useWorldStore } from '../stores/useWorldStore';
 import { useUserStore } from '../stores/useUserStore';
 import { useThemeStore } from '../stores/useThemeStore';
 import { useTrackStore } from '../stores/useTrackStore';
+import { useExcelStore } from '../stores/useExcelStore';
 import { Header } from '../components/dashboard/Header';
 import { WorldGrid } from '../components/dashboard/WorldGrid';
 import { TrackSelectionPage } from '../components/dashboard/TrackSelectionPage';
 import { WorkspaceLayout } from '../components/workspace/WorkspaceLayout';
+import { ExcelWorldGrid } from '../components/excel/ExcelWorldGrid';
+import { ExcelWorkspaceLayout } from '../components/excel/ExcelWorkspaceLayout';
 import { Code2, ExternalLink } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const { activeWorld, initWorlds } = useWorldStore();
+  const { activeWorld: activeSqlWorld, initWorlds } = useWorldStore();
+  const { activeWorld: activeExcelWorld } = useExcelStore();
   const { initUser } = useUserStore();
   const { theme } = useThemeStore();
   const { selectedTrack } = useTrackStore();
@@ -20,8 +24,12 @@ export const App: React.FC = () => {
     initWorlds();
   }, []);
 
-  if (activeWorld) {
+  if (activeSqlWorld) {
     return <WorkspaceLayout />;
+  }
+
+  if (activeExcelWorld) {
+    return <ExcelWorkspaceLayout />;
   }
 
   const isLight = theme === 'slate-100';
@@ -34,7 +42,13 @@ export const App: React.FC = () => {
     >
       <Header />
       <main className="flex-1">
-        {selectedTrack === 'mysql' ? <WorldGrid /> : <TrackSelectionPage />}
+        {selectedTrack === 'mysql' ? (
+          <WorldGrid />
+        ) : selectedTrack === 'excel' ? (
+          <ExcelWorldGrid />
+        ) : (
+          <TrackSelectionPage />
+        )}
       </main>
       <footer
         className={`border-t ${
