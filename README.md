@@ -12,11 +12,12 @@
   <a href="https://query-quest-livid.vercel.app/"><img src="https://img.shields.io/badge/Live_Demo-query--quest--livid.vercel.app-10b981.svg?style=flat-square&logo=vercel" alt="Live Demo on Vercel" /></a>
   <a href="https://github.com/shashaank747/QueryQuest"><img src="https://img.shields.io/badge/Version-2.0_Released-6366f1.svg?style=flat-square" alt="Version 2.0" /></a>
   <a href="#-data-tracks-hub"><img src="https://img.shields.io/badge/Tracks-Excel_•_MySQL_•_Power_BI-0ea5e9.svg?style=flat-square" alt="Data Tracks" /></a>
-  <a href="#-tier-based-world-progression--locking-system-3x3-model"><img src="https://img.shields.io/badge/Worlds-7_Interactive_Worlds-f59e0b.svg?style=flat-square" alt="7 Worlds" /></a>
-  <a href="#-industry-worlds--curriculum"><img src="https://img.shields.io/badge/Missions-52_Enterprise_Scenarios-10b981.svg?style=flat-square" alt="52 Missions" /></a>
+  <a href="#-interactive-excel-spreadsheet-studio"><img src="https://img.shields.io/badge/Spreadsheet-Microsoft_Ribbon_&_AST_Engine-107c41.svg?style=flat-square" alt="Spreadsheet Studio" /></a>
+  <a href="#-tier-based-world-progression--locking-system-3x3-model"><img src="https://img.shields.io/badge/Worlds-7_Interactive_Worlds_x2_Tracks-f59e0b.svg?style=flat-square" alt="7 Worlds" /></a>
+  <a href="#-industry-worlds--curriculum"><img src="https://img.shields.io/badge/Missions-94_Enterprise_Scenarios-10b981.svg?style=flat-square" alt="94 Missions" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/SQLite-WASM_In--Browser-0284c7.svg?style=flat-square" alt="SQLite WASM" /></a>
   <a href="#-technology-stack"><img src="https://img.shields.io/badge/Editor-Monaco_IDE-6366f1.svg?style=flat-square" alt="Monaco Editor" /></a>
-  <a href="#-test-suite-execution"><img src="https://img.shields.io/badge/Tests-271_Passed-emerald.svg?style=flat-square" alt="Test Status" /></a>
+  <a href="#-test-suite-execution"><img src="https://img.shields.io/badge/Tests-386_Passed-emerald.svg?style=flat-square" alt="Test Status" /></a>
   <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square" alt="License" /></a>
 </p>
 
@@ -54,30 +55,35 @@ Quest Query features a curated track selection portal introducing the essential 
          │       Excel        │    │       MySQL        │    │      Power BI      │
          │  (Spreadsheets &   │    │ (Enterprise World  │    │   (Dashboards &    │
          │Financial Modeling) │    │    Simulation)     │    │        DAX)        │
-         │   [Coming Soon]    │    │   [Playable Now]   │    │   [Coming Soon]    │
-         └────────────────────┘    └──────────┬─────────┘    └────────────────────┘
-                                              │
-                      ┌───────────────────────┴───────────────────────┐
-                      ▼                                               ▼
-         ┌─────────────────────────┐                     ┌─────────────────────────┐
-         │ TIER 1: BEGINNER (100%) │  ──(Complete 2)──▶  │ TIER 2: INTERMEDIATE    │
-         │ Supermarket, Metro,     │                     │ Airport, Warehouse      │
-         │ Query & Kaapi           │                     │   [Play Any 2 T1]       │
-         │  [Unlocked by Default]  │                     └────────────┬────────────┘
-         └─────────────────────────┘                                  │
-                                                          (Complete 2)│
-                                                                      ▼
-                                                         ┌─────────────────────────┐
-                                                         │ TIER 3: ADVANCED        │
-                                                         │ Hospital, Bank          │
-                                                         │   [Play Any 2 T2]       │
-                                                         └─────────────────────────┘
+         │   [Playable Now]   │    │   [Playable Now]   │    │   [Coming Soon]    │
+         └─────────┬──────────┘    └──────────┬─────────┘    └────────────────────┘
+                   │                          │
+                   └─────────────┬────────────┘
+                                 │
+         ┌───────────────────────┴───────────────────────┐
+         ▼                                               ▼
+┌─────────────────────────┐                     ┌─────────────────────────┐
+│ TIER 1: BEGINNER (100%) │  ──(Complete 2)──▶  │ TIER 2: INTERMEDIATE    │
+│ Supermarket, Metro,     │                     │ Airport, Warehouse      │
+│ Query & Kaapi           │                     │   [Play Any 2 T1]       │
+│  [Unlocked by Default]  │                     └────────────┬────────────┘
+└─────────────────────────┘                                  │
+                                                 (Complete 2)│
+                                                             ▼
+                                                ┌─────────────────────────┐
+                                                │ TIER 3: ADVANCED        │
+                                                │ Hospital, Bank          │
+                                                │   [Play Any 2 T2]       │
+                                                └─────────────────────────┘
 ```
 
-### 1. Excel (Spreadsheets & Financial Modeling) &bull; *Coming Soon*
-- Master the corporate workhorse: dynamic multi-tier commissions, supplier inventory reconciliation, financial 3-statement modeling, and what-if scenarios.
-- Topics: `XLOOKUP`, nested dynamic arrays, pivot intelligence, and sensitivity solvers.
-- 15 planned hands-on workbooks.
+### 1. Excel (Spreadsheets & Financial Modeling) &bull; *Playable Now (Version 2.0)*
+- Master the corporate workhorse with an authentic in-browser spreadsheet studio:
+  - **Microsoft Excel Ribbon**: Full green `#107c41` toolbar featuring File, Home, Insert, Formulas, Data, and View tabs.
+  - **Formula Bar & Name Box**: Target cell indicators, coordinate jump navigation (`E12`), and interactive formula editing.
+  - **Custom AST Calculation Engine**: Real recursive-descent formula parser evaluating math, boolean logic (`IF`, `AND`, `OR`), aggregations (`SUM`, `AVERAGE`, `MIN`, `MAX`), conditional math (`SUMIF`, `COUNTIF`, `SUMIFS`), text manipulation (`CONCAT`, `LEFT`, `RIGHT`), dynamic lookups (`XLOOKUP`, `VLOOKUP`, `INDEX/MATCH`), and financial amortization (`PMT`).
+  - **7 Industry Worlds & 42 Missions**: Mirroring MySQL's operational domains across 3 progressive skill tiers.
+  - **100% Client-Side**: Instant formula execution, live recalculation, and multi-sheet workbooks with zero server latency.
 
 ### 2. MySQL (Relational Databases & Enterprise Simulation) &bull; *Playable Now*
 - The flagship Quest Query simulation: 7 interactive industry worlds and 52 progressive missions running on an in-browser SQLite WASM engine.
@@ -249,17 +255,33 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 - **Procedural Sound Engine**: Web Audio API procedural sound synthesizer (click feedback, success chimes, level-up melodies) with instant mute toggle.
 - **Offline Persistence**: Client-side storage via IndexedDB (`idb`) preserves binary database snapshots and completed mission states across sessions.
 
+### 7. Interactive Excel Spreadsheet Studio & AST Engine
+- **Microsoft Excel / Google Sheets Ribbon**:
+  - Classic dark green `#107c41` ribbon header with File, Home, Insert, Formulas, Data, and View tabs.
+  - Complete formatting toolbars: Font family, size, Bold, Italic, Underline, cell borders, fill palettes, text color, alignment (Left/Center/Right), Wrap Text, Number formats (`General`, `Currency ₹/$`, `Percentage %`, `.00`), quick AutoSum (`Σ`), Sort, and Filter.
+- **Formula Bar & Coordinate Name Box**:
+  - Coordinate indicator with instant jump navigation (`A1`, `E12`, etc.).
+  - `fx` formula bar with syntax-aware formula input and Enter/Cancel commit controls.
+- **Client-Side AST Recursive-Descent Calculation Engine**:
+  - Evaluates formulas (`=SUM(...)`, `=IF(...)`, `=XLOOKUP(...)`), nested parentheses, PEMDAS operator precedence, cell ranges (`B2:B11`), and absolute coordinates (`$A$1`).
+  - Supports arithmetic (`+`, `-`, `*`, `/`, `^`, `%`), concatenation (`&`), comparisons (`=`, `<>`, `>`, `<`, `>=`, `<=`), conditional aggregations (`SUMIF`, `COUNTIF`, `SUMIFS`), and matrix lookups (`XLOOKUP`, `VLOOKUP`, `INDEX/MATCH`).
+  - Circular reference detection and graceful Excel standard error propagation (`#DIV/0!`, `#VALUE!`, `#REF!`, `#N/A`, `#NAME?`).
+- **Interactive Grid & Multi-Sheet Architecture**:
+  - Grid rows (1..50+) and columns (A..Z+), in-cell editing, target coordinate visual highlight badge, bottom sheet switcher (`Sheet1`, `+` add sheet), and real-time status bar (Average, Count, Sum).
+- **7 Dedicated Spreadsheet Worlds & 42 Missions**:
+  - Seamlessly mirrors MySQL's industry scenarios: Supermarket, Metro, Kaapi, Airport, Warehouse, Hospital, and Bank.
+
 ---
 
 ## ⚡ Performance & Bundle Metrics
 
 | Metric | Measurement |
 | :--- | :--- |
-| **Gzipped JavaScript Bundle** | **~211 kB** (`dist/assets/index-*.js` including Monaco, SQLite WASM client, Lucide icons) |
-| **Gzipped CSS Bundle** | **~10.2 kB** (`dist/assets/index-*.css`) |
+| **Gzipped JavaScript Bundle** | **~265 kB** (`dist/assets/index-*.js` including Monaco, Excel AST engine, SQLite WASM client, Lucide icons) |
+| **Gzipped CSS Bundle** | **~11.8 kB** (`dist/assets/index-*.css`) |
 | **Web Worker Bundle** | **45.3 kB** (`dist/assets/sql.worker-*.js`) |
 | **Initial Boot Time** | **< 300 ms** in modern browsers |
-| **Main Thread Overhead** | **0 ms** during query execution (isolated Web Worker) |
+| **Main Thread Overhead** | **0 ms** during SQL query execution (isolated Web Worker) |
 
 ---
 
@@ -268,6 +290,8 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 - **UI & Framework**: React 18, TypeScript, Tailwind CSS, Zustand, Lucide Icons, Motion
 - **SQL Editor**: Monaco Editor (`@monaco-editor/react`) with dynamic remeasuring & Consolas monospace stack
 - **SQL Engine**: SQLite 3 compiled to WebAssembly via `sql.js` (Web Worker isolation)
+- **Spreadsheet Engine**: Custom TypeScript AST Recursive-Descent Formula Parser & Evaluator
+- **Spreadsheet Studio**: Microsoft Excel / Google Sheets Ribbon, Formula Bar, and Virtual Grid
 - **Local Persistence**: IndexedDB (`idb`)
 - **Audio Synthesizer**: Web Audio API Procedural Synthesizer
 - **Testing**: Vitest, React Testing Library, Playwright
@@ -301,7 +325,7 @@ Visit **[http://localhost:3000](http://localhost:3000)** in your browser.
 ### Test Suite Execution
 
 ```bash
-# Run complete automated test suite (14 suites, 271 unit & scenario tests)
+# Run complete automated test suite (19 suites, 386 unit, scenario & integration tests)
 npm test
 
 # Run tests in watch mode
