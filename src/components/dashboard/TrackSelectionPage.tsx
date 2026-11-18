@@ -89,10 +89,10 @@ export const TrackSelectionPage: React.FC = () => {
             {/* Core Competencies List */}
             <div className="space-y-2 mb-6">
               {[
-                'XLOOKUP & Nested Dynamic Arrays',
-                'Financial 3-Statement Forecasting',
-                'What-If Scenario & Goal Seek Solvers',
-                'Multi-Table Pivot Intelligence',
+                'The Grid & Foundations (Navigation, Formatting, Referencing)',
+                'Logic, Text & Lookups (IFS, TEXTSPLIT, XLOOKUP, INDEX/MATCH)',
+                'Modern Dynamic Arrays & Power Query (FILTER, LET/LAMBDA, ETL)',
+                'Financial Modeling & Automation (Solver, What-If, Macros/VBA)',
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-xs">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
@@ -106,7 +106,7 @@ export const TrackSelectionPage: React.FC = () => {
 
           <div>
             <div className="pt-4 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between mb-4 text-[11px] text-slate-500 font-medium">
-              <span>15 Planned Workbooks</span>
+              <span>16 Modules • 4 Tiers</span>
               <span>Finance & Ops</span>
             </div>
             <button

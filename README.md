@@ -74,10 +74,34 @@ Quest Query features a curated track selection portal introducing the essential 
                                                          └─────────────────────────┘
 ```
 
-### 1. Excel (Spreadsheets & Financial Modeling) &bull; *Coming Soon*
-- Master the corporate workhorse: dynamic multi-tier commissions, supplier inventory reconciliation, financial 3-statement modeling, and what-if scenarios.
-- Topics: `XLOOKUP`, nested dynamic arrays, pivot intelligence, and sensitivity solvers.
-- 15 planned hands-on workbooks.
+### 1. Excel (Spreadsheets & Financial Modeling) &bull; *Coming Soon (16 Modules Across 4 Skill Tiers)*
+- Master the corporate workhorse: move beyond basic cell editing to build resilient, automated workbooks that reconcile complex inventory, forecast multi-year financial statements, and automate operational reporting.
+- **Pedagogical Progression**: 16 hands-on modules structured across 4 rigorous skill tiers:
+  1. **Tier 1: The Grid & Foundations (Modules 1–4)**: Mouse-free grid navigation, data types & formatting masks, absolute/mixed cell referencing (`$`), and structured table sanitization.
+  2. **Tier 2: Logic, Text & Lookups (Modules 5–8)**: Multi-branching logical gates (`IFS`, `SWITCH`), dynamic string parsing (`TEXTSPLIT`, `TEXTBEFORE`), business calendar calculations (`NETWORKDAYS.INTL`), and 2D lookup engines (`XLOOKUP`, `INDEX/MATCH`).
+  3. **Tier 3: Modern Arrays & Business Intelligence (Modules 9–13)**: Dynamic array formulas (`FILTER`, `SORT`, `UNIQUE`, `#` spill operator), functional programming (`LET`, `LAMBDA`), interactive Pivot dashboards, automated ETL with Power Query (M), and star schema data modeling with Power Pivot (DAX).
+  4. **Tier 4: Optimization, Automation & Mastery (Modules 14–16)**: Multi-scenario 3-statement financial modeling (DCF, Solver, Data Tables), VBA process automation, and forensic formula auditing under high calculation loads.
+
+#### 📊 16-Module Excel Syllabus Breakdown
+
+| # | Module Title | Tier | Focus Area | Key Functions & Formulas | Key Shortcuts & Game Mechanics |
+| :---: | :--- | :--- | :--- | :--- | :--- |
+| **01** | **Grid Navigation & Interface Mechanics** | Tier 1: Foundations | Keyboard Mastery & Spatial Awareness | `SUM`, `AVERAGE`, `COUNT`, `MIN`, `MAX` | `Ctrl+Arrows`, `Ctrl+Shift+Arrows`, `Ctrl+Home/End`, Speed Grid Run |
+| **02** | **Data Types, Formatting & Paste Special** | Tier 1: Foundations | Data Integrity & Executive Presentation | `VALUE`, `TEXT`, `TRIM`, `N`, `TYPE` | `Ctrl+1`, `Ctrl+Alt+V`, `Ctrl+E`, Data Hygiene Quarantine |
+| **03** | **Cell Referencing & Core Arithmetic** | Tier 1: Foundations | Formula Mechanics & Mathematical Rigor | `SUM`, `PRODUCT`, `ROUND`, `MOD`, `ABS` | `F4`, `Ctrl+\``, `F2`, `Ctrl+D`, The Dollar Sign Matrix Lock |
+| **04** | **Sorting, Filtering & Data Hygiene** | Tier 1: Foundations | Structured Tables & Tabular Sanitization | `SUBTOTAL`, `COUNTA`, `COUNTBLANK`, `UNIQUE`, `SORT` | `Ctrl+T`, `Ctrl+Shift+L`, `Alt+A+M`, Filter Gauntlet |
+| **05** | **Logical Gates & Conditional Aggregation** | Tier 2: Logic & Lookups | Conditional Decision Logic & Summary Metrics | `IF`, `IFS`, `SWITCH`, `AND`, `OR`, `SUMIFS`, `COUNTIFS`, `IFERROR` | `F9`, `Ctrl+Shift+Enter`, `Alt+M+V`, Logic Gate Circuit Puzzle |
+| **06** | **Text Parsing & String Manipulation** | Tier 2: Logic & Lookups | Unstructured Data Extraction & String Wrangling | `LEFT`, `RIGHT`, `MID`, `FIND`, `TEXTJOIN`, `TEXTSPLIT`, `TEXTBEFORE` | `Ctrl+H`, `Alt+A+E`, `Ctrl+E`, Log File Disassembler |
+| **07** | **Date & Time Calculations** | Tier 2: Logic & Lookups | Temporal Modeling & Business Calendars | `TODAY`, `DATE`, `DATEDIF`, `EDATE`, `EOMONTH`, `NETWORKDAYS.INTL` | `Ctrl+;`, `Ctrl+Shift+:`, SLA Penalty Clock |
+| **08** | **Lookup & Reference Engines** | Tier 2: Logic & Lookups | Relational Retrieval & Matrix Lookups | `XLOOKUP`, `INDEX`, `MATCH`, `XMATCH`, `CHOOSE`, `OFFSET` | `Ctrl+Shift+A`, `Alt+M+P`, `Alt+M+D`, Two-Way Matrix Key |
+| **09** | **Dynamic Array Formulas & Spill Mechanics** | Tier 3: Arrays & BI | Spill Ranges & Array Reshaping | `FILTER`, `SORT`, `SORTBY`, `UNIQUE`, `SEQUENCE`, `VSTACK`, `HSTACK` | `#` Spill Ref, `Ctrl+Shift+8`, Spill Obstacle Clearance |
+| **10** | **Functional Programming (LET & LAMBDA)** | Tier 3: Arrays & BI | Modular Code, Variables & Custom Functions | `LET`, `LAMBDA`, `MAP`, `REDUCE`, `SCAN`, `BYROW`, `BYCOL` | `Ctrl+F3`, `Alt+M+N`, Custom Function Foundry |
+| **11** | **PivotTables, PivotCharts & Dashboards** | Tier 3: Arrays & BI | Interactive Reporting & Visual Analytics | `GETPIVOTDATA`, `CUBEVALUE`, `CUBEMEMBER` | `Alt+N+V`, `Alt+F5`, `Alt+J+T+S`, Executive War Room Assembly |
+| **12** | **Power Query (Automated ETL Pipelines)** | Tier 3: Arrays & BI | Extract, Transform & Load Without Code | `Table.SelectRows`, `Table.UnpivotOtherColumns`, `Table.NestedJoin` | `Alt+F12`, `Alt+A+P+T`, Corrupted CSV Pipeline Repair |
+| **13** | **Data Modeling & Power Pivot (DAX)** | Tier 3: Arrays & BI | Star Schemas & Scalable Business Logic | `CALCULATE`, `FILTER`, `ALL`, `RELATED`, `TOTALYTD`, `DISTINCTCOUNT` | `Alt+B+M`, `Alt+H+D+M`, Relationship Web Architect |
+| **14** | **Financial Modeling & What-If Analysis** | Tier 4: Automation & Endgame | Forecasting, Capital Budgeting & Optimization | `NPV`, `XNPV`, `IRR`, `XIRR`, `PMT`, `IPMT`, `RATE`, Solver | `Alt+A+W+G`, `Alt+A+W+T`, `Alt+A+Y`, Corporate M&A Valuation |
+| **15** | **Macros & VBA Automation** | Tier 4: Automation & Endgame | Scripting, Event Triggers & Process Automation | `MsgBox`, `Range.Select`, `Cells.Value`, `Worksheet.Protect` | `Alt+F11`, `Alt+F8`, `F5`, `F8`, Automated Report Dispatcher Bot |
+| **16** | **Formula Auditing, Debugging & Performance** | Tier 4: Automation & Endgame | Diagnostic Mastery, Volatility Control & Speed | `ISERROR`, `FORMULATEXT`, `INFO`, `CELL`, Recalc Chains | `Ctrl+[`, `Ctrl+]`, `Alt+M+V`, `Alt+M+W`, Megasheet Forensic Audit |
 
 ### 2. MySQL (Relational Databases & Enterprise Simulation) &bull; *Playable Now*
 - The flagship Quest Query simulation: 7 interactive industry worlds and 52 progressive missions running on an in-browser SQLite WASM engine.

@@ -11,8 +11,16 @@ import {
   Clock,
   Layers,
   Send,
+  Code,
+  Keyboard,
+  Gamepad2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import {
+  EXCEL_MODULES,
+  EXCEL_TIERS,
+  ExcelTierNumber,
+} from '../../modules/excel/curriculum';
 
 interface TrackDetail {
   id: TrackId;
@@ -37,33 +45,7 @@ const TRACK_DETAILS: Record<'excel' | 'powerbi', TrackDetail> = {
     icon: <FileSpreadsheet className="w-6 h-6 text-emerald-500" />,
     overview:
       'Master the backbone of corporate decision-making. Move beyond basic cell editing to build resilient, automated workbooks that reconcile complex inventory, forecast multi-year financial statements, and automate operational reporting.',
-    modules: [
-      {
-        title: 'Retail Inventory Reconciliation',
-        focus: 'Supply Chain Operations',
-        skills: ['XLOOKUP', 'INDEX & MATCH', 'Data Cleaning', 'Fuzzy Matching'],
-      },
-      {
-        title: 'Corporate 3-Statement P&L Model',
-        focus: 'Corporate Finance',
-        skills: ['Dynamic Arrays (FILTER, SORT)', 'Multi-scenario What-If', 'Variance Analysis'],
-      },
-      {
-        title: 'Sales Commission & Tiered Bonus Engine',
-        focus: 'HR & Revenue Operations',
-        skills: ['Nested Logic', 'Conditional Formatting', 'Formula Auditing'],
-      },
-      {
-        title: 'Warehouse Lead-Time & Safety Stock Forecast',
-        focus: 'Logistics Engineering',
-        skills: ['Goal Seek', 'Solver', 'Data Tables', 'Standard Deviation'],
-      },
-      {
-        title: 'Executive KPI Pivot & Slicer Dashboard',
-        focus: 'Business Intelligence',
-        skills: ['Pivot Tables', 'Calculated Fields', 'Interactive Slicers'],
-      },
-    ],
+    modules: [],
   },
   powerbi: {
     id: 'powerbi',
@@ -110,6 +92,7 @@ export const TrackPreviewModal: React.FC = () => {
 
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<ExcelTierNumber | 'all'>('all');
 
   if (!previewTrack || previewTrack === 'mysql') return null;
 
@@ -131,6 +114,22 @@ export const TrackPreviewModal: React.FC = () => {
     }
   };
 
+  const isExcel = previewTrack === 'excel';
+
+  const tierTabs = [
+    { id: 'all' as const, label: 'All 16 Modules', count: EXCEL_MODULES.length },
+    ...EXCEL_TIERS.map((t) => ({
+      id: t.tier,
+      label: t.tabLabel,
+      count: t.moduleCount,
+    })),
+  ];
+
+  const filteredExcelModules =
+    selectedTier === 'all'
+      ? EXCEL_MODULES
+      : EXCEL_MODULES.filter((m) => m.tier === selectedTier);
+
   return (
     <Modal
       isOpen={!!previewTrack}
@@ -138,9 +137,10 @@ export const TrackPreviewModal: React.FC = () => {
         setPreviewTrack(null);
         setIsSubscribed(false);
         setEmail('');
+        setSelectedTier('all');
       }}
       title=""
-      maxWidth="xl"
+      maxWidth="2xl"
     >
       <div className="space-y-6">
         {/* Header */}
@@ -191,76 +191,294 @@ export const TrackPreviewModal: React.FC = () => {
           {detail.overview}
         </div>
 
-        {/* Planned Modules */}
+        {/* Modules Section */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3
-              className={`text-sm font-bold uppercase tracking-wider ${
-                isLight ? 'text-slate-900' : 'text-slate-200'
-              } flex items-center gap-2`}
-            >
-              <Layers className="w-4 h-4 text-emerald-500" />
-              Planned Business Modules ({detail.modules.length})
-            </h3>
-            <span className="text-xs text-slate-500">Interactive Case Studies</span>
-          </div>
-
-          <div className="space-y-2.5">
-            {detail.modules.map((mod, idx) => (
-              <div
-                key={idx}
-                className={`p-3.5 rounded-xl border transition-all ${
-                  isLight
-                    ? 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
-                    : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                        detail.badgeColor === 'emerald'
-                          ? 'bg-emerald-500/20 text-emerald-500'
-                          : 'bg-amber-500/20 text-amber-500'
-                      }`}
-                    >
-                      {idx + 1}
-                    </span>
-                    <span
-                      className={`font-bold text-sm ${
-                        isLight ? 'text-slate-900' : 'text-slate-100'
-                      }`}
-                    >
-                      {mod.title}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${
-                      isLight
-                        ? 'bg-slate-100 text-slate-600'
-                        : 'bg-slate-850 text-slate-400 border border-slate-700/50'
+          {isExcel ? (
+            <div className="space-y-3.5">
+              {/* Excel Header with Stats */}
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-emerald-500" />
+                  <h3
+                    className={`text-sm font-bold uppercase tracking-wider ${
+                      isLight ? 'text-slate-900' : 'text-slate-200'
                     }`}
                   >
-                    {mod.focus}
-                  </span>
+                    Curriculum Modules ({filteredExcelModules.length})
+                  </h3>
                 </div>
-                <div className="flex items-center gap-1.5 flex-wrap pl-7">
-                  {mod.skills.map((skill, sIdx) => (
-                    <span
-                      key={sIdx}
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
-                        isLight
-                          ? 'bg-slate-100 text-slate-600 border border-slate-200'
-                          : 'bg-slate-800 text-slate-300 border border-slate-700/60'
-                      }`}
-                    >
-                      {skill}
-                    </span>
-                  ))}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>16 Modules Across 4 Skill Tiers</span>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {/* Tier Filter Tabs */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
+                {tierTabs.map((tab) => {
+                  const isActive = selectedTier === tab.id;
+                  return (
+                    <button
+                      key={String(tab.id)}
+                      onClick={() => setSelectedTier(tab.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                        isActive
+                          ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 font-bold'
+                          : isLight
+                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                          : 'bg-slate-850 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                      }`}
+                    >
+                      <span>{tab.label}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                          isActive
+                            ? 'bg-emerald-600/90 text-white'
+                            : isLight
+                            ? 'bg-slate-200 text-slate-700'
+                            : 'bg-slate-700 text-slate-300'
+                        }`}
+                      >
+                        {tab.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Excel Modules List */}
+              <div className="space-y-3">
+                {filteredExcelModules.map((mod) => (
+                  <div
+                    key={mod.id}
+                    className={`p-3.5 sm:p-4 rounded-xl border transition-all ${
+                      isLight
+                        ? 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+                        : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    {/* Module Title & Badges */}
+                    <div className="flex items-start justify-between gap-2.5 mb-2 flex-wrap">
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
+                            mod.tier === 1
+                              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                              : mod.tier === 2
+                              ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30'
+                              : mod.tier === 3
+                              ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30'
+                              : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                          }`}
+                        >
+                          #{mod.number}
+                        </span>
+                        <div>
+                          <h4
+                            className={`font-bold text-sm leading-tight ${
+                              isLight ? 'text-slate-900' : 'text-slate-100'
+                            }`}
+                          >
+                            {mod.title}
+                          </h4>
+                          <span className="text-[10px] text-slate-500 font-medium">
+                            {mod.tierName}
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
+                          isLight
+                            ? 'bg-slate-100 text-slate-700 border border-slate-200'
+                            : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
+                        }`}
+                      >
+                        {mod.focus}
+                      </span>
+                    </div>
+
+                    {/* Description */}
+                    <p
+                      className={`text-xs mb-3 leading-relaxed ${
+                        isLight ? 'text-slate-600' : 'text-slate-400'
+                      }`}
+                    >
+                      {mod.description}
+                    </p>
+
+                    {/* Core Concepts */}
+                    <div className="mb-2.5">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-emerald-500" />
+                        <span>Core Concepts</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {mod.coreConcepts.map((concept, cIdx) => (
+                          <span
+                            key={cIdx}
+                            className={`text-[10px] font-medium px-2 py-0.5 rounded-md ${
+                              isLight
+                                ? 'bg-slate-100 text-slate-700 border border-slate-200'
+                                : 'bg-slate-800/90 text-slate-300 border border-slate-700/50'
+                            }`}
+                          >
+                            {concept}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Function Tags */}
+                    {mod.functions.length > 0 && (
+                      <div className="mb-2.5">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 flex items-center gap-1">
+                          <Code className="w-3 h-3 text-cyan-500" />
+                          <span>Functions & Formulas</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {mod.functions.map((fn, fIdx) => (
+                            <span
+                              key={fIdx}
+                              className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                                isLight
+                                  ? 'bg-cyan-50 text-cyan-800 border border-cyan-200'
+                                  : 'bg-cyan-950/40 text-cyan-300 border border-cyan-800/50'
+                              }`}
+                            >
+                              {fn}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Key Shortcuts & Game Mechanics */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/60">
+                      {/* Shortcuts */}
+                      {mod.shortcuts.length > 0 && (
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">
+                            <Keyboard className="w-3 h-3 text-amber-500" />
+                            <span>Key Shortcuts</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {mod.shortcuts.map((sc, scIdx) => (
+                              <span
+                                key={scIdx}
+                                className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded ${
+                                  isLight
+                                    ? 'bg-amber-50/80 text-amber-900 border border-amber-200/80'
+                                    : 'bg-amber-950/30 text-amber-300 border border-amber-800/40'
+                                }`}
+                              >
+                                {sc}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Game Mechanics */}
+                      {mod.gameMechanics.length > 0 && (
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">
+                            <Gamepad2 className="w-3 h-3 text-purple-500" />
+                            <span>Game Mechanics</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {mod.gameMechanics.map((gm, gmIdx) => (
+                              <span
+                                key={gmIdx}
+                                className={`text-[9.5px] font-medium px-1.5 py-0.5 rounded ${
+                                  isLight
+                                    ? 'bg-purple-50 text-purple-800 border border-purple-200'
+                                    : 'bg-purple-950/30 text-purple-300 border border-purple-800/40'
+                                }`}
+                              >
+                                {gm}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div>
+              {/* Power BI Modules Header */}
+              <div className="flex items-center justify-between mb-3">
+                <h3
+                  className={`text-sm font-bold uppercase tracking-wider ${
+                    isLight ? 'text-slate-900' : 'text-slate-200'
+                  } flex items-center gap-2`}
+                >
+                  <Layers className="w-4 h-4 text-amber-500" />
+                  Planned Business Modules ({detail.modules.length})
+                </h3>
+                <span className="text-xs text-slate-500">Interactive Case Studies</span>
+              </div>
+
+              <div className="space-y-2.5">
+                {detail.modules.map((mod, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-3.5 rounded-xl border transition-all ${
+                      isLight
+                        ? 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+                        : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                            detail.badgeColor === 'emerald'
+                              ? 'bg-emerald-500/20 text-emerald-500'
+                              : 'bg-amber-500/20 text-amber-500'
+                          }`}
+                        >
+                          {idx + 1}
+                        </span>
+                        <span
+                          className={`font-bold text-sm ${
+                            isLight ? 'text-slate-900' : 'text-slate-100'
+                          }`}
+                        >
+                          {mod.title}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${
+                          isLight
+                            ? 'bg-slate-100 text-slate-600'
+                            : 'bg-slate-850 text-slate-400 border border-slate-700/50'
+                        }`}
+                      >
+                        {mod.focus}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-wrap pl-7">
+                      {mod.skills.map((skill, sIdx) => (
+                        <span
+                          key={sIdx}
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                            isLight
+                              ? 'bg-slate-100 text-slate-600 border border-slate-200'
+                              : 'bg-slate-800 text-slate-300 border border-slate-700/60'
+                          }`}
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Notification Form / Early Access */}
@@ -324,6 +542,7 @@ export const TrackPreviewModal: React.FC = () => {
               setPreviewTrack(null);
               setIsSubscribed(false);
               setEmail('');
+              setSelectedTier('all');
             }}
           >
             Close Preview
