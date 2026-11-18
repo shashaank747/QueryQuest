@@ -588,25 +588,28 @@ export const ExcelRibbon: React.FC = () => {
             {/* Quick AutoSum & Filter Functions */}
             <div className="flex items-center gap-2">
               <div className="relative">
-                <button
-                  onClick={() => handleAutoSum('SUM')}
-                  className="flex flex-col items-center justify-center px-2 py-1 rounded hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 transition-colors"
-                  title="AutoSum (Σ)"
-                >
-                  <div className="flex items-center gap-1">
-                    <Sigma className="w-4 h-4" />
+                <div className="flex flex-col items-center justify-center rounded transition-colors">
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => handleAutoSum('SUM')}
+                      className="flex items-center gap-1 px-1.5 py-1 rounded-l hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      title="AutoSum (Σ)"
+                    >
+                      <Sigma className="w-4 h-4" />
+                      <span className="text-[10px] font-bold">AutoSum</span>
+                    </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setShowAutoSumMenu(!showAutoSumMenu);
                       }}
-                      className="p-0.5 hover:bg-emerald-500/20 rounded"
+                      className="p-1 hover:bg-emerald-500/20 rounded-r text-emerald-600 dark:text-emerald-400"
+                      title="More AutoSum Functions"
                     >
                       <ChevronDown className="w-2.5 h-2.5" />
                     </button>
                   </div>
-                  <span className="text-[10px] mt-0.5 font-bold">AutoSum</span>
-                </button>
+                </div>
                 {showAutoSumMenu && (
                   <div
                     className={`absolute left-0 top-full mt-1 w-36 rounded-lg shadow-xl border p-1 z-50 text-[11px] ${
