@@ -97,18 +97,14 @@ describe('World 5: Bank Operations — Full Playtester Suite', () => {
       expect(bankWorld.reportConfig.metrics.length).toBeGreaterThan(0);
     });
 
-    it('should seed 3 branches, 7 accounts, 8 transactions, 3 cards, and 2 audit logs', () => {
+    it('should seed 3 branches, 7 accounts, and 8 transactions', () => {
       const branches = db.exec('SELECT COUNT(*) FROM branches;')[0].values[0][0];
       const accounts = db.exec('SELECT COUNT(*) FROM accounts;')[0].values[0][0];
       const txns = db.exec('SELECT COUNT(*) FROM transactions;')[0].values[0][0];
-      const cards = db.exec('SELECT COUNT(*) FROM cards;')[0].values[0][0];
-      const auditLogs = db.exec('SELECT COUNT(*) FROM audit_logs;')[0].values[0][0];
 
       expect(branches).toBe(3);
       expect(accounts).toBe(7);
       expect(txns).toBe(8);
-      expect(cards).toBe(3);
-      expect(auditLogs).toBe(2);
     });
 
     it('should enforce foreign key integrity between accounts and branches', () => {

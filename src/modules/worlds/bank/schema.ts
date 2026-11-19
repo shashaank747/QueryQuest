@@ -33,20 +33,4 @@ CREATE TABLE IF NOT EXISTS transactions (
   channel TEXT NOT NULL,
   FOREIGN KEY (account_id) REFERENCES accounts(account_id)
 );
-
-CREATE TABLE IF NOT EXISTS cards (
-  card_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  account_id INTEGER NOT NULL,
-  card_number TEXT NOT NULL UNIQUE,
-  card_type TEXT NOT NULL,
-  is_active INTEGER NOT NULL DEFAULT 1,
-  FOREIGN KEY (account_id) REFERENCES accounts(account_id)
-);
-
-CREATE TABLE IF NOT EXISTS audit_logs (
-  log_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  event_type TEXT NOT NULL,
-  description TEXT NOT NULL,
-  created_at TEXT NOT NULL
-);
 `;

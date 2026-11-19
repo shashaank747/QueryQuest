@@ -30,15 +30,4 @@ INSERT INTO transactions (transaction_id, account_id, txn_type, amount, txn_time
   (6, 6, 'WITHDRAWAL', 15000.0, '2026-11-16 13:10:00', 'ATM Terminal'),
   (7, 7, 'DEPOSIT', 4500000.0, '2026-11-16 14:00:00', 'Wire Transfer'),
   (8, 2, 'WITHDRAWAL', 120000.0, '2026-11-16 14:45:00', 'Branch Counter');
-
--- Cards Seed Data
-INSERT INTO cards (card_id, account_id, card_number, card_type, is_active) VALUES
-  (1, 2, '4532-8812-9901-3321', 'Debit Platinum', 1),
-  (2, 4, '5421-1190-4432-8765', 'Credit Signature', 1),
-  (3, 6, '4111-9988-2345-6712', 'Debit Gold', 1);
-
--- Audit Logs Seed Data
-INSERT INTO audit_logs (log_id, event_type, description, created_at) VALUES
-  (1, 'VAULT_VERIFICATION', 'Daily start-of-day vault physical count reconciled.', '2026-11-16 08:30:00'),
-  (2, 'SECURITY_SCAN', 'RTGS gateway TLS cryptographic verification passed.', '2026-11-16 09:00:00');
 `;

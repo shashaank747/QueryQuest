@@ -97,21 +97,21 @@ export const supermarketWorld: WorldDefinition = {
         type: 'table',
       },
       {
-        id: 'revenue_by_category',
-        title: 'Revenue by Department / Category',
+        id: 'inventory_by_supplier',
+        title: 'Product Stock by Supplier',
         query:
-          'SELECT c.category_name, ROUND(SUM(oi.quantity * oi.unit_price), 2) as revenue FROM categories c JOIN products p ON c.category_id = p.category_id JOIN order_items oi ON p.product_id = oi.product_id GROUP BY c.category_name ORDER BY revenue DESC;',
-        description: 'Departmental sales distribution across store merchandise lines.',
+          'SELECT s.company_name, COUNT(p.product_id) as total_products, SUM(i.quantity_on_hand) as total_units FROM suppliers s JOIN products p ON s.supplier_id = p.supplier_id JOIN inventory i ON p.product_id = i.product_id GROUP BY s.company_name ORDER BY total_units DESC;',
+        description: 'Inventory stock distribution across verified suppliers.',
         type: 'bar_chart',
-        labelKey: 'category_name',
-        valueKey: 'revenue',
+        labelKey: 'company_name',
+        valueKey: 'total_units',
       },
       {
-        id: 'best_sellers',
-        title: 'Top Best-Selling Products',
+        id: 'top_priced_products',
+        title: 'Top Premium Products in Catalog',
         query:
-          'SELECT p.product_name, SUM(oi.quantity) as units_sold FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_name ORDER BY units_sold DESC LIMIT 5;',
-        description: 'High-velocity SKUs commanding the largest order volume.',
+          'SELECT product_name, unit_price, status FROM products WHERE status = "Active" ORDER BY unit_price DESC LIMIT 5;',
+        description: 'Premium merchandise lines with highest price points.',
         type: 'table',
       },
       {

@@ -32,7 +32,7 @@ export const SchemaExplorer: React.FC = () => {
 
   const [expandedTables, setExpandedTables] = useState<Record<string, boolean>>({
     products: true,
-    categories: true,
+    inventory: true,
   });
   const [search, setSearch] = useState('');
 

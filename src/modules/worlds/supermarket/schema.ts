@@ -13,23 +13,5 @@ CREATE TABLE IF NOT EXISTS suppliers (
   phone TEXT NOT NULL,
   city TEXT NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS customers (
-  customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  membership_level TEXT DEFAULT 'Standard',
-  loyalty_points INTEGER DEFAULT 0
-);
-
-CREATE TABLE IF NOT EXISTS employees (
-  employee_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  role TEXT NOT NULL,
-  salary INTEGER NOT NULL,
-  hire_date TEXT NOT NULL
-);
 `;
 

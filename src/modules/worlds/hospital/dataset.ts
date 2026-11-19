@@ -20,15 +20,6 @@ INSERT INTO doctors (doctor_id, first_name, last_name, specialty, department_id,
   (5, 'Marcus', 'Brody', 'Cardiothoracic Surgery', 2, 1),
   (6, 'Amina', 'Siddiqui', 'Emergency Medicine', 1, 1);
 
--- Patients Seed Data
-INSERT INTO patients (patient_id, first_name, last_name, dob, blood_group, emergency_contact) VALUES
-  (1, 'Siddharth', 'Varma', '1982-04-12', 'O+', '+91 98111 22334'),
-  (2, 'Pooja', 'Hegde', '1995-09-28', 'A+', '+91 98222 33445'),
-  (3, 'Robert', 'Langdon', '1964-06-22', 'B+', '+91 98333 44556'),
-  (4, 'Kavya', 'Krishnan', '2018-11-05', 'AB+', '+91 98444 55667'),
-  (5, 'Deepak', 'Chopra', '1958-01-17', 'O-', '+91 98555 66778'),
-  (6, 'Zoya', 'Akhtar', '1989-07-30', 'A-', '+91 98666 77889');
-
 -- Wards Seed Data
 INSERT INTO wards (ward_id, ward_name, ward_type, total_beds, occupied_beds) VALUES
   (1, 'Intensive Care Unit (ICU)', 'Critical Care', 12, 12),
