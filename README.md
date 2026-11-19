@@ -39,6 +39,17 @@ Instead of sterile, disconnected tutorial quizzes asking for trivial queries lik
 
 ---
 
+## 🎯 Curriculum Focus & Pedagogy: 100% MySQL & Relational Data
+
+Quest Query is built with a focused educational architecture: **100% pure focus on relational databases, MySQL syntax, and real-world SQL engineering**.
+
+- **Dedicated Relational SQL Simulation**: Quest Query is strictly an enterprise relational database platform. All operational scenarios model authentic normalized schemas, tables, primary/foreign keys, relational constraints, and SQL queries with zero non-relational distractions.
+- **Student-Authored SQL (Zero Solution Spoilers)**: Starter query boilerplates provide mission context and task reminders without giving away the answers or pre-populating query clauses. Students write the SQL logic (`SELECT`, `WHERE`, `JOIN`, `GROUP BY`, `HAVING`, CTEs, window functions, and transactions) themselves.
+- **100% Active Relational Catalogs**: Every single table defined across all 7 industry worlds is actively queried in scenario missions. All dead or unreferenced tables have been pruned from database schemas.
+- **Zero Server Overhead**: The relational database engine runs completely client-side inside your browser using **SQLite 3 compiled to WebAssembly**. All queries, schema mutations, and data persistence happen locally with 0ms server latency.
+
+---
+
 ## 🔒 Tier-Based World Progression & Lock System (3x3 Model)
 
 To guarantee a pedagogically rigorous learning curve, Quest Query organizes **7 industry worlds** into **3 Progressive Skill Tiers** governed by a **"Play Any 2 to Unlock Next Tier"** rule:
@@ -231,6 +242,17 @@ The dashboard presents industry worlds as interactive **3D collectible physical 
 - **XP Progression & Levels**: Real-time level-up calculation with milestone achievements.
 - **Procedural Sound Engine**: Web Audio API procedural sound synthesizer (click feedback, success chimes, level-up melodies) with instant mute toggle.
 - **Offline Persistence**: Client-side storage via IndexedDB (`idb`) preserves binary database snapshots and completed mission states across sessions.
+
+### 7. Cosmic Aurora Cadet Authentication & Access Terminal
+- **Unique Aesthetic Theme**: Deep cosmic twilight backdrop (`#0a0b1a`) enriched by bioluminescent emerald, cyan, and violet nebula blur orbs with cybernetic grid lines, completely avoiding generic bright or dark palettes.
+- **Strict Credential Validation**:
+  - **Cadet Call Sign (Username)**: Minimum 3 characters with live length meter.
+  - **Terminal Email (Mail ID)**: Real-time format validation enforcing the presence of **both `@` and `.com`** with live indicator badges (`@ Found`, `.com Found`).
+  - **Access Cipher (Password)**: Minimum 6 characters with interactive show/hide visibility toggle.
+- **Session Continuity & Quick Access**:
+  - Remember credentials option persisted via `localStorage`.
+  - *"Continue as Guest Cadet (1-Click Test Drive)"* button for instant sandbox entry.
+  - Live Cadet call-sign pill and one-click session logout in the dashboard header.
 
 ---
 
