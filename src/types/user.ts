@@ -1,6 +1,7 @@
 export interface UserProfile {
   id: string;
   username: string;
+  email?: string;
   role: string;
   xp: number;
   level: number;
@@ -10,6 +11,7 @@ export interface UserProfile {
   achievements: string[];
   totalQueriesRun: number;
   successfulQueriesRun: number;
+  isLoggedIn?: boolean;
 }
 
 export interface Achievement {

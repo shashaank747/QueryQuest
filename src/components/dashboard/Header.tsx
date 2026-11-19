@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flame, Trophy, BookOpen, Volume2, VolumeX, Sparkles, Sun, Moon } from 'lucide-react';
+import { Flame, Trophy, BookOpen, Volume2, VolumeX, Sparkles, Sun, Moon, LogOut } from 'lucide-react';
 import { useUserStore } from '../../stores/useUserStore';
 import { useThemeStore } from '../../stores/useThemeStore';
 import { useWorldStore } from '../../stores/useWorldStore';
@@ -169,6 +169,33 @@ export const Header: React.FC = () => {
           >
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-emerald-500" />}
           </button>
+
+          {/* Cadet Profile & Logout */}
+          <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-200 dark:border-slate-800">
+            <div
+              className={`hidden xl:flex items-center gap-2 px-2.5 py-1.5 rounded-lg border ${
+                isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-slate-900 border-slate-800 text-slate-200'
+              } text-xs`}
+              title={profile.email ? `Call Sign: ${profile.username} (${profile.email})` : profile.username}
+            >
+              <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-[10px]">
+                {profile.username ? profile.username.charAt(0).toUpperCase() : 'C'}
+              </div>
+              <span className="font-semibold truncate max-w-[90px]">{profile.username}</span>
+            </div>
+
+            <button
+              onClick={() => useUserStore.getState().logout()}
+              className={`p-2 rounded-lg transition-colors border ${
+                isLight
+                  ? 'text-slate-500 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 border-slate-200 hover:border-rose-200'
+                  : 'text-slate-400 hover:text-rose-400 bg-slate-900 hover:bg-rose-950/40 border-slate-800 hover:border-rose-900/60'
+              }`}
+              title="Log out of Quest Query terminal session"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </header>
 

@@ -5,17 +5,22 @@ import { useThemeStore } from '../stores/useThemeStore';
 import { Header } from '../components/dashboard/Header';
 import { WorldGrid } from '../components/dashboard/WorldGrid';
 import { WorkspaceLayout } from '../components/workspace/WorkspaceLayout';
+import { LoginScreen } from '../components/auth/LoginScreen';
 import { Code2, ExternalLink } from 'lucide-react';
 
 export const App: React.FC = () => {
   const { activeWorld, initWorlds } = useWorldStore();
-  const { initUser } = useUserStore();
+  const { initUser, isAuthenticated } = useUserStore();
   const { theme } = useThemeStore();
 
   useEffect(() => {
     initUser();
     initWorlds();
   }, []);
+
+  if (!isAuthenticated) {
+    return <LoginScreen />;
+  }
 
   if (activeWorld) {
     return <WorkspaceLayout />;
