@@ -59,11 +59,32 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
 
-  login: async (username: string, email: string) => {
-    const { profile } = get();
-    const cleanUsername = username.trim() || 'Cadet Operator';
-    const cleanEmail = email.trim();
+  login: async (username: string, email: string, password?: string) => {
+    const cleanUsername = username?.trim() || '';
+    const cleanEmail = email?.trim() || '';
 
+    // Backend credential validations
+    if (cleanUsername.length < 3) {
+      throw new Error('User name must be at least 3 characters long.');
+    }
+
+    const hasAt = cleanEmail.includes('@');
+    const hasDotCom = cleanEmail.toLowerCase().includes('.com');
+    if (!hasAt || !hasDotCom) {
+      if (!hasAt && !hasDotCom) {
+        throw new Error("Invalid Mail ID: email must contain both '@' and '.com'.");
+      } else if (!hasAt) {
+        throw new Error("Invalid Mail ID: missing '@' symbol.");
+      } else {
+        throw new Error("Invalid Mail ID: missing '.com' domain ending.");
+      }
+    }
+
+    if (password !== undefined && password.length < 6) {
+      throw new Error('Password must be at least 6 characters long.');
+    }
+
+    const { profile } = get();
     const updated: UserProfile = {
       ...profile,
       username: cleanUsername,

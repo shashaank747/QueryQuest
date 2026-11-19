@@ -6,7 +6,6 @@ import {
   Eye,
   EyeOff,
   Sparkles,
-  CheckCircle2,
   AlertCircle,
   Database,
   ArrowRight,
@@ -39,55 +38,24 @@ export const LoginScreen: React.FC = () => {
     }
   }, []);
 
-  // Validation rules
-  const isUsernameValid = username.trim().length >= 3;
-  const hasAt = email.includes('@');
-  const hasDotCom = email.toLowerCase().includes('.com');
-  const isEmailValid = hasAt && hasDotCom;
-  const isPasswordValid = password.length >= 6;
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-
-    // Validate Username
-    if (!isUsernameValid) {
-      setErrorMessage('Username must be at least 3 characters long.');
-      soundService.playErrorBuzz();
-      return;
-    }
-
-    // Validate Email strictly checking @ and .com
-    if (!isEmailValid) {
-      if (!hasAt && !hasDotCom) {
-        setErrorMessage("Email must contain both '@' and '.com'.");
-      } else if (!hasAt) {
-        setErrorMessage("Email format error: missing '@' symbol.");
-      } else {
-        setErrorMessage("Email format error: missing '.com' domain ending.");
-      }
-      soundService.playErrorBuzz();
-      return;
-    }
-
-    // Validate Password
-    if (!isPasswordValid) {
-      setErrorMessage('Password must be at least 6 characters.');
-      soundService.playErrorBuzz();
-      return;
-    }
-
     setIsSubmitting(true);
-    soundService.playSuccessChime();
 
     try {
+      // Backend validation runs inside useUserStore.login
+      await login(username, email, password);
+      soundService.playSuccessChime();
+
       if (rememberMe && typeof window !== 'undefined') {
         localStorage.setItem('queryquest_user_username', username.trim());
         localStorage.setItem('queryquest_user_email', email.trim());
       }
-      await login(username, email, password);
-    } catch (err) {
-      setErrorMessage('Failed to initialize session. Please try again.');
+    } catch (err: unknown) {
+      soundService.playErrorBuzz();
+      const message = err instanceof Error ? err.message : 'Authentication failed. Please verify your credentials.';
+      setErrorMessage(message);
       setIsSubmitting(false);
     }
   };
@@ -229,7 +197,7 @@ export const LoginScreen: React.FC = () => {
                 </button>
               </div>
 
-              {/* Right Column: Compact Form Fields */}
+              {/* Right Column: Clean Form Fields with Backend Validation */}
               <div className="md:col-span-7 flex flex-col justify-center">
                 {/* Mode Heading */}
                 <div className="mb-3">
@@ -243,11 +211,11 @@ export const LoginScreen: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Error Alert */}
+                {/* Error Alert Displaying Backend Validation Result */}
                 {errorMessage && (
-                  <div className="mb-3 p-2 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-start gap-2 text-xs text-rose-200 animate-in fade-in duration-150">
-                    <AlertCircle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0 mt-0.5" />
-                    <span>{errorMessage}</span>
+                  <div className="mb-3 p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-start gap-2.5 text-xs text-rose-200 animate-in fade-in duration-150">
+                    <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
+                    <span className="font-medium leading-relaxed">{errorMessage}</span>
                   </div>
                 )}
 
@@ -255,20 +223,9 @@ export const LoginScreen: React.FC = () => {
                 <form onSubmit={handleSubmit} className="space-y-3">
                   {/* Username Field */}
                   <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-semibold text-slate-300">
-                        User Name <span className="text-emerald-400">*</span>
-                      </label>
-                      <span className="text-[10px] text-slate-500">
-                        {username.length >= 3 ? (
-                          <span className="text-emerald-400 font-medium">Valid Call Sign</span>
-                        ) : username.length > 0 ? (
-                          <span className="text-amber-400">Min 3 characters</span>
-                        ) : (
-                          'Min 3 chars'
-                        )}
-                      </span>
-                    </div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      User Name <span className="text-emerald-400">*</span>
+                    </label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
                         <User className="w-3.5 h-3.5" />
@@ -279,43 +236,16 @@ export const LoginScreen: React.FC = () => {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         placeholder="e.g. alex_chen"
-                        className="w-full pl-9 pr-9 py-2 bg-[#080918]/80 border border-violet-500/25 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all font-medium"
+                        className="w-full pl-9 pr-4 py-2 bg-[#080918]/80 border border-violet-500/25 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all font-medium"
                       />
-                      {username.length >= 3 && (
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-emerald-400">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  {/* Email Field with Strict @ and .com Validation */}
+                  {/* Email Field */}
                   <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-slate-300">
-                        Mail ID <span className="text-emerald-400">*</span>
-                      </label>
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                            hasAt
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : 'bg-slate-800/80 text-slate-500 border border-slate-700'
-                          }`}
-                        >
-                          {hasAt ? '✓ @' : '○ @'}
-                        </span>
-                        <span
-                          className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                            hasDotCom
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : 'bg-slate-800/80 text-slate-500 border border-slate-700'
-                          }`}
-                        >
-                          {hasDotCom ? '✓ .com' : '○ .com'}
-                        </span>
-                      </div>
-                    </div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Mail ID <span className="text-emerald-400">*</span>
+                    </label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
                         <Mail className="w-3.5 h-3.5" />
@@ -326,50 +256,16 @@ export const LoginScreen: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="cadet@questquery.com"
-                        className={`w-full pl-9 pr-9 py-2 bg-[#080918]/80 border rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition-all font-medium ${
-                          isEmailValid
-                            ? 'border-emerald-500/50 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30'
-                            : email.length > 0
-                            ? 'border-amber-500/50 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30'
-                            : 'border-violet-500/25 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30'
-                        }`}
+                        className="w-full pl-9 pr-4 py-2 bg-[#080918]/80 border border-violet-500/25 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all font-medium"
                       />
-                      {isEmailValid ? (
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-emerald-400">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                        </div>
-                      ) : email.length > 0 ? (
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-amber-400">
-                          <AlertCircle className="w-3.5 h-3.5" />
-                        </div>
-                      ) : null}
                     </div>
                   </div>
 
                   {/* Password Field */}
                   <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-semibold text-slate-300">
-                        Password <span className="text-emerald-400">*</span>
-                      </label>
-                      <span className="text-[10px] text-slate-500">
-                        {password.length > 0 ? (
-                          <span
-                            className={`font-semibold ${
-                              password.length >= 8
-                                ? 'text-emerald-400'
-                                : password.length >= 6
-                                ? 'text-teal-400'
-                                : 'text-rose-400'
-                            }`}
-                          >
-                            {password.length >= 8 ? 'Strong' : password.length >= 6 ? 'Adequate' : 'Min 6 chars'}
-                          </span>
-                        ) : (
-                          'Min 6 chars'
-                        )}
-                      </span>
-                    </div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Password <span className="text-emerald-400">*</span>
+                    </label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-emerald-400 transition-colors">
                         <Lock className="w-3.5 h-3.5" />
@@ -380,7 +276,7 @@ export const LoginScreen: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        className="w-full pl-9 pr-9 py-2 bg-[#080918]/80 border border-violet-500/25 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all font-medium"
+                        className="w-full pl-9 pr-10 py-2 bg-[#080918]/80 border border-violet-500/25 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 transition-all font-medium"
                       />
                       <button
                         type="button"
