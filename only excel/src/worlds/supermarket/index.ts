@@ -111,7 +111,7 @@ export const supermarketWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(E2:E11)',
       solutionExplanation:
         '=SUM(E2:E11) totals all inventory quantities in column E from row 2 to 11, returning 420 total stock units.',
-      initialFormulaPlaceholder: '=SUM(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -161,7 +161,7 @@ export const supermarketWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=IF(E2<F2, "REORDER", "OK")',
       solutionExplanation:
         'With E2 (18) being less than F2 (25), the IF condition evaluates to TRUE, flagging the SKU as "REORDER".',
-      initialFormulaPlaceholder: '=IF(E2<F2, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -211,7 +211,7 @@ export const supermarketWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=D2-C2',
       solutionExplanation:
         '=D2-C2 subtracts cost (₹320) from retail price (₹450), generating a gross profit of ₹130 per unit.',
-      initialFormulaPlaceholder: '=D2-',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'EXACT_FORMULA',
@@ -256,7 +256,7 @@ export const supermarketWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=COUNTIF(H2:H11, ">50")',
       solutionExplanation:
         '=COUNTIF(H2:H11, ">50") inspects margins in column H and counts the 3 SKUs exceeding ₹50 (Basmati Rice ₹130, Atta ₹80, Amul Butter ₹55).',
-      initialFormulaPlaceholder: '=COUNTIF(H2:H11, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -306,7 +306,7 @@ export const supermarketWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=AVERAGE(I2:I11)',
       solutionExplanation:
         '=AVERAGE(I2:I11) sums all daily unit sales (229) and divides by 10 items to return 22.9 units per day.',
-      initialFormulaPlaceholder: '=AVERAGE(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -352,7 +352,7 @@ export const supermarketWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(K2:K11)',
       solutionExplanation:
         '=SUM(K2:K11) aggregates all line revenues to deliver ₹34,675 total store turnover.',
-      initialFormulaPlaceholder: '=SUM(K2:K11)',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',

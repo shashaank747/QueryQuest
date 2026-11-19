@@ -35,7 +35,7 @@ export const SUPERMARKET_MISSIONS: Mission[] = [
 );`,
     solutionExplanation:
       'CREATE TABLE creates a relational table in SQLite. Specifying INTEGER PRIMARY KEY automatically provides unique row identification and indexed lookups. NOT NULL prevents accidental missing values in crucial fields.',
-    initialSqlPlaceholder: `-- Mission 1: Create the store branches workspace table\nCREATE TABLE store_branches (\n  \n);`,
+    initialSqlPlaceholder: `-- Mission 1: Create the store branches workspace table\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'TABLE_EXISTS',
@@ -83,7 +83,7 @@ export const SUPERMARKET_MISSIONS: Mission[] = [
 );`,
     solutionExplanation:
       'UNIQUE ensures no two departments share the same name, preventing accidental duplicate departments in the store directory.',
-    initialSqlPlaceholder: `-- Mission 2: Create departments table\nCREATE TABLE departments (\n  \n);`,
+    initialSqlPlaceholder: `-- Mission 2: Create departments table\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'TABLE_EXISTS',
@@ -122,7 +122,7 @@ export const SUPERMARKET_MISSIONS: Mission[] = [
 VALUES ('FreshRoots Organics', 'Kavita Rao', '+91 98888 77777', 'Bengaluru');`,
     solutionExplanation:
       'INSERT INTO adds new tuples into a relation. By listing the column names explicitly, SQLite maps the values safely even if column orders change.',
-    initialSqlPlaceholder: `-- Mission 3: Register FreshRoots Organics into suppliers\nINSERT INTO suppliers (\n  company_name, contact_name, phone, city\n) VALUES (\n  \n);`,
+    initialSqlPlaceholder: `-- Mission 3: Register FreshRoots Organics into suppliers\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_EXISTS',
@@ -168,7 +168,7 @@ FROM inventory
 WHERE quantity_on_hand < reorder_level;`,
     solutionExplanation:
       'The WHERE clause filters rows based on a boolean predicate. By comparing quantity_on_hand with reorder_level directly across each row, SQL isolates stock deficits instantly.',
-    initialSqlPlaceholder: `-- Mission 4: Find products running low on stock\nSELECT product_id, quantity_on_hand, reorder_level\nFROM inventory\nWHERE ...;`,
+    initialSqlPlaceholder: `-- Mission 4: Find products running low on stock\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -208,7 +208,7 @@ SET unit_price = 480.00
 WHERE product_id = 1;`,
     solutionExplanation:
       'UPDATE modifies existing records. Always include a precise WHERE filter matching the primary key to prevent unintended updates to other records in production.',
-    initialSqlPlaceholder: `-- Mission 5: Update the price of product_id 1 to 480.00\nUPDATE products\nSET ...\nWHERE ...;`,
+    initialSqlPlaceholder: `-- Mission 5: Update the price of product_id 1 to 480.00\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_EXISTS',
@@ -254,7 +254,7 @@ WHERE product_id = 1;`,
 WHERE status = 'Discontinued';`,
     solutionExplanation:
       'DELETE FROM removes matching rows from a table. The condition status = \'Discontinued\' targets only obsolete items, keeping active products safe.',
-    initialSqlPlaceholder: `-- Mission 6: Remove discontinued products\nDELETE FROM products\nWHERE ...;`,
+    initialSqlPlaceholder: `-- Mission 6: Remove discontinued products\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_ABSENT',
@@ -302,7 +302,7 @@ FROM products
 WHERE product_name LIKE '%Organic%' AND status = 'Active';`,
     solutionExplanation:
       "The LIKE operator performs pattern matching against string data. By wrapping 'Organic' in '%' wildcards (%Organic%), SQLite matches any product name containing 'Organic' anywhere in the title, and the AND status = 'Active' filter excludes obsolete items.",
-    initialSqlPlaceholder: `-- Mission 7: Find active organic products in the catalog\nSELECT product_id, product_name, category_id, unit_price\nFROM products\nWHERE ...;`,
+    initialSqlPlaceholder: `-- Mission 7: Find active organic products in the catalog\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -350,7 +350,7 @@ WHERE status = 'Completed' AND total_amount BETWEEN 500 AND 2500
 ORDER BY total_amount DESC;`,
     solutionExplanation:
       'The BETWEEN operator cleanly tests whether an expression falls within an inclusive boundary (equivalent to total_amount >= 500 AND total_amount <= 2500). Sorting by total_amount DESC displays highest-value baskets first.',
-    initialSqlPlaceholder: `-- Mission 8: Filter completed orders between 500 and 2500\nSELECT order_id, customer_id, order_date, total_amount\nFROM orders\nWHERE ...\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 8: Filter completed orders between 500 and 2500\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -395,7 +395,7 @@ HAVING total_revenue > 2000
 ORDER BY total_revenue DESC;`,
     solutionExplanation:
       'GROUP BY aggregates individual payment transactions by payment_method. Aggregate functions COUNT() and SUM() calculate totals per group, and HAVING filters the aggregated sums (total_revenue > 2000), unlike WHERE which filters single rows before grouping.',
-    initialSqlPlaceholder: `-- Mission 9: Summarize payment methods with revenue > 2000\nSELECT payment_method, COUNT(payment_id) AS total_transactions, SUM(amount) AS total_revenue\nFROM payments\nGROUP BY ...\nHAVING ...\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 9: Summarize payment methods with revenue > 2000\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -445,7 +445,7 @@ ORDER BY total_spent DESC
 LIMIT 3;`,
     solutionExplanation:
       'By grouping orders by customer_id and computing aggregate metrics (order count and total expenditure), SQL provides concise customer-level insights. Sorting by total_spent descending with LIMIT 3 isolates the highest-value patrons directly from raw transaction records.',
-    initialSqlPlaceholder: `-- Mission 10: Top 3 spending customers\nSELECT customer_id, COUNT(order_id) AS total_orders, SUM(total_amount) AS total_spent\nFROM orders\nGROUP BY ...\nORDER BY ...\nLIMIT 3;`,
+    initialSqlPlaceholder: `-- Mission 10: Top 3 spending customers\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',

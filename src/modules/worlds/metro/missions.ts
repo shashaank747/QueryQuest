@@ -52,7 +52,7 @@ export const METRO_MISSIONS: Mission[] = [
 );`,
     solutionExplanation:
       'Relational database systems enforce operational integrity at the schema layer. By declaring station_id as PRIMARY KEY, we ensure every station is uniquely identifiable, while NOT NULL and DEFAULT guarantee predictable signaling queries.',
-    initialSqlPlaceholder: `-- Mission 1: Initialize BMRCL stations table\nCREATE TABLE stations (\n  \n);`,
+    initialSqlPlaceholder: `-- Mission 1: Initialize BMRCL stations table\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'TABLE_EXISTS',
@@ -139,7 +139,7 @@ export const METRO_MISSIONS: Mission[] = [
 );`,
     solutionExplanation:
       'The CHECK constraint is evaluated on every INSERT and UPDATE. If any transaction attempts to set balance_inr to a negative value, SQLite rejects the operation and throws a constraint failure, protecting transit revenue.',
-    initialSqlPlaceholder: `-- Mission 2: Create smart_cards ledger\nCREATE TABLE smart_cards (\n  \n);`,
+    initialSqlPlaceholder: `-- Mission 2: Create smart_cards ledger\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'TABLE_EXISTS',
@@ -244,7 +244,7 @@ export const METRO_MISSIONS: Mission[] = [
   (108, 'Test Terminal', 'Yellow', 'West', 15, 0, NULL, 'Closed');`,
     solutionExplanation:
       'Multi-row INSERT statements batch rows into a single atomic database operation, ensuring that station catalogs populate quickly with zero partial states.',
-    initialSqlPlaceholder: `-- Mission 3: Insert 8 flagship stations into stations\nINSERT INTO stations (\n  \n) VALUES \n  \n;`,
+    initialSqlPlaceholder: `-- Mission 3: Insert 8 flagship stations into stations\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_COUNT',
@@ -307,7 +307,7 @@ FROM stations
 ORDER BY daily_footfall DESC;`,
     solutionExplanation:
       'Column aliases improve report readability for non-technical stakeholders. ORDER BY with DESC prioritizes the highest footfall hubs (like Majestic at 85,000 daily commuters) at the top of the result set.',
-    initialSqlPlaceholder: `-- Mission 4: Query busiest hubs ranked by footfall\nSELECT \nFROM stations\n;`,
+    initialSqlPlaceholder: `-- Mission 4: Query busiest hubs ranked by footfall\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -354,7 +354,7 @@ WHERE line_color IN ('Purple', 'Yellow')
 ORDER BY base_fare_inr ASC;`,
     solutionExplanation:
       'The IN operator simplifies multi-value matching compared to chained OR clauses. BETWEEN provides an inclusive numerical range check, filtering stations whose standard ticket fare is between ₹25 and ₹50.',
-    initialSqlPlaceholder: `-- Mission 5: Corridor and fare range audit\nSELECT * FROM stations\nWHERE \n;`,
+    initialSqlPlaceholder: `-- Mission 5: Corridor and fare range audit\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -399,7 +399,7 @@ WHERE (parking_slots IS NULL OR station_name LIKE '%Road%')
   AND status = 'Operational';`,
     solutionExplanation:
       'IS NULL is the only reliable way to check for missing database values (as NULL = NULL is never true). Grouping the OR condition inside parentheses ensures the status = "Operational" check applies globally across the filter.',
-    initialSqlPlaceholder: `-- Mission 6: Feeder parking and road scan\nSELECT * FROM stations\nWHERE \n;`,
+    initialSqlPlaceholder: `-- Mission 6: Feeder parking and road scan\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -444,7 +444,7 @@ SET status = 'Operational', base_fare_inr = 45
 WHERE status = 'Under_Trial';`,
     solutionExplanation:
       'UPDATE modifies existing records in place. Specifying the target condition in the WHERE clause ensures only the station currently undergoing trials is updated, while all other records remain untouched.',
-    initialSqlPlaceholder: `-- Mission 7: Update station trial status and fare\nUPDATE stations\nSET \nWHERE \n;`,
+    initialSqlPlaceholder: `-- Mission 7: Update station trial status and fare\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_EXISTS',
@@ -499,7 +499,7 @@ WHERE status = 'Under_Trial';`,
 WHERE status = 'Closed';`,
     solutionExplanation:
       'DELETE removes rows matching the WHERE criteria. Without a WHERE clause, all rows in the table would be purged. Always audit target rows before running deletions on production transit databases.',
-    initialSqlPlaceholder: `-- Mission 8: Delete closed test stations\nDELETE FROM stations\nWHERE \n;`,
+    initialSqlPlaceholder: `-- Mission 8: Delete closed test stations\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_COUNT',
@@ -563,7 +563,7 @@ FROM stations;`,
 FROM stations;`,
     solutionExplanation:
       'Aggregate functions collapse multiple rows of operational data into compact executive metrics. BMRCL leadership can instantly assess daily ridership volume, ticket pricing averages, and peak station pressure in a single glance.',
-    initialSqlPlaceholder: `-- Mission 9: End-of-Day Executive Telemetry\nSELECT \nFROM stations;\n`,
+    initialSqlPlaceholder: `-- Mission 9: End-of-Day Executive Telemetry\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',

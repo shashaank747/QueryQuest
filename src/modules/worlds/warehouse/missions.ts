@@ -32,7 +32,7 @@ JOIN products p ON b.product_id = p.product_id
 WHERE b.quantity >= b.max_capacity;`,
     solutionExplanation:
       'An INNER JOIN combines rows from two tables whenever the ON predicate evaluates to true. Linking inventory_bins to products by product_id bridges low-level storage telemetry with descriptive product names.',
-    initialSqlPlaceholder: `-- Mission 1: First Discovery of Relational INNER JOIN\nSELECT b.bin_code, p.product_name, b.quantity, b.max_capacity\nFROM inventory_bins b\nJOIN products p ON ...\nWHERE ...;`,
+    initialSqlPlaceholder: `-- Mission 1: First Discovery of Relational INNER JOIN\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -82,7 +82,7 @@ WHERE z.temp_controlled = 1
 ORDER BY b.quantity DESC;`,
     solutionExplanation:
       'Multi-table relational queries traverse intermediate bridge tables (inventory_bins) to connect domain entities (products) with facility environments (zones), ensuring strict cold-chain compliance.',
-    initialSqlPlaceholder: `-- Mission 2: Multi-table join across products, bins, and zones\nSELECT p.sku, p.product_name, b.bin_code, b.quantity, z.zone_name\nFROM products p\nJOIN inventory_bins b ON ...\nJOIN zones z ON ...\nWHERE z.temp_controlled = 1\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 2: Multi-table join across products, bins, and zones\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -128,7 +128,7 @@ FROM warehouses w
 LEFT JOIN zones z ON w.warehouse_id = z.warehouse_id;`,
     solutionExplanation:
       'LEFT JOIN preserves all rows from the primary left table (warehouses) regardless of whether a matching record exists in the right table (zones). If a warehouse has no zones, zone columns return NULL instead of dropping the facility from the report.',
-    initialSqlPlaceholder: `-- Mission 3: Warehouse zone distribution with LEFT JOIN\nSELECT w.warehouse_name, w.location, z.zone_name\nFROM warehouses w\nLEFT JOIN zones z ON ...;`,
+    initialSqlPlaceholder: `-- Mission 3: Warehouse zone distribution with LEFT JOIN\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -174,7 +174,7 @@ LEFT JOIN zones z ON w.warehouse_id = z.warehouse_id;`,
 FROM inventory_bins;`,
     solutionExplanation:
       'The CASE expression provides powerful conditional logic inside SQL queries, transforming continuous quantitative metrics into standardized operational categories for decision-makers.',
-    initialSqlPlaceholder: `-- Mission 4: Categorize bin fill levels with CASE WHEN\nSELECT bin_code, quantity, max_capacity,\n  CASE\n    WHEN ... THEN 'Full'\n    WHEN ... THEN 'Optimal'\n    ELSE 'Underutilized'\n  END AS fill_level\nFROM inventory_bins;`,
+    initialSqlPlaceholder: `-- Mission 4: Categorize bin fill levels with CASE WHEN\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -218,7 +218,7 @@ HAVING total_pallets > 15
 ORDER BY total_pallets DESC;`,
     solutionExplanation:
       'The HAVING clause filters aggregated groups after the GROUP BY reduction occurs, enabling procurement analysts to isolate top-tier commercial logistics providers.',
-    initialSqlPlaceholder: `-- Mission 5: Carrier freight volume summary with HAVING\nSELECT carrier, COUNT(shipment_id) AS total_shipments, SUM(pallet_count) AS total_pallets\nFROM shipments\nGROUP BY carrier\nHAVING ...\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 5: Carrier freight volume summary with HAVING\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -269,7 +269,7 @@ HAVING total_stock > 50
 ORDER BY total_stock DESC;`,
     solutionExplanation:
       'Combining multi-table relational JOINs with GROUP BY and HAVING filters produces executive-level capacity summaries, unifying physical geography with live stock telemetry.',
-    initialSqlPlaceholder: `-- Mission 6: Zone capacity reconciliation with HAVING\nSELECT z.zone_name, SUM(b.quantity) AS total_stock\nFROM zones z\nJOIN inventory_bins b ON ...\nGROUP BY z.zone_name\nHAVING total_stock > 50\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 6: Zone capacity reconciliation with HAVING\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',

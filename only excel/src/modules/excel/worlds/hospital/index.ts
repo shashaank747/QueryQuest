@@ -104,7 +104,7 @@ export const hospitalWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(D2:D8)',
       solutionExplanation:
         '=SUM(D2:D8) aggregates censuses across all 7 hospital wards, returning 316 total inpatients.',
-      initialFormulaPlaceholder: '=SUM(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -154,7 +154,7 @@ export const hospitalWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=D2/C2',
       solutionExplanation:
         '=D2/C2 divides 36 inpatients by 40 licensed beds, calculating 0.90 (90% bed occupancy).',
-      initialFormulaPlaceholder: '=D2/',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'EXACT_FORMULA',
@@ -200,7 +200,7 @@ export const hospitalWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=IF(E2>=0.85, "NEAR CAPACITY", "AVAILABLE")',
       solutionExplanation:
         'Because ICU occupancy E2 is 0.90 (>= 0.85), the IF formula triggers "NEAR CAPACITY".',
-      initialFormulaPlaceholder: '=IF(E2>=0.85, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -250,7 +250,7 @@ export const hospitalWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=D2/G2',
       solutionExplanation:
         '=D2/G2 divides 36 patients by 18 nurses, resulting in a 2:1 staffing ratio for ICU.',
-      initialFormulaPlaceholder: '=D2/',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'EXACT_FORMULA',
@@ -296,7 +296,7 @@ export const hospitalWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=AVERAGE(E2:E8)',
       solutionExplanation:
         '=AVERAGE(E2:E8) computes the mean occupancy across 7 wards as 82.86%.',
-      initialFormulaPlaceholder: '=AVERAGE(E2:E8)',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -342,7 +342,7 @@ export const hospitalWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=XLOOKUP(I2, A2:A8, D2:D8)',
       solutionExplanation:
         '=XLOOKUP(I2, A2:A8, D2:D8) matches "Intensive Care Unit (ICU)" and returns 36 inpatients.',
-      initialFormulaPlaceholder: '=XLOOKUP(I2, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_MATCH',

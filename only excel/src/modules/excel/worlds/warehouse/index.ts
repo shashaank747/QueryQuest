@@ -103,7 +103,7 @@ export const warehouseWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=C2-D2',
       solutionExplanation:
         '=C2-D2 calculates 600 - 540 = 60 free bin locations remaining in Zone A1.',
-      initialFormulaPlaceholder: '=C2-',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'EXACT_FORMULA',
@@ -148,7 +148,7 @@ export const warehouseWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(D2:D9)',
       solutionExplanation:
         '=SUM(D2:D9) consolidates total inventory across all 8 zones to 2,990 occupied pallet spaces.',
-      initialFormulaPlaceholder: '=SUM(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -198,7 +198,7 @@ export const warehouseWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=D2/C2',
       solutionExplanation:
         '=D2/C2 divides 540 by 600, yielding 0.90 (or 90% utilization).',
-      initialFormulaPlaceholder: '=D2/',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'EXACT_FORMULA',
@@ -244,7 +244,7 @@ export const warehouseWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=IF(F2>=0.9, "CRITICAL", "NORMAL")',
       solutionExplanation:
         'Zone A1 operates at 90% (0.90), meeting the >=0.9 threshold and returning "CRITICAL".',
-      initialFormulaPlaceholder: '=IF(F2>=0.9, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -294,7 +294,7 @@ export const warehouseWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=COUNTIF(C2:C9, ">500")',
       solutionExplanation:
         '=COUNTIF(C2:C9, ">500") identifies the 2 zones exceeding 500 bins: Zone A1 (600) and Zone C1 (750).',
-      initialFormulaPlaceholder: '=COUNTIF(C2:C9, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -339,7 +339,7 @@ export const warehouseWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(H2:H9)',
       solutionExplanation:
         '=SUM(H2:H9) sums freight across all zones to 82,000 kg (82 Metric Tonnes).',
-      initialFormulaPlaceholder: '=SUM(H2:H9)',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',

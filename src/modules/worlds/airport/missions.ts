@@ -32,7 +32,7 @@ JOIN airlines a ON f.airline_id = a.airline_id
 WHERE f.status = 'Delayed';`,
     solutionExplanation:
       'An INNER JOIN matches records between two tables whenever their join condition evaluates to true. Joining flights with airlines on airline_id pairs each flight with its carrier brand, enabling targeted delay triage.',
-    initialSqlPlaceholder: `-- Mission 1: First Relational INNER JOIN\n-- Link delayed flights to their operating airline names\nSELECT f.flight_number, a.airline_name, f.destination, f.status\nFROM flights f\nJOIN airlines a ON ...\nWHERE f.status = 'Delayed';`,
+    initialSqlPlaceholder: `-- Mission 1: First Relational INNER JOIN\n-- Link delayed flights to their operating airline names\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -79,7 +79,7 @@ JOIN gates g ON f.gate_id = g.gate_id
 JOIN terminals t ON g.terminal_id = t.terminal_id;`,
     solutionExplanation:
       'Relational databases normalize data across separate entity tables to avoid redundancy. Chaining multiple JOINs reconstructs full operational contexts (flights -> gates -> terminals) without data duplication.',
-    initialSqlPlaceholder: `-- Mission 2: Multi-Table Relational Chain\n-- Map flights to physical gates and terminal names\nSELECT f.flight_number, t.terminal_name, g.gate_number, f.destination, f.status\nFROM flights f\nJOIN gates g ON ...\nJOIN terminals t ON ...;`,
+    initialSqlPlaceholder: `-- Mission 2: Multi-Table Relational Chain\n-- Map flights to physical gates and terminal names\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -126,7 +126,7 @@ LEFT JOIN flights f ON g.gate_id = f.gate_id
 WHERE f.flight_id IS NULL;`,
     solutionExplanation:
       'A LEFT OUTER JOIN retains all records from the left table (gates), populating right-table columns with NULL when no match exists. Filtering on `WHERE f.flight_id IS NULL` is the canonical SQL anti-join pattern for detecting unused resources.',
-    initialSqlPlaceholder: `-- Mission 3: Unmatched Record Detection with LEFT JOIN\n-- Find gates that have no active flights assigned\nSELECT g.gate_id, g.gate_number, g.status\nFROM gates g\nLEFT JOIN flights f ON ...\nWHERE f.flight_id IS NULL;`,
+    initialSqlPlaceholder: `-- Mission 3: Unmatched Record Detection with LEFT JOIN\n-- Find gates that have no active flights assigned\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -172,7 +172,7 @@ WHERE f.flight_id IS NULL;`,
 FROM flights;`,
     solutionExplanation:
       'The CASE statement brings branching conditional logic into SQL queries. Evaluating passenger thresholds into discrete labels transforms continuous operational metrics into actionable categories.',
-    initialSqlPlaceholder: `-- Mission 4: Conditional Logic with CASE WHEN\n-- Classify flights into capacity tiers\nSELECT flight_number, destination, passenger_count,\n  CASE\n    WHEN passenger_count >= 250 THEN 'Heavy'\n    WHEN ...\n    ELSE 'Light'\n  END AS capacity_tier\nFROM flights;`,
+    initialSqlPlaceholder: `-- Mission 4: Conditional Logic with CASE WHEN\n-- Classify flights into capacity tiers\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -215,7 +215,7 @@ WHERE b.weight_kg > 25.0
 ORDER BY b.weight_kg DESC;`,
     solutionExplanation:
       'Relational JOINs bridge passenger baggage records with flight routes, giving ramp operations direct visibility into cargo loading distribution.',
-    initialSqlPlaceholder: `-- Mission 5: Join flights and baggage for heavy luggage\nSELECT f.flight_number, f.destination, b.passenger_name, b.weight_kg\nFROM flights f\nJOIN baggage b ON ...\nWHERE b.weight_kg > 25.0\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 5: Join flights and baggage for heavy luggage\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -263,7 +263,7 @@ HAVING total_passengers > 500
 ORDER BY total_passengers DESC;`,
     solutionExplanation:
       'Multi-table aggregations combined with HAVING allow filtering on grouped metric calculations (unlike WHERE which filters individual rows before aggregation). This extracts exactly the high-capacity hubs required for infrastructure planning.',
-    initialSqlPlaceholder: `-- Mission 6: Multi-table terminal throughput summary with HAVING\nSELECT t.terminal_name, COUNT(f.flight_id) AS total_flights, SUM(f.passenger_count) AS total_passengers\nFROM terminals t\nJOIN gates g ON ...\nJOIN flights f ON ...\nGROUP BY t.terminal_name\nHAVING ...\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 6: Multi-table terminal throughput summary with HAVING\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',

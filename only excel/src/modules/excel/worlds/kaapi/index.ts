@@ -103,7 +103,7 @@ export const kaapiWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(D2:D9)',
       solutionExplanation:
         '=SUM(D2:D9) totals all units sold across all 8 menu items, giving 595 total portions.',
-      initialFormulaPlaceholder: '=SUM(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -153,7 +153,7 @@ export const kaapiWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=AVERAGE(E2:E9)',
       solutionExplanation:
         '=AVERAGE(E2:E9) sums all dish prices (₹385) and divides by 8 items, giving an average price of ₹48.125.',
-      initialFormulaPlaceholder: '=AVERAGE(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -199,7 +199,7 @@ export const kaapiWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=D2*E2',
       solutionExplanation:
         '=D2*E2 multiplies 145 cups of coffee by ₹30 per cup to generate ₹4,350 in coffee revenue.',
-      initialFormulaPlaceholder: '=D2*',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'EXACT_FORMULA',
@@ -244,7 +244,7 @@ export const kaapiWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=IF(D2>=80, "STAR", "REGULAR")',
       solutionExplanation:
         'Since D2 is 145 (>= 80), the IF statement evaluates to TRUE, tagging Degree Filter Kaapi as a "STAR" item.',
-      initialFormulaPlaceholder: '=IF(D2>=80, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -294,7 +294,7 @@ export const kaapiWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(F2:F9)',
       solutionExplanation:
         '=SUM(F2:F9) aggregates all morning menu item sales to ₹27,225 total revenue.',
-      initialFormulaPlaceholder: '=SUM(F2:F9)',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -339,7 +339,7 @@ export const kaapiWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=COUNTIF(G2:G9, "STAR")',
       solutionExplanation:
         '=COUNTIF(G2:G9, "STAR") counts the 4 popular items with >= 80 portions sold (Filter Kaapi, Masala Dosa, Button Idli, Medu Vada).',
-      initialFormulaPlaceholder: '=COUNTIF(G2:G9, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',

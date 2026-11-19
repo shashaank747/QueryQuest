@@ -52,7 +52,7 @@ export const KAAPI_MISSIONS: Mission[] = [
 );`,
     solutionExplanation:
       'Relational schemas enforce operational rules. Declaring item_id as PRIMARY KEY ensures each menu SKU is distinct. DEFAULT clauses ensure newly entered seasonal specials automatically default to Mild spice and Available status without tedious manual inputs.',
-    initialSqlPlaceholder: `-- Mission 1: Initialize menu_items table\nCREATE TABLE menu_items (\n  \n);`,
+    initialSqlPlaceholder: `-- Mission 1: Initialize menu_items table\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'TABLE_EXISTS',
@@ -119,7 +119,7 @@ export const KAAPI_MISSIONS: Mission[] = [
 );`,
     solutionExplanation:
       'The CHECK constraint acts as a database-level firewall. Any checkout attempt attempting to decrement cups_left below zero immediately triggers a constraint violation, ensuring the brass-tumbler kaapi credits remain strictly balanced.',
-    initialSqlPlaceholder: `-- Mission 2: Create kaapi_passes ledger\nCREATE TABLE kaapi_passes (\n  \n);`,
+    initialSqlPlaceholder: `-- Mission 2: Create kaapi_passes ledger\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'TABLE_EXISTS',
@@ -203,7 +203,7 @@ export const KAAPI_MISSIONS: Mission[] = [
   (308, 'Rava Onion Dosa', 'Dosa', 'Medium', 75, 0, 380, 'Discontinued');`,
     solutionExplanation:
       'Multi-row batch insertions populate the menu inventory atomically. The NULL keyword accurately denotes missing nutrition laboratory data for freshly created culinary specials.',
-    initialSqlPlaceholder: `-- Mission 3: Stock 8 items into menu_items\nINSERT INTO menu_items (\n  \n) VALUES \n  \n;`,
+    initialSqlPlaceholder: `-- Mission 3: Stock 8 items into menu_items\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_COUNT',
@@ -266,7 +266,7 @@ FROM menu_items
 ORDER BY orders_today DESC;`,
     solutionExplanation:
       'Column aliases like dish_name and plates_served transform raw internal database column identifiers into clear, user-facing headings suitable for POS digital menu boards.',
-    initialSqlPlaceholder: `-- Mission 4: Query best-selling dishes ranked by orders\nSELECT \nFROM menu_items\n;`,
+    initialSqlPlaceholder: `-- Mission 4: Query best-selling dishes ranked by orders\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -313,7 +313,7 @@ WHERE category IN ('Idli_Vada', 'Kaapi')
 ORDER BY price_inr ASC;`,
     solutionExplanation:
       'Combining the IN operator with BETWEEN allows precise filtering across multiple categorical dimensions and numerical ranges in a clean, readable syntax.',
-    initialSqlPlaceholder: `-- Mission 5: Filter express tiffin and coffee items\nSELECT * FROM menu_items\nWHERE \n;`,
+    initialSqlPlaceholder: `-- Mission 5: Filter express tiffin and coffee items\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -358,7 +358,7 @@ WHERE (item_name LIKE '%Dosa%' OR calories IS NULL)
   AND status != 'Discontinued';`,
     solutionExplanation:
       'Parenthesizing the OR condition guarantees that the exclusion of discontinued items (status != "Discontinued") applies uniformly across both dosa varieties and null-calorie specials.',
-    initialSqlPlaceholder: `-- Mission 6: Dosa lineup and missing calories audit\nSELECT * FROM menu_items\nWHERE \n;`,
+    initialSqlPlaceholder: `-- Mission 6: Dosa lineup and missing calories audit\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -403,7 +403,7 @@ SET status = 'Available', price_inr = 65
 WHERE status = 'Seasonal';`,
     solutionExplanation:
       'UPDATE modifies existing records in place. Specifying the target condition in the WHERE clause ensures only seasonal specials are activated, preserving the integrity of all other menu items.',
-    initialSqlPlaceholder: `-- Mission 7: Activate seasonal Karupatti Kaapi\nUPDATE menu_items\nSET \nWHERE \n;`,
+    initialSqlPlaceholder: `-- Mission 7: Activate seasonal Karupatti Kaapi\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_EXISTS',
@@ -452,7 +452,7 @@ WHERE status = 'Seasonal';`,
 WHERE status = 'Discontinued';`,
     solutionExplanation:
       'DELETE physically purges obsolete or deprecated records from relational tables. Running targeted deletions keeps billing screen menus crisp and eliminates erroneous order submissions.',
-    initialSqlPlaceholder: `-- Mission 8: Delete discontinued items\nDELETE FROM menu_items\nWHERE \n;`,
+    initialSqlPlaceholder: `-- Mission 8: Delete discontinued items\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_COUNT',
@@ -516,7 +516,7 @@ FROM menu_items;`,
 FROM menu_items;`,
     solutionExplanation:
       'Single-table aggregations distill thousands of register events into essential operational intelligence. Chef Suresh can instantly evaluate breakfast footfall, average item price, and peak order demand in a single glance.',
-    initialSqlPlaceholder: `-- Mission 9: Morning Shift Closing Register\nSELECT \nFROM menu_items;\n`,
+    initialSqlPlaceholder: `-- Mission 9: Morning Shift Closing Register\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',

@@ -32,14 +32,7 @@ WHERE a.balance > (SELECT AVG(balance) FROM accounts WHERE account_type = a.acco
 ORDER BY a.balance DESC;`,
     solutionExplanation:
       'A correlated subquery depends on the outer query for its values—here, account_type = a.account_type. For every account evaluated by SQLite, the subquery calculates the dynamic average balance for that specific account tier (Savings, Checking, or Commercial) and returns only those accounts outperforming their peer group average.',
-    initialSqlPlaceholder: `-- Mission 1: Correlated subquery for peer-group balance outliers
-SELECT a.account_number, a.customer_name, a.account_type, a.balance
-FROM accounts a
-WHERE a.balance > (
-  -- Correlated subquery computing AVG(balance) per account_type
-  
-)
-ORDER BY a.balance DESC;`,
+    initialSqlPlaceholder: `-- Mission 1: Correlated subquery for peer-group balance outliers\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -92,16 +85,7 @@ JOIN transactions t ON hva.account_id = t.account_id
 ORDER BY t.amount DESC;`,
     solutionExplanation:
       'Common Table Expressions (CTEs) define clean temporary result sets before the main SELECT query runs. Here, HighValueAccounts encapsulates the ₹10M balance filter, allowing the main query to join directly against transactions cleanly.',
-    initialSqlPlaceholder: `-- Mission 2: Common Table Expression for Tier-1 accounts
-WITH HighValueAccounts AS (
-  SELECT account_id, account_number, customer_name, balance
-  FROM accounts
-  WHERE balance >= 10000000.0
-)
-SELECT hva.customer_name, hva.account_number, hva.balance, t.txn_type, t.amount
-FROM HighValueAccounts hva
-JOIN transactions t ON hva.account_id = t.account_id
-ORDER BY t.amount DESC;`,
+    initialSqlPlaceholder: `-- Mission 2: Common Table Expression for Tier-1 accounts\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -149,11 +133,7 @@ FROM transactions
 ORDER BY account_id, txn_timestamp;`,
     solutionExplanation:
       'The SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) window function divides rows into independent partitions per account and calculates a cumulative sum chronologically up to each row, preserving every single transaction in the output.',
-    initialSqlPlaceholder: `-- Mission 3: Cumulative running total per account using SUM() OVER
-SELECT transaction_id, account_id, txn_type, amount, txn_timestamp,
-       SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS running_total
-FROM transactions
-ORDER BY account_id, txn_timestamp;`,
+    initialSqlPlaceholder: `-- Mission 3: Cumulative running total per account using SUM() OVER\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -201,11 +181,7 @@ FROM transactions
 ORDER BY account_id, txn_timestamp;`,
     solutionExplanation:
       'The LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) analytical function evaluates each account partition chronologically and retrieves the amount from the previous row. If no prior transaction exists for an account, it returns NULL.',
-    initialSqlPlaceholder: `-- Mission 4: Retrieve previous transaction amount using LAG() OVER
-SELECT transaction_id, account_id, txn_type, amount, txn_timestamp,
-       LAG(amount) OVER (PARTITION BY account_id ORDER BY txn_timestamp) AS prev_amount
-FROM transactions
-ORDER BY account_id, txn_timestamp;`,
+    initialSqlPlaceholder: `-- Mission 4: Retrieve previous transaction amount using LAG() OVER\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -253,11 +229,7 @@ FROM accounts
 ORDER BY branch_id, branch_rank;`,
     solutionExplanation:
       'The DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) window function groups accounts by branch_id, ranks accounts in descending order of balance within each branch, and ensures rank numbers increase without gaps.',
-    initialSqlPlaceholder: `-- Mission 5: Partitioned account ranking using DENSE_RANK() OVER
-SELECT account_number, customer_name, branch_id, balance,
-       DENSE_RANK() OVER (PARTITION BY branch_id ORDER BY balance DESC) AS branch_rank
-FROM accounts
-ORDER BY branch_id, branch_rank;`,
+    initialSqlPlaceholder: `-- Mission 5: Partitioned account ranking using DENSE_RANK() OVER\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -312,20 +284,7 @@ VALUES (2, 'TRANSFER', 50000.0, '2026-11-16 16:00:00', 'Internal Transfer');
 COMMIT;`,
     solutionExplanation:
       'ACID transactions (Atomicity, Consistency, Isolation, Durability) ensure that all constituent statements either succeed together or leave the database completely unchanged upon failure. Wrapping the debit, credit, and journal log in a transaction protects against partial updates.',
-    initialSqlPlaceholder: `-- Mission 6: Atomic funds transfer between Account 2 and Account 4
-BEGIN TRANSACTION;
-
--- 1. Debit ₹50,000 from Account 2
-UPDATE accounts SET balance = balance - 50000.0 WHERE account_id = 2;
-
--- 2. Credit ₹50,000 to Account 4
-UPDATE accounts SET balance = balance + 50000.0 WHERE account_id = 4;
-
--- 3. Log internal transfer transaction record
-INSERT INTO transactions (account_id, txn_type, amount, txn_timestamp, channel)
-VALUES (2, 'TRANSFER', 50000.0, '2026-11-16 16:00:00', 'Internal Transfer');
-
-COMMIT;`,
+    initialSqlPlaceholder: `-- Mission 6: Atomic funds transfer between Account 2 and Account 4\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_EXISTS',

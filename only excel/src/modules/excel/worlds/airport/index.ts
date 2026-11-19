@@ -105,7 +105,7 @@ export const airportWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(D2:D9)',
       solutionExplanation:
         '=SUM(D2:D9) adds all 8 flight manifests to yield 1,960 total arriving passengers.',
-      initialFormulaPlaceholder: '=SUM(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -155,7 +155,7 @@ export const airportWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=AVERAGE(E2:E9)',
       solutionExplanation:
         '=AVERAGE(E2:E9) computes the average aircraft turnaround across 8 gates as 53.75 minutes.',
-      initialFormulaPlaceholder: '=AVERAGE(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -201,7 +201,7 @@ export const airportWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=IF(F2>15, "DELAYED", "ON-TIME")',
       solutionExplanation:
         'Air India flight AI-502 has 35 minutes delay, which exceeds 15, returning "DELAYED".',
-      initialFormulaPlaceholder: '=IF(F2>15, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -246,7 +246,7 @@ export const airportWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=COUNTIF(G2:G9, "DELAYED")',
       solutionExplanation:
         '=COUNTIF(G2:G9, "DELAYED") counts 4 delayed flights (AI-502, UK-815, EK-568, BA-118).',
-      initialFormulaPlaceholder: '=COUNTIF(G2:G9, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -296,7 +296,7 @@ export const airportWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=XLOOKUP(H2, A2:A9, C2:C9)',
       solutionExplanation:
         '=XLOOKUP(H2, A2:A9, C2:C9) searches for "AI-502" in the flight list and retrieves the corresponding "Gate A3".',
-      initialFormulaPlaceholder: '=XLOOKUP(H2, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_MATCH',
@@ -346,7 +346,7 @@ export const airportWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=MAX(F2:F9)',
       solutionExplanation:
         '=MAX(F2:F9) identifies the longest tarmac delay of 60 minutes (British Airways BA-118).',
-      initialFormulaPlaceholder: '=MAX(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',

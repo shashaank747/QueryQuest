@@ -105,7 +105,7 @@ export const metroWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(D2:D9)',
       solutionExplanation:
         '=SUM(D2:D9) aggregates daily passenger numbers from all 8 stations, returning 340,000 daily commuters.',
-      initialFormulaPlaceholder: '=SUM(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -155,7 +155,7 @@ export const metroWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=AVERAGE(E2:E9)',
       solutionExplanation:
         '=AVERAGE(E2:E9) totals the peak footfalls (97,000) and divides by 8 stations, resulting in 12,125 commuters per station.',
-      initialFormulaPlaceholder: '=AVERAGE(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -201,7 +201,7 @@ export const metroWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=G2-H2',
       solutionExplanation:
         '=G2-H2 calculates 450 - 420 = 30 parking bays remaining at Majestic.',
-      initialFormulaPlaceholder: '=G2-',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'EXACT_FORMULA',
@@ -246,7 +246,7 @@ export const metroWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=COUNTIF(E2:E9, ">10000")',
       solutionExplanation:
         '=COUNTIF(E2:E9, ">10000") identifies the 5 high-density stations: Majestic (18.5k), Whitefield (16k), Baiyappanahalli (14.2k), MG Road (12k), and Indiranagar (11.5k).',
-      initialFormulaPlaceholder: '=COUNTIF(E2:E9, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -296,7 +296,7 @@ export const metroWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=AVERAGE(F2:F9)',
       solutionExplanation:
         '=AVERAGE(F2:F9) computes the arithmetic mean of fares (₹263 / 8 stations = ₹32.875).',
-      initialFormulaPlaceholder: '=AVERAGE(F2:F9)',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -342,7 +342,7 @@ export const metroWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(J2:J9)',
       solutionExplanation:
         '=SUM(J2:J9) consolidates all station revenues to ₹11,466,000 (₹1.146 Crore).',
-      initialFormulaPlaceholder: '=SUM(J2:J9)',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',

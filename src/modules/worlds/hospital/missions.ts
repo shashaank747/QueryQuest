@@ -30,7 +30,7 @@ FROM wards
 WHERE occupied_beds > (SELECT AVG(occupied_beds) FROM wards);`,
     solutionExplanation:
       'Scalar subqueries evaluate to a single atomic value, enabling dynamic comparisons against dataset-wide aggregates without hardcoding changing numbers.',
-    initialSqlPlaceholder: `-- Mission 1: Scalar subquery for wards with above-average occupied beds\nSELECT ward_name, ward_type, total_beds, occupied_beds\nFROM wards\nWHERE occupied_beds > (\n  \n);`,
+    initialSqlPlaceholder: `-- Mission 1: Scalar subquery for wards with above-average occupied beds\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -76,7 +76,7 @@ WHERE EXISTS (
 );`,
     solutionExplanation:
       'Correlated subqueries with EXISTS evaluate per-row conditions in the outer query, returning TRUE immediately upon encountering the first matching record for optimal query performance.',
-    initialSqlPlaceholder: `-- Mission 2: Correlated subquery with EXISTS for ICU attending doctors\nSELECT d.doctor_id, d.first_name, d.last_name, d.specialty\nFROM doctors d\nWHERE EXISTS (\n  SELECT 1 FROM admissions a\n  WHERE ...\n);`,
+    initialSqlPlaceholder: `-- Mission 2: Correlated subquery with EXISTS for ICU attending doctors\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -132,7 +132,7 @@ WHERE occupancy_rate >= 80.0
 ORDER BY occupancy_rate DESC;`,
     solutionExplanation:
       'Common Table Expressions (WITH clauses) improve query modularity and readability by structuring intermediate calculations into named logical blocks before final filtering and ordering.',
-    initialSqlPlaceholder: `-- Mission 3: CTE for wards with occupancy rate >= 80%\nWITH WardStats AS (\n  SELECT \n    ward_name, total_beds, occupied_beds, ROUND((CAST(occupied_beds AS REAL) / total_beds) * 100.0, 2) AS occupancy_rate\n  FROM wards\n)\nSELECT ward_name, total_beds, occupied_beds, occupancy_rate\nFROM WardStats\nWHERE ...\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 3: CTE for wards with occupancy rate >= 80%\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -175,7 +175,7 @@ FROM wards
 ORDER BY occupancy_rank ASC;`,
     solutionExplanation:
       'The DENSE_RANK() window function assigns consecutive ranks without gaps, providing clean and standardized operational tiering across hospital infrastructure.',
-    initialSqlPlaceholder: `-- Mission 4: Window function ranking of wards by occupied beds\nSELECT ward_name, ward_type, occupied_beds,\n       DENSE_RANK() OVER (ORDER BY occupied_beds DESC) AS occupancy_rank\nFROM wards\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 4: Window function ranking of wards by occupied beds\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -218,7 +218,7 @@ FROM admissions
 ORDER BY admission_date ASC;`,
     solutionExplanation:
       'LAG() provides seamless access to the previous row within a partitioned or ordered window, allowing healthcare analysts to calculate admission velocity and triage spacing.',
-    initialSqlPlaceholder: `-- Mission 5: Window function LAG for admission date progression\nSELECT admission_id, patient_id, admission_date,\n       LAG(admission_date) OVER (ORDER BY admission_date) AS prev_admission_date\nFROM admissions\nORDER BY ...;`,
+    initialSqlPlaceholder: `-- Mission 5: Window function LAG for admission date progression\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'SELECT_EXACT',
@@ -265,7 +265,7 @@ WHERE ward_id = 1;
 COMMIT;`,
     solutionExplanation:
       'ACID transactions preserve relational invariants across multiple related tables. Wrapping dual updates in a transaction guarantees that hospital census and admission ledgers remain perfectly synchronized without risk of partial writes.',
-    initialSqlPlaceholder: `-- Mission 6: ACID transaction for atomic discharge and bed reclaim\nBEGIN TRANSACTION;\nUPDATE admissions\nSET status = 'Discharged', discharge_date = '2026-11-16'\nWHERE admission_id = 101;\nUPDATE wards\nSET occupied_beds = occupied_beds - 1\nWHERE ward_id = 1;\nCOMMIT;`,
+    initialSqlPlaceholder: `-- Mission 6: ACID transaction for atomic discharge and bed reclaim\n-- Write your SQL query below\n`,
     validationRules: [
       {
         type: 'ROW_EXISTS',

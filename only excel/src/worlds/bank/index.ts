@@ -105,7 +105,7 @@ export const bankWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=D2-E2',
       solutionExplanation:
         '=D2-E2 subtracts ₹0 withdrawal from ₹450,000 deposit, resulting in ₹450,000 net inflow.',
-      initialFormulaPlaceholder: '=D2-',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'EXACT_FORMULA',
@@ -150,7 +150,7 @@ export const bankWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(D2:D10)',
       solutionExplanation:
         '=SUM(D2:D10) totals all 9 deposits to ₹1,335,000 (₹13.35 Lakhs).',
-      initialFormulaPlaceholder: '=SUM(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -200,7 +200,7 @@ export const bankWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=SUM(E2:E10)',
       solutionExplanation:
         '=SUM(E2:E10) consolidates all withdrawals across ATMs and branches to ₹60,000.',
-      initialFormulaPlaceholder: '=SUM(',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -245,7 +245,7 @@ export const bankWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=IF(D2>200000, "FLAGGED", "CLEARED")',
       solutionExplanation:
         'Because D2 is ₹450,000 (> ₹200,000), the formula returns "FLAGGED".',
-      initialFormulaPlaceholder: '=IF(D2>200000, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -295,7 +295,7 @@ export const bankWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=COUNTIF(G2:G10, "FLAGGED")',
       solutionExplanation:
         '=COUNTIF(G2:G10, "FLAGGED") counts 3 corporate high-value deposits (TXN-901, TXN-903, TXN-905).',
-      initialFormulaPlaceholder: '=COUNTIF(G2:G10, ',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
@@ -340,7 +340,7 @@ export const bankWorld: ExcelWorldDefinition = {
       sampleSolutionFormula: '=AVERAGE(D2:D10)',
       solutionExplanation:
         '=AVERAGE(D2:D10) divides total deposits (₹1,335,000) by 9 transactions, yielding ₹148,333.33.',
-      initialFormulaPlaceholder: '=AVERAGE(D2:D10)',
+      initialFormulaPlaceholder: '=',
       validationRules: [
         {
           type: 'FORMULA_CONTAINS',
